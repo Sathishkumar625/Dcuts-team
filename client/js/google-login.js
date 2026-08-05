@@ -140,7 +140,7 @@ if(role==="admin"){
 
 
 
-window.location.href="dashboard.html";
+window.location.href="index.html";
 
 
 
@@ -149,7 +149,7 @@ window.location.href="dashboard.html";
 else{
 
 
-window.location.href="timesheet.html";
+window.location.href="pages/timesheet.html";
 
 
 }

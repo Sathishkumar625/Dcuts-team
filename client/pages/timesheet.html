@@ -32,9 +32,15 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
 
 <body>
+<script src="../js/auth.js"></script>
 
+<script>
+const role = localStorage.getItem("role");
 
-
+if(!role){
+    window.location.href = "../login.html";
+}
+</script>
 <div id="navbar-container"></div>
 
 

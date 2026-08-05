@@ -17,7 +17,18 @@
 </head>
 
 <body>
+    <script src="../js/auth.js"></script>
+<script>
+const role = localStorage.getItem("role");
 
+if(!role){
+    window.location.href="../login.html";
+}
+
+if(role!=="admin"){
+    window.location.href="timesheet.html";
+}
+</script>
 <!-- ================= NAVBAR ================= -->
 
 <nav class="navbar">
