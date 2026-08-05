@@ -205,27 +205,40 @@ return;
 
 
 
-let newTimesheet = {
 
-    id: Date.now(),
 
-    employee: employee,
+let newTimesheet={
 
-    date: date,
 
-    project: project,
 
-    task: tasks.map(t => t.task).join(", "),
+id:Date.now(),
 
-    hours: tasks.reduce((total, t) => total + Number(t.hours || 0), 0),
 
-    tasks: tasks,
 
-    comments: comments,
+employee:employee,
 
-    createdAt: new Date()
+
+
+date:date,
+
+
+
+project:project,
+
+
+
+tasks:tasks,
+
+
+
+comments:comments,
+
+
+
+createdAt:new Date()
 
 };
+
 
 
 
@@ -301,6 +314,7 @@ return;
 
 
 table.innerHTML="";
+
 
 
 

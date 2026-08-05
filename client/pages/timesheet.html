@@ -1,243 +1,421 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Timesheet | THE D CUTS</title>
+<meta charset="UTF-8">
 
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/timesheet.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<title>
+Timesheet | THE D CUTS
+</title>
+
+
+
+<link rel="stylesheet" href="../css/style.css">
+
+<link rel="stylesheet" href="../css/timesheet.css">
+
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
 
 </head>
 
+
+
 <body>
 
-<!-- ================= NAVBAR ================= -->
 
-<nav class="navbar">
 
-    <div class="logo">
+<div id="navbar-container"></div>
 
-        <div class="logo-icon">
-            <i class="fa-regular fa-clock"></i>
-        </div>
 
-        <h2>DCUTS.TS</h2>
 
-    </div>
 
-    <ul class="menu">
 
-        <li>
-            <a href="../index.html">
-                <i class="fa-solid fa-house"></i>
-                Home
-            </a>
-        </li>
-
-        <li>
-            <a href="dashboard.html">
-                <i class="fa-solid fa-table-columns"></i>
-                Dashboard
-            </a>
-        </li>
-
-        <li class="active">
-            <a href="timesheet.html">
-                <i class="fa-regular fa-clock"></i>
-                Timesheet
-            </a>
-        </li>
-
-        <li>
-            <a href="reports.html">
-                <i class="fa-regular fa-file-lines"></i>
-                Reports
-            </a>
-        </li>
-
-        <li>
-            <a href="calendar.html">
-                <i class="fa-solid fa-calendar-days"></i>
-                Calendar
-            </a>
-        </li>
-
-        <li>
-            <a href="employees.html">
-                <i class="fa-solid fa-users"></i>
-                Employees
-            </a>
-        </li>
-
-        <li>
-            <a href="clients.html">
-                <i class="fa-solid fa-user-tie"></i>
-                Clients
-            </a>
-        </li>
-
-        <li>
-            <a href="settings.html">
-                <i class="fa-solid fa-gear"></i>
-                Settings
-            </a>
-        </li>
-
-    </ul>
-
-    <div class="profile">
-        <p>Dcuts</p>
-
-        <span>
-            <i class="fa-solid fa-shield-halved"></i>
-            Admin
-        </span>
-    </div>
-
-</nav>
-
-<!-- ================= TIMESHEET ================= -->
 
 <div class="timesheet-page">
 
-    <h1>Daily Timesheet</h1>
 
-    <p class="subtitle">
-        Enter your daily work details
-    </p>
 
-    <div class="timesheet-card">
+<h1>
 
-        <label>Employee Name</label>
+Daily Timesheet
 
-        <select id="employeeName">
+</h1>
 
-            <option value="">Select Employee</option>
+<p class="subtitle">
 
-            <option value="Sathish Kumar">Sathish Kumar</option>
+Enter your daily work details
 
-            <option value="Naveen">Naveen</option>
+</p>
 
-        </select>
 
-        <label>Date</label>
 
-        <input
-            type="date"
-            id="date">
 
-        <label>Project</label>
 
-        <select id="project">
 
-            <option value="">Select Project</option>
 
-            <option value="DRT">DRT</option>
 
-            <option value="KC">KC</option>
 
-            <option value="MS">MS</option>
+<div class="timesheet-card">
 
-            <option value="SRG">SRG</option>
 
-            <option value="SST">SST</option>
 
-            <option value="VISWA SILK">VISWA SILK</option>
 
-            <option value="OTHERS">OTHERS</option>
 
-        </select>
+<label>
 
-        <div class="task-header">
+Employee Name
 
-            <h3>Tasks</h3>
+</label>
 
-            <button onclick="addTask()">
-                <i class="fa-solid fa-plus"></i>
-                Add Task
-            </button>
 
-        </div>
+<select id="employeeName">
 
-        <div id="taskContainer">
 
-            <div class="task-row">
+<option value="">
 
-                <input
-                    class="taskInput"
-                    placeholder="Enter Task">
+Select Employee
 
-                <input
-                    class="hourInput"
-                    type="number"
-                    placeholder="Hours">
+</option>
 
-            </div>
 
-        </div>
+<option value="Sathish Kumar">
 
-        <label>Comments</label>
+Sathish Kumar
 
-        <textarea
-            id="comments"
-            placeholder="Comments"></textarea>
+</option>
 
-        <button
-            class="save-btn"
-            onclick="saveTimesheet()">
 
-            <i class="fa-solid fa-save"></i>
+<option value="Naveen">
 
-            Save Timesheet
+Naveen
 
-        </button>
+</option>
 
-    </div>
 
-    <div class="table-card">
+</select>
 
-        <h2>My Timesheets</h2>
 
-        <table>
 
-            <thead>
 
-                <tr>
 
-                    <th>Employee</th>
 
-                    <th>Date</th>
 
-                    <th>Project</th>
 
-                    <th>Task</th>
+<label>
 
-                    <th>Hours</th>
+Date
 
-                </tr>
+</label>
 
-            </thead>
 
-            <tbody id="timesheetTable">
+<input
 
-            </tbody>
+type="date"
 
-        </table>
+id="date">
 
-    </div>
+
+
+
+
+
+
+<label>
+
+Project
+
+</label>
+
+
+<select id="project">
+
+
+<option value="">
+
+Select Project
+
+</option>
+
+
+<option value="DRT">
+
+DRT
+
+</option>
+
+
+<option value="KC">
+
+KC
+
+</option>
+
+
+<option value="MS">
+
+MS
+
+</option>
+
+
+<option value="SRG">
+
+SRG
+
+</option>
+
+
+<option value="SST">
+
+SST
+
+</option>
+
+
+<option value="VISWA SILK">
+
+VISWA SILK
+
+</option>
+
+
+<option value="OTHERS">
+
+OTHERS
+
+</option>
+
+
+
+</select>
+
+
+
+
+
+
+
+
+
+<div class="task-header">
+
+
+<h3>
+
+Tasks
+
+</h3>
+
+
+<button onclick="addTask()">
+
+
+<i class="fa-solid fa-plus"></i>
+
+Add Task
+
+
+</button>
+
 
 </div>
 
+
+
+
+
+
+
+
+<div id="taskContainer">
+
+
+
+<div class="task-row">
+
+
+<input
+
+class="taskInput"
+
+placeholder="Enter Task">
+
+
+
+<input
+
+class="hourInput"
+
+type="number"
+
+placeholder="Hours">
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<label>
+
+Comments
+
+</label>
+
+
+<textarea
+
+id="comments"
+
+placeholder="Comments">
+
+</textarea>
+
+
+
+
+
+
+
+
+
+<button class="save-btn"
+
+onclick="saveTimesheet()">
+
+
+
+<i class="fa-solid fa-save"></i>
+
+Save Timesheet
+
+
+</button>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="table-card">
+
+
+<h2>
+
+My Timesheets
+
+</h2>
+
+
+
+<table>
+
+
+<thead>
+
+<tr>
+
+
+<th>
+Employee
+</th>
+
+
+<th>
+Date
+</th>
+
+
+<th>
+Project
+</th>
+
+
+<th>
+Task
+</th>
+
+
+<th>
+Hours
+</th>
+
+
+
+</tr>
+
+
+</thead>
+
+
+
+<tbody id="timesheetTable">
+
+
+</tbody>
+
+
+</table>
+
+
+
+</div>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
 <script src="../js/auth.js"></script>
+
+<script src="../js/navbar.js"></script>
+
 <script src="../js/sidebar.js"></script>
+
 <script src="../js/timesheet.js"></script>
 
 </body>
+
 </html>
