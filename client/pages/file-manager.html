@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>THE D CUTS - File Manager</title>
+
+<link rel="stylesheet"
+href="../css/file-manager.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1 class="page-title">
+
+File Manager
+
+</h1>
+
+<div class="file-container">
+
+<!-- Upload Form -->
+
+<div class="upload-card">
+
+<h2>Upload Files</h2>
+
+<div class="form-group">
+
+<label>Employee</label>
+
+<select id="employee">
+
+<option value="">Select Employee</option>
+
+<option>Sathish</option>
+
+<option>Naveen</option>
+
+</select>
+
+</div>
+
+<div class="form-group">
+
+<label>Client</label>
+
+<select id="client">
+
+<option value="">Select Client</option>
+
+</select>
+
+</div>
+
+<div class="form-group">
+
+<label>Project</label>
+
+<select id="project">
+
+<option value="">Select Project</option>
+
+<option>DRT</option>
+
+<option>KC</option>
+
+<option>SST</option>
+
+<option>MS</option>
+
+<option>SRG</option>
+
+<option>Wedding Shoot</option>
+
+<option>Outdoor Shoot</option>
+
+<option>Others Work</option>
+
+</select>
+
+</div>
+
+<div class="form-group">
+
+<label>Upload Images</label>
+
+<input
+type="file"
+id="images"
+multiple
+accept=".jpg,.jpeg,.png,.webp">
+
+</div>
+
+<div class="form-group">
+
+<label>Upload Video</label>
+
+<input
+type="file"
+id="video"
+accept=".mp4,.mov,.avi,.mkv">
+
+</div>
+
+<button onclick="uploadFiles()">
+
+<i class="fa-solid fa-cloud-arrow-up"></i>
+
+Upload Files
+
+</button>
+
+</div>
+
+<!-- Uploaded Files -->
+
+<div class="file-list">
+
+<h2>Uploaded Files</h2>
+
+<input
+type="text"
+id="search"
+placeholder="Search Project / Client"
+onkeyup="searchFiles()">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Preview</th>
+
+<th>Project</th>
+
+<th>Employee</th>
+
+<th>File</th>
+
+<th>Type</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="fileTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="../js/file-manager.js"></script>
+
+</body>
+
+</html>

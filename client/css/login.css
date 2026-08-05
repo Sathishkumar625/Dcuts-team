@@ -1,0 +1,404 @@
+/* ==========================================
+   LOGIN PAGE
+========================================== */
+
+
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+    font-family:"Poppins",sans-serif;
+
+}
+
+
+
+body{
+
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #020617,
+        #111827,
+        #1e293b
+    );
+
+
+    color:white;
+
+
+}
+
+
+
+/* ==========================
+LOGIN CONTAINER
+========================== */
+
+
+.login-container{
+
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+}
+
+
+
+/* ==========================
+LOGIN CARD
+========================== */
+
+
+.login-card{
+
+
+    width:380px;
+
+
+    padding:40px;
+
+
+    background:
+
+    rgba(255,255,255,.08);
+
+
+    backdrop-filter:blur(15px);
+
+
+    border-radius:25px;
+
+
+    border:1px solid rgba(255,255,255,.15);
+
+
+    box-shadow:
+
+    0 20px 40px rgba(0,0,0,.4);
+
+
+
+    animation:
+
+    slide .5s ease;
+
+
+}
+
+
+
+
+@keyframes slide{
+
+
+from{
+
+transform:translateY(30px);
+
+opacity:0;
+
+}
+
+
+to{
+
+transform:translateY(0);
+
+opacity:1;
+
+}
+
+
+}
+
+
+
+/* ==========================
+LOGO
+========================== */
+
+
+.logo{
+
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+
+}
+
+
+
+.logo i{
+
+
+    font-size:50px;
+
+    color:#fbbf24;
+
+
+}
+
+
+
+.logo h2{
+
+
+    margin-top:15px;
+
+    letter-spacing:2px;
+
+
+}
+
+
+
+
+
+.login-card h1{
+
+
+    text-align:center;
+
+    margin-bottom:25px;
+
+
+}
+
+
+
+
+/* ==========================
+INPUT
+========================== */
+
+
+.login-card input{
+
+
+    width:100%;
+
+
+    padding:15px;
+
+
+    margin-bottom:20px;
+
+
+    border:none;
+
+
+    outline:none;
+
+
+    border-radius:12px;
+
+
+    background:#1e293b;
+
+
+    color:white;
+
+
+    font-size:15px;
+
+
+}
+
+
+
+.login-card input:focus{
+
+
+    border:1px solid #3b82f6;
+
+
+}
+
+
+
+
+/* ==========================
+BUTTON
+========================== */
+
+
+.login-card button{
+
+
+    width:100%;
+
+
+    padding:15px;
+
+
+    border:none;
+
+
+    border-radius:12px;
+
+
+    background:#2563eb;
+
+
+    color:white;
+
+
+    font-size:16px;
+
+
+    cursor:pointer;
+
+
+    transition:.3s;
+
+
+}
+
+
+
+.login-card button:hover{
+
+
+    background:#1d4ed8;
+
+
+    transform:translateY(-3px);
+
+
+}
+
+
+
+
+#message{
+
+
+    margin-top:20px;
+
+
+    text-align:center;
+
+
+    color:#f87171;
+
+
+}
+
+
+
+
+/* ==========================
+MOBILE
+========================== */
+
+
+@media(max-width:500px){
+
+
+.login-card{
+
+
+    width:90%;
+
+    padding:30px;
+
+
+}
+
+
+}
+/* ==========================
+   GOOGLE LOGIN BUTTON
+========================== */
+
+
+.google-btn{
+
+
+    width:100%;
+
+    margin-top:15px;
+
+    padding:15px;
+
+
+    border:none;
+
+    border-radius:12px;
+
+
+    background:white;
+
+
+    color:#111827;
+
+
+    font-size:16px;
+
+
+    cursor:pointer;
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    justify-content:center;
+
+
+    gap:12px;
+
+
+    transition:.3s;
+
+
+}
+
+
+
+.google-btn i{
+
+
+    color:#ea4335;
+
+    font-size:20px;
+
+
+}
+
+
+
+.google-btn:hover{
+
+
+    transform:translateY(-3px);
+
+    box-shadow:0 10px 20px rgba(0,0,0,.3);
+
+
+}

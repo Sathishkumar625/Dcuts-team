@@ -1,0 +1,56 @@
+/* ==========================
+   PAGE ANIMATION
+========================== */
+
+.fade-in{
+    animation:fadeIn .35s ease;
+}
+
+@keyframes fadeIn{
+
+    from{
+        opacity:0;
+        transform:translateY(15px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+.loading{
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:250px;
+
+}
+
+.spinner{
+
+    width:55px;
+    height:55px;
+
+    border:6px solid rgba(255,255,255,.15);
+    border-top:6px solid #d4af37;
+
+    border-radius:50%;
+
+    animation:spin .8s linear infinite;
+
+}
+
+@keyframes spin{
+
+    from{
+        transform:rotate(0deg);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}

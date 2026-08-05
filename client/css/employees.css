@@ -1,0 +1,241 @@
+/* ==========================================
+   EMPLOYEES PAGE
+========================================== */
+
+.page-container{
+    width:92%;
+    margin:30px auto;
+}
+
+.page-container h1{
+    margin-bottom:25px;
+    font-size:34px;
+}
+
+/* ===========================
+EMPLOYEE FORM
+=========================== */
+
+.employee-form{
+
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+
+    background:#121a2b;
+
+    padding:30px;
+
+    border-radius:20px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+}
+
+.employee-form input,
+.employee-form select{
+
+    padding:14px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:12px;
+
+    background:#1e293b;
+
+    color:white;
+
+}
+
+.employee-form input:focus,
+.employee-form select:focus{
+
+    border:1px solid #3b82f6;
+
+}
+
+#saveEmployee{
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    transition:.3s;
+
+}
+
+#saveEmployee:hover{
+
+    background:#1d4ed8;
+
+}
+
+#searchEmployee{
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#1e293b;
+
+    color:white;
+
+}
+
+/* ===========================
+TABLE
+=========================== */
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    background:#121a2b;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+}
+
+thead{
+
+    background:#1e293b;
+
+}
+
+thead th{
+
+    padding:15px;
+
+    text-align:left;
+
+}
+
+tbody td{
+
+    padding:15px;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+tbody tr:hover{
+
+    background:#182338;
+
+}
+
+/* ===========================
+STATUS
+=========================== */
+
+.active-status{
+
+    background:#16a34a;
+
+    padding:6px 12px;
+
+    border-radius:30px;
+
+    color:white;
+
+}
+
+.inactive-status{
+
+    background:#dc2626;
+
+    padding:6px 12px;
+
+    border-radius:30px;
+
+    color:white;
+
+}
+
+/* ===========================
+BUTTONS
+=========================== */
+
+.edit-btn{
+
+    background:#22c55e;
+
+    color:white;
+
+    border:none;
+
+    padding:8px 12px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+.delete-btn{
+
+    background:#ef4444;
+
+    color:white;
+
+    border:none;
+
+    padding:8px 12px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+.edit-btn:hover{
+
+    background:#16a34a;
+
+}
+
+.delete-btn:hover{
+
+    background:#dc2626;
+
+}
+
+/* ===========================
+RESPONSIVE
+=========================== */
+
+@media(max-width:900px){
+
+.employee-form{
+
+    grid-template-columns:1fr;
+
+}
+
+table{
+
+    display:block;
+
+    overflow-x:auto;
+
+}
+
+}

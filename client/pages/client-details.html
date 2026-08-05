@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+Client Details
+</title>
+
+<link rel="stylesheet"
+href="../css/client-details.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1 class="page-title">
+
+Client Details
+
+</h1>
+
+
+
+<!-- CLIENT CARD -->
+
+<div class="client-card">
+
+<h2 id="clientName">
+Loading...
+</h2>
+
+
+<p>
+
+<b>Company :</b>
+
+<span id="companyName">
+-
+</span>
+
+</p>
+
+
+<p>
+
+<b>Phone :</b>
+
+<span id="phone">
+-
+</span>
+
+</p>
+
+
+
+<p>
+
+<b>Email :</b>
+
+<span id="email">
+-
+</span>
+
+</p>
+
+
+
+<p>
+
+<b>GST :</b>
+
+<span id="gst">
+-
+</span>
+
+</p>
+
+
+
+<p>
+
+<b>Status :</b>
+
+<span id="status">
+-
+</span>
+
+</p>
+
+
+
+<p>
+
+<b>Address :</b>
+
+<span id="address">
+-
+</span>
+
+</p>
+
+
+
+<div class="btn-group">
+
+<button
+class="edit-btn"
+onclick="editClient()">
+
+Edit
+
+</button>
+
+
+<button
+class="delete-btn"
+onclick="deleteClient()">
+
+Delete
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- PROJECTS -->
+
+<div class="project-section">
+
+<h2>
+
+Projects
+
+</h2>
+
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>
+
+Project
+
+</th>
+
+
+<th>
+
+Status
+
+</th>
+
+
+<th>
+
+Start
+
+</th>
+
+
+<th>
+
+End
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody id="projectTable">
+
+</tbody>
+
+</table>
+
+
+</div>
+
+
+
+
+
+
+<!-- TIMESHEETS -->
+
+<div class="timesheet-section">
+
+<h2>
+
+Timesheets
+
+</h2>
+
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Date</th>
+
+<th>Project</th>
+
+<th>Task</th>
+
+<th>Hours</th>
+
+</tr>
+
+</thead>
+
+<tbody id="timesheetTable">
+
+</tbody>
+
+</table>
+
+
+</div>
+
+
+
+</div>
+
+<script src="../js/client-details.js"></script>
+
+</body>
+
+</html>

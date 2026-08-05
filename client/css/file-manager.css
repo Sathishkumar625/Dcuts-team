@@ -1,0 +1,257 @@
+/* ==============================
+   FILE MANAGER
+============================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI",sans-serif;
+}
+
+body{
+    background:#111827;
+    color:#fff;
+    padding:30px;
+}
+
+.container{
+    max-width:1600px;
+    margin:auto;
+}
+
+.page-title{
+    color:#d4af37;
+    margin-bottom:25px;
+}
+
+.file-container{
+    display:grid;
+    grid-template-columns:1fr 2fr;
+    gap:25px;
+}
+
+.upload-card,
+.file-list{
+
+    background:#1f2937;
+
+    padding:25px;
+
+    border-radius:18px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+}
+
+.upload-card h2,
+.file-list h2{
+
+    color:#d4af37;
+
+    margin-bottom:20px;
+
+}
+
+.form-group{
+
+    margin-bottom:18px;
+
+}
+
+.form-group label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    color:#d4af37;
+
+}
+
+.form-group input,
+.form-group select{
+
+    width:100%;
+
+    padding:14px;
+
+    background:#111827;
+
+    border:none;
+
+    border-radius:10px;
+
+    color:white;
+
+    outline:none;
+
+}
+
+.upload-card button{
+
+    width:100%;
+
+    padding:15px;
+
+    background:#d4af37;
+
+    color:black;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.upload-card button:hover{
+
+    background:#f5c542;
+
+    transform:translateY(-2px);
+
+}
+
+#search{
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#111827;
+
+    color:white;
+
+    margin-bottom:20px;
+
+}
+
+.file-list table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.file-list th{
+
+    background:#111827;
+
+    color:#d4af37;
+
+    padding:15px;
+
+}
+
+.file-list td{
+
+    padding:15px;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+    text-align:center;
+
+}
+
+.file-list tr:hover{
+
+    background:rgba(212,175,55,.08);
+
+}
+
+.preview-img{
+
+    width:70px;
+
+    height:70px;
+
+    object-fit:cover;
+
+    border-radius:8px;
+
+}
+
+.video-icon{
+
+    font-size:32px;
+
+    color:#d4af37;
+
+}
+
+.action-btn{
+
+    border:none;
+
+    padding:8px 12px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    margin:3px;
+
+}
+
+.download-btn{
+
+    background:#16a34a;
+
+    color:white;
+
+}
+
+.delete-btn{
+
+    background:#dc2626;
+
+    color:white;
+
+}
+
+.download-btn:hover{
+
+    background:#15803d;
+
+}
+
+.delete-btn:hover{
+
+    background:#b91c1c;
+
+}
+
+@media(max-width:900px){
+
+.file-container{
+
+grid-template-columns:1fr;
+
+}
+
+.file-list{
+
+overflow-x:auto;
+
+}
+
+table{
+
+min-width:900px;
+
+}
+
+}

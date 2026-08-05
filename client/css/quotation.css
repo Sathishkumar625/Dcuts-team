@@ -1,0 +1,271 @@
+/* ==========================
+   QUOTATION PAGE
+========================== */
+
+.quotation-container{
+    display:grid;
+    grid-template-columns:400px 1fr;
+    gap:25px;
+    margin-top:20px;
+}
+
+/* Left Card */
+
+.quotation-card{
+    background:#1f2937;
+    padding:25px;
+    border-radius:18px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+
+.quotation-card h2,
+.quotation-card h3{
+    color:#d4af37;
+    margin-bottom:20px;
+}
+
+.form-group{
+    margin-bottom:18px;
+}
+
+.form-group label{
+    display:block;
+    color:#fff;
+    margin-bottom:8px;
+}
+
+.form-group input,
+.form-group select{
+
+    width:100%;
+    padding:12px;
+
+    background:#111827;
+    color:#fff;
+
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;
+
+    outline:none;
+}
+
+.form-group input:focus,
+.form-group select:focus{
+
+    border-color:#d4af37;
+
+}
+
+/* Service Table */
+
+#serviceTable{
+
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:20px;
+
+}
+
+#serviceTable th{
+
+    background:#111827;
+    color:#d4af37;
+    padding:10px;
+
+}
+
+#serviceTable td{
+
+    padding:8px;
+
+}
+
+#serviceTable input{
+
+    width:100%;
+    padding:8px;
+
+    background:#111827;
+    color:#fff;
+
+    border:none;
+    border-radius:6px;
+
+}
+
+/* Buttons */
+
+#addServiceBtn,
+#saveQuotationBtn{
+
+    width:100%;
+    padding:14px;
+
+    border:none;
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:16px;
+    font-weight:bold;
+
+    transition:.3s;
+
+}
+
+#addServiceBtn{
+
+    background:#2563eb;
+    color:#fff;
+    margin-bottom:15px;
+
+}
+
+#saveQuotationBtn{
+
+    background:#d4af37;
+    color:#000;
+
+}
+
+#addServiceBtn:hover,
+#saveQuotationBtn:hover{
+
+    transform:translateY(-2px);
+
+}
+
+/* Right Side */
+
+.quotation-list{
+
+    background:#1f2937;
+    padding:25px;
+    border-radius:18px;
+
+}
+
+.quotation-header{
+
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:20px;
+
+}
+
+.quotation-header input{
+
+    width:300px;
+    padding:12px;
+
+    background:#111827;
+    color:#fff;
+
+    border:none;
+    border-radius:10px;
+
+}
+
+.quotation-list table{
+
+    width:100%;
+    border-collapse:collapse;
+
+}
+
+.quotation-list thead{
+
+    background:#111827;
+
+}
+
+.quotation-list th{
+
+    color:#d4af37;
+    padding:15px;
+
+}
+
+.quotation-list td{
+
+    color:#fff;
+    padding:15px;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+/* Action Buttons */
+
+.edit-btn{
+
+    background:#2563eb;
+    color:#fff;
+
+    border:none;
+
+    padding:8px 12px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}
+
+.delete-btn{
+
+    background:#ef4444;
+    color:#fff;
+
+    border:none;
+
+    padding:8px 12px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    margin-left:5px;
+
+}
+
+.convert-btn{
+
+    background:#22c55e;
+    color:#fff;
+
+    border:none;
+
+    padding:8px 12px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    margin-left:5px;
+
+}
+
+/* Mobile */
+
+@media(max-width:1000px){
+
+.quotation-container{
+
+grid-template-columns:1fr;
+
+}
+
+.quotation-header{
+
+justify-content:stretch;
+
+}
+
+.quotation-header input{
+
+width:100%;
+
+}
+
+}

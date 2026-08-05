@@ -1,0 +1,267 @@
+/* ====================================
+        TABLET (1024px)
+==================================== */
+
+@media (max-width:1024px){
+
+.navbar{
+
+    flex-direction:column;
+
+    height:auto;
+
+    padding:20px;
+
+    gap:20px;
+
+}
+
+.menu{
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+
+    gap:12px;
+
+}
+
+.profile{
+
+    text-align:center;
+
+}
+
+.hero{
+
+    flex-direction:column;
+
+    text-align:center;
+
+    gap:30px;
+
+}
+
+.hero h1{
+
+    font-size:36px;
+
+}
+
+.clock{
+
+    text-align:center;
+
+}
+
+.cards{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+
+/* ====================================
+        MOBILE (768px)
+==================================== */
+
+@media (max-width:768px){
+
+.navbar{
+
+    padding:15px;
+
+}
+
+.logo h2{
+
+    font-size:22px;
+
+}
+
+.menu{
+
+    width:100%;
+
+    justify-content:center;
+
+    gap:10px;
+
+}
+
+.menu li a{
+
+    padding:10px;
+
+    font-size:13px;
+
+}
+
+.hero{
+
+    padding:25px;
+
+}
+
+.hero h1{
+
+    font-size:30px;
+
+}
+
+.hero p{
+
+    font-size:15px;
+
+}
+
+.clock h2{
+
+    font-size:22px;
+
+}
+
+.clock h3{
+
+    font-size:28px;
+
+}
+
+.quick{
+
+    width:95%;
+
+}
+
+.cards{
+
+    grid-template-columns:1fr;
+
+}
+
+.card{
+
+    padding:25px;
+
+}
+
+.card h3{
+
+    font-size:22px;
+
+}
+
+}
+
+
+/* ====================================
+        SMALL MOBILE (480px)
+==================================== */
+
+@media (max-width:480px){
+
+.navbar{
+
+    padding:12px;
+
+}
+
+.logo{
+
+    flex-direction:column;
+
+}
+
+.logo h2{
+
+    font-size:20px;
+
+}
+
+.menu{
+
+    flex-direction:column;
+
+    width:100%;
+
+}
+
+.menu li{
+
+    width:100%;
+
+}
+
+.menu li a{
+
+    justify-content:center;
+
+}
+
+.hero{
+
+    padding:20px;
+
+}
+
+.hero h1{
+
+    font-size:24px;
+
+}
+
+.hero p{
+
+    font-size:14px;
+
+}
+
+.clock h2{
+
+    font-size:18px;
+
+}
+
+.clock h3{
+
+    font-size:24px;
+
+}
+
+.quick h2{
+
+    font-size:24px;
+
+}
+
+.card{
+
+    padding:20px;
+
+}
+
+.card i{
+
+    width:50px;
+
+    height:50px;
+
+    font-size:20px;
+
+}
+
+.card h3{
+
+    font-size:20px;
+
+}
+
+.profile{
+
+    width:100%;
+
+}
+
+}

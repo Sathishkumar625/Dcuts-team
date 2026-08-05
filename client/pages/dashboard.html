@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | THE D CUTS</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            <i class="fa-regular fa-clock"></i>
+        </div>
+
+        <h2>DCUTS.TS</h2>
+
+    </div>
+
+    <ul class="menu">
+
+        <li>
+            <a href="../index.html">
+                <i class="fa-solid fa-house"></i>
+                Home
+            </a>
+        </li>
+
+        <li class="active">
+            <a href="dashboard.html">
+                <i class="fa-solid fa-table-columns"></i>
+                Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="timesheet.html">
+                <i class="fa-regular fa-clock"></i>
+                Timesheet
+            </a>
+        </li>
+
+        <li>
+            <a href="reports.html">
+                <i class="fa-regular fa-file-lines"></i>
+                Reports
+            </a>
+        </li>
+
+        <li>
+            <a href="calendar.html">
+                <i class="fa-solid fa-calendar-days"></i>
+                Calendar
+            </a>
+        </li>
+
+        <li>
+            <a href="employees.html">
+                <i class="fa-solid fa-users"></i>
+                Employees
+            </a>
+        </li>
+
+        <li>
+            <a href="clients.html">
+                <i class="fa-solid fa-user-tie"></i>
+                Clients
+            </a>
+        </li>
+
+        <li>
+            <a href="settings.html">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+        </li>
+
+    </ul>
+
+    <div class="profile">
+
+        <p>Dcuts</p>
+
+        <span>
+            <i class="fa-solid fa-shield-halved"></i>
+            Admin
+        </span>
+
+    </div>
+
+</nav>
+
+<div class="dashboard-page">
+
+    <div class="dashboard-header">
+
+        <h1>Dashboard</h1>
+
+        <p>THE D CUTS Project Overview</p>
+
+    </div>
+
+    <div class="dashboard-cards">
+
+        <div class="dash-card">
+
+            <i class="fa-solid fa-users"></i>
+
+            <div>
+
+                <h2 id="employeeCount">0</h2>
+
+                <p>Employees</p>
+
+            </div>
+
+        </div>
+
+        <div class="dash-card">
+
+            <i class="fa-solid fa-store"></i>
+
+            <div>
+
+                <h2 id="projectCount">0</h2>
+
+                <p>Projects</p>
+
+            </div>
+
+        </div>
+
+        <div class="dash-card">
+
+            <i class="fa-solid fa-file-lines"></i>
+
+            <div>
+
+                <h2 id="reportCount">0</h2>
+
+                <p>Reports</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="recent-section">
+
+        <h2>Recent Reports</h2>
+
+        <div id="recentReports"></div>
+
+    </div>
+
+</div>
+
+<script src="../js/auth.js"></script>
+
+<script src="../js/sidebar.js"></script>
+
+<script src="../js/dashboard.js"></script>
+
+</body>
+</html>

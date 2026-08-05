@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Settings | THE D CUTS</title>
+
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/settings.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            <i class="fa-regular fa-clock"></i>
+        </div>
+
+        <h2>DCUTS.TS</h2>
+
+    </div>
+
+    <ul class="menu">
+
+        <li>
+            <a href="../index.html">
+                <i class="fa-solid fa-house"></i>
+                Home
+            </a>
+        </li>
+
+        <li>
+            <a href="dashboard.html">
+                <i class="fa-solid fa-table-columns"></i>
+                Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="timesheet.html">
+                <i class="fa-regular fa-clock"></i>
+                Timesheet
+            </a>
+        </li>
+
+        <li>
+            <a href="reports.html">
+                <i class="fa-regular fa-file-lines"></i>
+                Reports
+            </a>
+        </li>
+
+        <li>
+            <a href="calendar.html">
+                <i class="fa-solid fa-calendar-days"></i>
+                Calendar
+            </a>
+        </li>
+
+        <li>
+            <a href="employees.html">
+                <i class="fa-solid fa-users"></i>
+                Employees
+            </a>
+        </li>
+
+        <li>
+            <a href="clients.html">
+                <i class="fa-solid fa-user-tie"></i>
+                Clients
+            </a>
+        </li>
+
+        <li class="active">
+            <a href="settings.html">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+        </li>
+
+    </ul>
+
+    <div class="profile">
+
+        <p>Dcuts</p>
+
+        <span>
+            <i class="fa-solid fa-shield-halved"></i>
+            Admin
+        </span>
+
+    </div>
+
+</nav>
+
+<div class="settings-page">
+
+    <!-- LEFT MENU -->
+
+    <aside class="settings-sidebar">
+
+        <div class="sidebar-title">
+
+            <i class="fa-solid fa-gear"></i>
+
+            <h2>Settings</h2>
+
+        </div>
+
+        <ul>
+
+            <li class="active" onclick="showSection('profile')">
+                <i class="fa-solid fa-user"></i>
+                Profile
+            </li>
+
+            <li onclick="showSection('company')">
+                <i class="fa-solid fa-building"></i>
+                Company
+            </li>
+
+            <li onclick="showSection('employees')">
+                <i class="fa-solid fa-users"></i>
+                Employees
+            </li>
+
+            <li onclick="showSection('projects')">
+                <i class="fa-solid fa-diagram-project"></i>
+                Projects
+            </li>
+
+            <li onclick="showSection('clients')">
+                <i class="fa-solid fa-store"></i>
+                Clients
+            </li>
+
+            <li onclick="showSection('security')">
+                <i class="fa-solid fa-lock"></i>
+                Security
+            </li>
+
+            <li onclick="showSection('notifications')">
+                <i class="fa-solid fa-bell"></i>
+                Notifications
+            </li>
+
+            <li onclick="showSection('appearance')">
+                <i class="fa-solid fa-palette"></i>
+                Appearance
+            </li>
+
+            <li onclick="showSection('backup')">
+                <i class="fa-solid fa-database"></i>
+                Backup
+            </li>
+
+            <li onclick="showSection('about')">
+                <i class="fa-solid fa-circle-info"></i>
+                About
+            </li>
+
+        </ul>
+
+    </aside>
+
+    <main class="settings-content">
+
+        <!-- உங்கள் Profile, Company, Employees, Projects, Clients, Security,
+        Notifications, Appearance, Backup, About sections அனைத்தும்
+        மாற்றமில்லாமல் இங்கே அதேபடி இருக்கும் -->
+
+    </main>
+
+</div>
+
+<script src="../js/sidebar.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/settings.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,318 @@
+/* ===================================
+        HOME PAGE
+===================================*/
+
+body{
+
+    background:#0b1120;
+
+    background-image:
+    radial-gradient(circle at top left,#1d4ed8 0%,transparent 30%),
+    radial-gradient(circle at bottom right,#312e81 0%,transparent 35%);
+
+}
+
+
+
+/* ============================
+WELCOME TEXT
+============================ */
+
+.hero{
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+.hero::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:300px;
+
+    height:300px;
+
+    background:rgba(59,130,246,.18);
+
+    filter:blur(100px);
+
+    right:-100px;
+
+    top:-100px;
+
+    border-radius:50%;
+
+}
+
+.hero h1{
+
+    font-size:44px;
+
+    font-weight:700;
+
+    margin-bottom:10px;
+
+    animation:fadeUp .8s ease;
+
+}
+
+.hero p{
+
+    font-size:17px;
+
+    color:#94a3b8;
+
+    animation:fadeUp 1s ease;
+
+}
+
+.clock{
+
+    z-index:2;
+
+}
+
+.clock h2{
+
+    font-size:28px;
+
+    font-weight:600;
+
+}
+
+.clock h3{
+
+    margin-top:10px;
+
+    font-size:34px;
+
+    color:#3b82f6;
+
+}
+
+
+
+/* ============================
+QUICK ACCESS
+============================ */
+
+.quick{
+
+    margin-top:50px;
+
+}
+
+.quick h2{
+
+    font-size:34px;
+
+    margin-bottom:30px;
+
+}
+
+
+
+/* ============================
+CARDS
+============================ */
+
+.card{
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+.card::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:120px;
+
+    height:120px;
+
+    background:rgba(59,130,246,.15);
+
+    right:-30px;
+
+    top:-30px;
+
+    border-radius:50%;
+
+    transition:.4s;
+
+}
+
+.card:hover::before{
+
+    transform:scale(1.8);
+
+}
+
+.card:hover{
+
+    transform:translateY(-12px);
+
+}
+
+.card h3{
+
+    font-size:28px;
+
+    margin-top:8px;
+
+}
+
+.card p{
+
+    margin-top:8px;
+
+    color:#94a3b8;
+
+    font-size:15px;
+
+}
+
+.card i{
+
+    transition:.4s;
+
+}
+
+.card:hover i{
+
+    transform:rotate(10deg) scale(1.15);
+
+}
+
+
+
+/* ============================
+SCROLLBAR
+============================ */
+
+::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#0b1120;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#2563eb;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#3b82f6;
+
+}
+
+
+
+/* ============================
+ANIMATION
+============================ */
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(40px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+.quick-grid{
+
+display:grid;
+
+grid-template-columns:
+repeat(auto-fit,minmax(280px,1fr));
+
+gap:30px;
+
+}
+
+
+.quick-card{
+
+background:
+
+rgba(255,255,255,.06);
+
+
+border:
+
+1px solid rgba(255,255,255,.1);
+
+
+border-radius:25px;
+
+
+padding:35px;
+
+
+cursor:pointer;
+
+
+transition:.3s;
+
+
+}
+
+
+
+.quick-card:hover{
+
+transform:translateY(-10px);
+
+}
+
+
+
+.icon-box{
+
+width:65px;
+
+height:65px;
+
+border-radius:20px;
+
+background:#2563eb;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:28px;
+
+}

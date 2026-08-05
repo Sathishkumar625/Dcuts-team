@@ -1,0 +1,432 @@
+/* ==========================================
+   AMAZON STYLE SETTINGS
+========================================== */
+
+.settings-page{
+
+    display:grid;
+
+    grid-template-columns:300px 1fr;
+
+    min-height:calc(100vh - 90px);
+
+    background:#f5f7fb;
+
+}
+
+
+/* ===========================
+LEFT MENU
+=========================== */
+
+.settings-sidebar{
+
+    background:#111827;
+
+    color:white;
+
+    padding:30px 20px;
+
+    border-right:1px solid rgba(255,255,255,.08);
+
+    position:sticky;
+
+    top:90px;
+
+    height:calc(100vh - 90px);
+
+    overflow:auto;
+
+}
+
+.sidebar-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:35px;
+
+}
+
+.sidebar-title i{
+
+    font-size:26px;
+
+    color:#3b82f6;
+
+}
+
+.sidebar-title h2{
+
+    font-size:24px;
+
+}
+
+.settings-sidebar ul{
+
+    list-style:none;
+
+}
+
+.settings-sidebar li{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    padding:16px 18px;
+
+    margin-bottom:10px;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    font-size:16px;
+
+}
+
+.settings-sidebar li:hover{
+
+    background:#2563eb;
+
+    transform:translateX(6px);
+
+}
+
+.settings-sidebar li.active{
+
+    background:#2563eb;
+
+    font-weight:600;
+
+}
+
+
+/* ===========================
+RIGHT CONTENT
+=========================== */
+
+.settings-content{
+
+    padding:40px;
+
+    overflow:auto;
+
+}
+
+
+/* ===========================
+CARD
+=========================== */
+
+.settings-card{
+
+    background:white;
+
+    border-radius:22px;
+
+    padding:35px;
+
+    margin-bottom:30px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.08);
+
+    animation:fade .35s;
+
+}
+
+.settings-card h2{
+
+    margin-bottom:25px;
+
+    color:#111827;
+
+}
+
+
+/* ===========================
+FORM GRID
+=========================== */
+
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:25px;
+
+}
+
+.form-grid div{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.form-grid label{
+
+    margin-bottom:8px;
+
+    color:#374151;
+
+    font-weight:600;
+
+}
+
+.form-grid input,
+
+.form-grid textarea,
+
+.form-grid select{
+
+    padding:14px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:12px;
+
+    outline:none;
+
+    transition:.3s;
+
+    font-size:15px;
+
+}
+
+.form-grid input:focus,
+
+.form-grid textarea:focus,
+
+.form-grid select:focus{
+
+    border-color:#2563eb;
+
+    box-shadow:0 0 0 3px rgba(37,99,235,.2);
+
+}
+
+
+/* ===========================
+BUTTON
+=========================== */
+
+.settings-card button{
+
+    margin-top:25px;
+
+    padding:14px 28px;
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    transition:.3s;
+
+}
+
+.settings-card button:hover{
+
+    background:#1d4ed8;
+
+    transform:translateY(-2px);
+
+}
+
+
+/* ===========================
+SWITCH
+=========================== */
+
+.switch{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin:18px 0;
+
+}
+
+.switch input{
+
+    width:55px;
+
+    height:24px;
+
+}
+
+
+/* ===========================
+ABOUT BOX
+=========================== */
+
+.about-box{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:20px;
+
+    margin-top:20px;
+
+}
+
+.about-item{
+
+    background:#eff6ff;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    text-align:center;
+
+}
+
+.about-item h3{
+
+    color:#2563eb;
+
+    margin-bottom:10px;
+
+}
+
+.about-item p{
+
+    color:#555;
+
+}
+
+
+/* ===========================
+TABLE
+=========================== */
+
+.settings-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:20px;
+
+}
+
+.settings-table th{
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:15px;
+
+}
+
+.settings-table td{
+
+    padding:14px;
+
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+
+/* ===========================
+HIDDEN
+=========================== */
+
+.hidden{
+
+    display:none;
+
+}
+
+
+/* ===========================
+ANIMATION
+=========================== */
+
+@keyframes fade{
+
+from{
+
+opacity:0;
+
+transform:translateY(15px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+}
+
+
+/* ===========================
+RESPONSIVE
+=========================== */
+
+@media(max-width:1100px){
+
+.settings-page{
+
+grid-template-columns:1fr;
+
+}
+
+.settings-sidebar{
+
+position:relative;
+
+top:0;
+
+height:auto;
+
+}
+
+.form-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.about-box{
+
+grid-template-columns:1fr;
+
+}
+
+.settings-content{
+
+padding:20px;
+
+}
+
+}
