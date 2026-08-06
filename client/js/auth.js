@@ -1,56 +1,49 @@
-/* ==========================================
-AUTH CHECK
-========================================== */
-
-const loggedUser = JSON.parse(localStorage.getItem("loggedUser"));
-
-if (!loggedUser) {
-
-    window.location.href = "../pages/login.html";
-
-}
-
-
-/* ==========================================
-LOGOUT
-========================================== */
-
-function logout() {
-
-    if (confirm("Logout?")) {
-
-        localStorage.removeItem("loggedUser");
-
-        window.location.href = "../pages/login.html";
-
-    }
-
-}
-// ==============================
-// AUTH CHECK
-// ==============================
+/* ==========================
+   AUTH CHECK
+========================== */
 
 const role = localStorage.getItem("role");
 
-// Login இல்லையெனில் Login Page
-if (!role) {
-    window.location.replace("../login.html");
+const currentPage = window.location.pathname;
+
+// Login page-ல் auth check வேண்டாம்
+if (
+    currentPage.endsWith("/login.html") ||
+    currentPage.endsWith("/login")
+) {
+    // Nothing
+} else {
+
+    if (!role) {
+        window.location.href = "/login.html";
+    }
+
+    // Employee restriction
+    if (role === "employee") {
+
+        if (
+            currentPage.includes("dashboard") ||
+            currentPage.includes("reports") ||
+            currentPage.includes("employees") ||
+            currentPage.includes("clients") ||
+            currentPage.includes("settings") ||
+            currentPage.includes("calendar") ||
+            currentPage.endsWith("/") ||
+            currentPage.endsWith("/index.html")
+        ) {
+
+            window.location.href="/pages/timesheet.html";
+
+        }
+
+    }
+
 }
 
-// Employee Restriction
-const page = window.location.pathname;
+function logout(){
 
-if (role === "employee") {
+localStorage.clear();
 
-    if (
-        page.includes("dashboard.html") ||
-        page.includes("reports.html") ||
-        page.includes("employees.html") ||
-        page.includes("clients.html") ||
-        page.includes("settings.html") ||
-        page.includes("calendar.html") ||
-        page.includes("index.html")
-    ) {
-        window.location.replace("timesheet.html");
-    }
+window.location.href="/login.html";
+
 }
