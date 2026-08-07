@@ -1,425 +1,140 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
 
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
-<title>
-Timesheet | THE D CUTS
-</title>
-
-
+<title>Timesheet | THE D CUTS</title>
 
 <link rel="stylesheet" href="../css/style.css">
-
 <link rel="stylesheet" href="../css/timesheet.css">
-
-
 
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-
-
 </head>
 
-
-
 <body>
+
 <script src="../js/auth.js"></script>
 
-<script>
-const role = localStorage.getItem("role");
-
-if(!role){
-    window.location.href = "../login.html";
-}
-</script>
 <div id="navbar-container"></div>
-
-
-
-
-
 
 <div class="timesheet-page">
 
-
-
-<h1>
-
-Daily Timesheet
-
-</h1>
+<h1>Daily Timesheet</h1>
 
 <p class="subtitle">
 
-Enter your daily work details
+Manage Daily Project Work
 
 </p>
 
-
-
-
-
-
-
-
-
 <div class="timesheet-card">
 
-
-
-
-
-<label>
-
-Employee Name
-
-</label>
-
+<label>Employee</label>
 
 <select id="employeeName">
 
+<option value="">Select Employee</option>
 
-<option value="">
+<option value="Sathish Kumar">Sathish Kumar</option>
 
-Select Employee
-
-</option>
-
-
-<option value="Sathish Kumar">
-
-Sathish Kumar
-
-</option>
-
-
-<option value="Naveen">
-
-Naveen
-
-</option>
-
+<option value="Naveen">Naveen</option>
 
 </select>
 
-
-
-
-
-
-
-
-<label>
-
-Date
-
-</label>
-
+<label>Date</label>
 
 <input
-
 type="date"
-
 id="date">
 
+<!-- Dynamic Project Container -->
 
+<div id="projectContainer">
 
+</div>
 
+<div class="btn-group">
 
-
-
-<label>
-
-Project
-
-</label>
-
-
-<select id="project">
-
-
-<option value="">
-
-Select Project
-
-</option>
-
-
-<option value="DRT">
-
-DRT
-
-</option>
-
-
-<option value="KC">
-
-KC
-
-</option>
-
-
-<option value="MS">
-
-MS
-
-</option>
-
-
-<option value="SRG">
-
-SRG
-
-</option>
-
-
-<option value="SST">
-
-SST
-
-</option>
-
-
-<option value="VISWA SILK">
-
-VISWA SILK
-
-</option>
-
-
-<option value="OTHERS">
-
-OTHERS
-
-</option>
-
-
-
-</select>
-
-
-
-
-
-
-
-
-
-<div class="task-header">
-
-
-<h3>
-
-Tasks
-
-</h3>
-
-
-<button onclick="addTask()">
-
+<button
+class="add-btn"
+onclick="addProjectCard()">
 
 <i class="fa-solid fa-plus"></i>
 
-Add Task
-
+Add Project
 
 </button>
 
-
-</div>
-
-
-
-
-
-
-
-
-<div id="taskContainer">
-
-
-
-<div class="task-row">
-
-
-<input
-
-class="taskInput"
-
-placeholder="Enter Task">
-
-
-
-<input
-
-class="hourInput"
-
-type="number"
-
-placeholder="Hours">
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-
-<label>
-
-Comments
-
-</label>
-
-
-<textarea
-
-id="comments"
-
-placeholder="Comments">
-
-</textarea>
-
-
-
-
-
-
-
-
-
-<button class="save-btn"
-
+<button
+class="save-btn"
 onclick="saveTimesheet()">
 
+<i class="fa-solid fa-floppy-disk"></i>
 
-
-<i class="fa-solid fa-save"></i>
-
-Save Timesheet
-
+Save
 
 </button>
 
+<button
+class="update-btn"
+id="updateBtn"
+onclick="updateTimesheet()">
 
+<i class="fa-solid fa-pen"></i>
 
+Update
 
-
-
+</button>
 
 </div>
 
-
-
-
-
-
-
-
+</div>
 
 <div class="table-card">
 
-
-<h2>
-
-My Timesheets
-
-</h2>
-
-
+<h2>Timesheet Records</h2>
 
 <table>
-
 
 <thead>
 
 <tr>
 
+<th>Employee</th>
 
-<th>
-Employee
-</th>
+<th>Date</th>
 
+<th>Project</th>
 
-<th>
-Date
-</th>
+<th>Total</th>
 
+<th>Completed</th>
 
-<th>
-Project
-</th>
+<th>Balance</th>
 
-
-<th>
-Task
-</th>
-
-
-<th>
-Hours
-</th>
-
-
+<th>Action</th>
 
 </tr>
 
-
 </thead>
-
-
 
 <tbody id="timesheetTable">
 
-
 </tbody>
-
 
 </table>
 
-
-
 </div>
 
-
-
-
-
-
-
 </div>
-
-
-
-
-
-
-
-<script src="../js/auth.js"></script>
 
 <script src="../js/navbar.js"></script>
-
 <script src="../js/sidebar.js"></script>
-
 <script src="../js/timesheet.js"></script>
 
 </body>

@@ -2,82 +2,149 @@
    THE D CUTS REPORT SYSTEM
 ===================================== */
 
-// Clients
 const clients = JSON.parse(localStorage.getItem("clients")) || [];
 
-// Timesheets
 const timesheets = JSON.parse(localStorage.getItem("timesheets")) || [];
 
-// Report Container
 const container = document.getElementById("reportContainer");
 
 function loadReports() {
 
     container.innerHTML = "";
 
+    if (clients.length === 0) {
+
+        container.innerHTML = `
+
+        <div class="report-card">
+
+            <h2>No Clients Found</h2>
+
+        </div>
+
+        `;
+
+        return;
+
+    }
+
     clients.forEach(client => {
 
-        // Timesheets for this client/project
-        let projectTimes = timesheets.filter(item =>
+        const projectTimes = timesheets.filter(item =>
+
             item.project === client.code
+
         );
 
-        // Total Videos (Today's Entries)
-        let todayVideos = projectTimes.length;
+        let totalVideos = 0;
 
-        // Balance Videos
+        let completedVideos = 0;
+
         let balanceVideos = 0;
+
+        projectTimes.forEach(item => {
+
+            totalVideos += Number(item.totalVideos || 0);
+
+            completedVideos += Number(item.completedVideos || 0);
+
+            balanceVideos += Number(item.balanceVideos || 0);
+
+        });
 
         container.innerHTML += `
 
-            <div class="report-card">
+        <div class="report-card">
 
-                <div class="report-icon">
-                    <i class="fa-solid fa-video"></i>
+            <div class="report-icon">
+
+                <i class="fa-solid fa-video"></i>
+
+            </div>
+
+            <h2>${client.code}</h2>
+
+            <h3>${client.name}</h3>
+
+            <p class="location">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                ${client.location}
+
+            </p>
+
+            <div class="report-box">
+
+                <div>
+
+                    <span>Total Videos</span>
+
+                    <strong>${totalVideos}</strong>
+
                 </div>
 
-                <h2>${client.code}</h2>
+                <div>
 
-                <h3>${client.name}</h3>
+                    <span>Completed</span>
 
-                <p class="location">
-                    <i class="fa-solid fa-location-dot"></i>
-                    ${client.location}
-                </p>
-
-                <div class="report-box">
-
-                    <div>
-                        <span>Today Videos</span>
-                        <strong>${todayVideos}</strong>
-                    </div>
-
-                    <div>
-                        <span>Balance Videos</span>
-                        <strong>${balanceVideos}</strong>
-                    </div>
+                    <strong>${completedVideos}</strong>
 
                 </div>
 
-                <div class="details">
+                <div>
 
-                    <h4>Timesheet Details</h4>
+                    <span>Balance</span>
 
-                    ${
-                        projectTimes.length === 0
-                        ? "<p>No Data</p>"
-                        : projectTimes.map(item => `
-                            <p>
-                                ${item.employee} -
-                                ${item.task} -
-                                ${item.hours} Hours
-                            </p>
-                        `).join("")
-                    }
+                    <strong>${balanceVideos}</strong>
 
                 </div>
 
             </div>
+
+            <div class="details">
+
+                <h4>Employee Work Details</h4>
+
+                ${
+                projectTimes.length === 0
+
+                ?
+
+                "<p>No Timesheet Submitted</p>"
+
+                :
+
+                projectTimes.map(item => `
+
+                    <div style="margin-bottom:12px;
+                                padding:10px;
+                                border-bottom:1px solid #333;">
+
+                        <strong>${item.employee}</strong><br>
+
+                        📅 ${item.date}<br>
+
+                        🎬 Total :
+                        ${item.totalVideos}<br>
+
+                        ✅ Completed :
+                        ${item.completedVideos}<br>
+
+                        ⏳ Balance :
+                        ${item.balanceVideos}<br>
+
+                        💬 ${item.comments || "-"}
+
+                    </div>
+
+                `).join("")
+
+                }
+
+            </div>
+
+        </div>
 
         `;
 
@@ -85,5 +152,4 @@ function loadReports() {
 
 }
 
-// Load Reports
 loadReports();
