@@ -1,70 +1,248 @@
-/* ==========================================
-   LOGIN SYSTEM
-   THE D CUTS TIMESHEET
-========================================== */
+const API =
+    "http://localhost:5000/api";
 
-// Demo Users
-const users = [
-    {
-        email: "admin@dcuts.com",
-        password: "admin123",
-        role: "admin",
-        name: "Admin"
-    },
-    {
-        email: "employee@dcuts.com",
-        password: "123456",
-        role: "employee",
-        name: "Employee"
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const button =
+            document.getElementById(
+                "loginButton"
+            );
+
+
+        const password =
+            document.getElementById(
+                "password"
+            );
+
+
+        if (button) {
+
+            button.addEventListener(
+                "click",
+                login
+            );
+
+        }
+
+
+        if (password) {
+
+            password.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key === "Enter"
+                    ) {
+
+                        login();
+
+                    }
+
+                }
+            );
+
+        }
+
     }
-];
+);
 
-// Make login function global
-window.login = function () {
 
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const message = document.getElementById("message");
+async function login() {
 
-    message.innerHTML = "";
+    const email =
+        document.getElementById(
+            "email"
+        ).value.trim();
 
-    // Validation
-    if (email === "" || password === "") {
-        message.innerHTML = "Please Enter Email & Password";
+
+    const password =
+        document.getElementById(
+            "password"
+        ).value.trim();
+
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    if (
+        !email ||
+        !password
+    ) {
+
+        message.innerText =
+            "Please enter email and password.";
+
         return;
+
     }
 
-    // Find User
-    const user = users.find(u =>
-        u.email === email &&
-        u.password === password
-    );
 
-    if (!user) {
-        message.innerHTML = "Invalid Email or Password";
-        return;
+    message.innerText =
+        "Logging in...";
+
+
+    try {
+
+        const response =
+            await fetch(
+
+                `${API}/auth/login`,
+
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            email:
+                                email,
+
+                            password:
+                                password
+
+                        })
+
+                }
+
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "LOGIN RESPONSE:",
+            data
+        );
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            message.innerText =
+                data.message ||
+                "Login failed.";
+
+            return;
+
+        }
+
+
+        /* ==========================================
+           SAVE LOGIN
+        ========================================== */
+
+        localStorage.clear();
+
+
+        localStorage.setItem(
+            "token",
+            data.token
+        );
+
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(
+                data.user
+            )
+        );
+
+
+        localStorage.setItem(
+            "loggedUser",
+            JSON.stringify(
+                data.user
+            )
+        );
+
+
+        localStorage.setItem(
+            "role",
+            String(
+                data.user.role
+            ).toLowerCase()
+        );
+
+
+        localStorage.setItem(
+            "userName",
+            data.user.name
+        );
+
+
+        localStorage.setItem(
+            "userEmail",
+            data.user.email
+        );
+
+
+        message.innerText =
+            "Login successful...";
+
+
+        const role =
+            String(
+                data.user.role
+            )
+            .toLowerCase();
+
+
+        setTimeout(
+            function () {
+
+                if (
+                    role === "admin"
+                ) {
+
+                    window.location.href =
+                        "./index.html";
+
+                }
+
+                else {
+
+                    window.location.href =
+                        "./pages/timesheet.html";
+
+                }
+
+            },
+            500
+        );
+
     }
 
-    // Save Login Session
-    localStorage.setItem("loggedUser", JSON.stringify(user));
-    localStorage.setItem("role", user.role);
-    localStorage.setItem("userName", user.name);
+    catch (error) {
 
-    // Redirect
-    if (user.role === "admin") {
-        window.location.replace("index.html");
-    } else {
-        window.location.replace("pages/timesheet.html");
+        console.error(
+            "LOGIN ERROR:",
+            error
+        );
+
+
+        message.innerText =
+            "Cannot connect to server. Make sure server is running.";
+
     }
-};
 
-// Logout Function
-window.logout = function () {
-
-    localStorage.removeItem("loggedUser");
-    localStorage.removeItem("role");
-    localStorage.removeItem("userName");
-
-    window.location.replace("../login.html");
-
-};
+}

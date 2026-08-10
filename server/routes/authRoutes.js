@@ -2,46 +2,41 @@ const express = require("express");
 
 const router = express.Router();
 
-
 const {
-
-register,
-login,
-googleLogin
-
-}
-=
-require("../controllers/authController");
+    register,
+    login,
+    googleLogin
+} = require("../controllers/authController");
 
 
-
-
+/* =====================================================
+   REGISTER
+===================================================== */
 
 router.post(
-"/register",
-register
+    "/register",
+    register
 );
 
 
-
+/* =====================================================
+   NORMAL LOGIN
+===================================================== */
 
 router.post(
-"/login",
-login
+    "/login",
+    login
 );
 
 
-
-
-// GOOGLE LOGIN
+/* =====================================================
+   GOOGLE LOGIN
+===================================================== */
 
 router.post(
-"/google",
-googleLogin
+    "/google",
+    googleLogin
 );
-
-
-
 
 
 module.exports = router;

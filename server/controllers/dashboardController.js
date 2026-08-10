@@ -1,65 +1,120 @@
 const Employee = require("../models/Employee");
 const Client = require("../models/Client");
-const Project = require("../models/Project");
 const Timesheet = require("../models/Timesheet");
-const Attendance = require("../models/Attendance");
 
 /* ==========================================
-   DASHBOARD
+   THE D CUTS DASHBOARD
 ========================================== */
 
 const getDashboard = async (req, res) => {
 
     try {
 
-        const totalEmployees = await Employee.countDocuments();
+        /* ===============================
+           EMPLOYEES
+        =============================== */
 
-        const totalClients = await Client.countDocuments();
+        const totalEmployees =
+            await Employee.countDocuments();
 
-        const totalProjects = await Project.countDocuments();
 
-        const totalTimesheets = await Timesheet.countDocuments();
+        /* ===============================
+           CLIENTS / PROJECTS
+           
+           Project.js இல்லாததால்
+           Clients-ஐ project count-க்கு
+           temporary source ஆக பயன்படுத்துகிறோம்.
+        =============================== */
+
+        const totalClients =
+            await Client.countDocuments();
+
+        const totalProjects =
+            totalClients;
+
+
+        /* ===============================
+           TIMESHEETS
+        =============================== */
+
+        const totalTimesheets =
+            await Timesheet.countDocuments();
+
+
+        /* ===============================
+           TIMESHEET STATUS
+        =============================== */
 
         const approvedTimesheets =
             await Timesheet.countDocuments({
                 status: "Approved"
             });
 
+
         const pendingTimesheets =
             await Timesheet.countDocuments({
                 status: "Pending"
             });
+
 
         const rejectedTimesheets =
             await Timesheet.countDocuments({
                 status: "Rejected"
             });
 
-        const today = new Date().toISOString().split("T")[0];
 
-        const presentToday =
-            await Attendance.countDocuments({
-                date: today,
-                status: "Present"
-            });
+        /* ===============================
+           TOTAL WORKING HOURS
+        =============================== */
 
-        // Total Working Hours
+        const hourResult =
+            await Timesheet.aggregate([
 
-        const hourResult = await Timesheet.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    totalHours: {
-                        $sum: "$hoursWorked"
+                {
+                    $group: {
+
+                        _id: null,
+
+                        totalHours: {
+                            $sum: "$hoursWorked"
+                        }
+
                     }
+
                 }
-            }
-        ]);
+
+            ]);
+
 
         const totalHours =
             hourResult.length > 0
                 ? hourResult[0].totalHours
                 : 0;
+
+
+        /* ===============================
+           TODAY
+        =============================== */
+
+        const today =
+            new Date()
+                .toISOString()
+                .split("T")[0];
+
+
+        /* ===============================
+           TODAY TIMESHEETS
+        =============================== */
+
+        const todayTimesheets =
+            await Timesheet.countDocuments({
+                date: today
+            });
+
+
+        /* ===============================
+           RESPONSE
+        =============================== */
 
         res.status(200).json({
 
@@ -75,13 +130,15 @@ const getDashboard = async (req, res) => {
 
                 totalTimesheets,
 
+                todayTimesheets,
+
                 approvedTimesheets,
 
                 pendingTimesheets,
 
                 rejectedTimesheets,
 
-                presentToday,
+                presentToday: 0,
 
                 totalHours
 
@@ -92,6 +149,11 @@ const getDashboard = async (req, res) => {
     }
 
     catch (error) {
+
+        console.error(
+            "Dashboard Error:",
+            error
+        );
 
         res.status(500).json({
 
@@ -104,6 +166,11 @@ const getDashboard = async (req, res) => {
     }
 
 };
+
+
+/* ==========================================
+   EXPORT
+========================================== */
 
 module.exports = {
 

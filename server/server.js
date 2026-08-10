@@ -1,121 +1,128 @@
-// ===============================
-// IMPORT PACKAGES
-// ===============================
+/* ==========================================
+   THE D CUTS TIMESHEET SERVER
+========================================== */
+
+
+require("dotenv").config();
+
 
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const dotenv = require("dotenv");
+const path = require("path");
 
 
-// ===============================
-// ENV CONFIG
-// ===============================
-
-dotenv.config();
-
-
-// ===============================
-// APP CREATE
-// ===============================
 
 const app = express();
 
 
-// ===============================
-// MIDDLEWARE
-// ===============================
+
+/* ==========================================
+   PORT
+========================================== */
+
+const PORT =
+    process.env.PORT || 5000;
+
+
+
+
+/* ==========================================
+   MIDDLEWARE
+========================================== */
+
 
 app.use(cors());
 
-app.use(express.json());
+
+app.use(
+    express.json()
+);
 
 
-// ===============================
-// DATABASE CONNECTION
-// ===============================
-
-console.log("Mongo URL:", process.env.MONGO_URI);
-
-
-mongoose.connect(process.env.MONGO_URI)
-
-.then(() => {
-
-    console.log("✅ MongoDB Connected");
-
-})
-
-.catch((error)=>{
-
-    console.log(
-        "❌ MongoDB Error:",
-        error.message
-    );
-
-});
-
-
-
-// ===============================
-// ROUTES IMPORT
-// ===============================
-
-
-const authRoutes = require("./routes/authRoutes");
-
-const employeeRoutes = require("./routes/employeeRoutes");
-
-const clientRoutes = require("./routes/clientRoutes");
-
-const timesheetRoutes = require("./routes/timesheetRoutes");
-
-const dailyReportRoutes =require("./routes/dailyReportRoutes");
-
-const projectReportRoutes =require("./routes/projectReportRoutes");
-
-const reportRoutes =require("./routes/reportRoutes");
-
-const dashboardRoutes =require("./routes/dashboardRoutes");
-
-const pdfRoutes =require("./routes/pdfRoutes");
-
-const settingRoutes = require("./routes/settingRoutes");
-
-const fileRoutes = require("./routes/fileRoutes");
+app.use(
+    express.urlencoded({
+        extended:true
+    })
+);
 
 
 
 
-// ===============================
-// ROUTES USE
-// ===============================
+/* ==========================================
+   FRONTEND CONNECT
+========================================== */
+
+
+app.use(
+    "/client",
+    express.static(
+        path.join(
+            __dirname,
+            "../client"
+        )
+    )
+);
+
+
+
+
+/* ==========================================
+   ROUTES
+========================================== */
+
+
+const authRoutes =
+    require("./routes/authRoutes");
+
+
+const employeeRoutes =
+    require("./routes/employeeRoutes");
+
+
+const clientRoutes =
+    require("./routes/clientRoutes");
+
+
+const timesheetRoutes =
+    require("./routes/timesheetRoutes");
+
+
+const reportRoutes =
+    require("./routes/reportRoutes");
+
+
+const dashboardRoutes =
+    require("./routes/dashboardRoutes");
+
+
+const settingRoutes =
+    require("./routes/settingRoutes");
+
+
+
+
+
+/* ==========================================
+   API ROUTES
+========================================== */
 
 
 app.use(
     "/api/auth",
     authRoutes
 );
-app.use("/api/settings", settingRoutes);
 
 
 app.use(
     "/api/employees",
     employeeRoutes
 );
-app.use("/api/files", fileRoutes);
-app.use("/uploads", express.static("uploads"));
 
 
 app.use(
     "/api/clients",
     clientRoutes
-);
-
-
-app.use(
-    "/api/projects",
-    projectRoutes
 );
 
 
@@ -126,65 +133,234 @@ app.use(
 
 
 app.use(
-    "/api/attendance",
-    attendanceRoutes
+    "/api/reports",
+    reportRoutes
 );
 
 
 app.use(
-    "/api/invoices",
-    invoiceRoutes
-);
-app.use(
-"/api/dailyreports",
-dailyReportRoutes
-);
-app.use(
-"/api/projectreports",
-projectReportRoutes
-);
-app.use(
-"/api/reports",
-require("./routes/reportRoutes")
-);
-app.use(
-"/api/dashboard",
-require("./routes/dashboardRoutes")
-);
-app.use(
-    "/api/pdf",
-    pdfRoutes
+    "/api/dashboard",
+    dashboardRoutes
 );
 
-// ===============================
-// TEST API
-// ===============================
+
+app.use(
+    "/api/settings",
+    settingRoutes
+);
 
 
-app.get("/", (req,res)=>{
 
-    res.json({
 
-        message:"THE D CUTS API Running Successfully"
+
+/* ==========================================
+   HEALTH CHECK
+========================================== */
+
+
+app.get(
+    "/api/health",
+    (req,res)=>{
+
+
+        res.json({
+
+            success:true,
+
+            message:
+            "THE D CUTS Server Running",
+
+            time:
+            new Date()
+
+        });
+
+
+    }
+);
+
+
+
+
+
+
+/* ==========================================
+   HOME
+========================================== */
+
+
+app.get(
+    "/",
+    (req,res)=>{
+
+
+        res.send(`
+
+        <h2>
+        THE D CUTS SERVER RUNNING 🚀
+        </h2>
+
+        <p>
+        Open:
+        /client/login.html
+        </p>
+
+        `);
+
+
+    }
+);
+
+
+
+
+
+
+/* ==========================================
+   API ERROR
+========================================== */
+
+
+app.use(
+    "/api",
+    (req,res)=>{
+
+
+        res.status(404).json({
+
+            success:false,
+
+            message:
+            "API Not Found"
+
+        });
+
+
+    }
+);
+
+
+
+
+
+
+/* ==========================================
+   ERROR HANDLER
+========================================== */
+
+
+app.use(
+(err,req,res,next)=>{
+
+
+    console.error(
+        err
+    );
+
+
+    res.status(500).json({
+
+        success:false,
+
+        message:
+        "Server Error"
 
     });
+
 
 });
 
 
 
-// ===============================
-// SERVER START
-// ===============================
 
 
-const PORT = process.env.PORT || 5000;
 
 
-app.listen(PORT,()=>{
+/* ==========================================
+   DATABASE
+========================================== */
+
+
+const MONGO_URI =
+process.env.MONGO_URI;
+
+
+
+if(!MONGO_URI){
+
 
     console.log(
-        `✅ Server running on http://localhost:${PORT}`
+        "Mongo URI Missing"
     );
+
+
+    process.exit(1);
+
+
+}
+
+
+
+
+console.log(
+    "Mongo URL:",
+    MONGO_URI
+);
+
+
+
+
+
+mongoose
+.connect(
+    MONGO_URI
+)
+
+
+.then(()=>{
+
+
+    console.log(
+        "✅ MongoDB Connected"
+    );
+
+
+
+    app.listen(
+        PORT,
+        ()=>{
+
+
+            console.log(
+                `🚀 Server running on port ${PORT}`
+            );
+
+
+            console.log(
+                `🌐 http://localhost:${PORT}`
+            );
+
+
+        }
+    );
+
+
+
+})
+
+
+
+.catch((error)=>{
+
+
+    console.log(
+        "❌ MongoDB Error"
+    );
+
+
+    console.log(
+        error.message
+    );
+
 
 });

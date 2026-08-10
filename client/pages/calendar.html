@@ -4,171 +4,538 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Calendar | THE D CUTS</title>
 
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/calendar.css">
 
-    <link rel="stylesheet"
+    <!-- MAIN CSS -->
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css">
+
+
+    <!-- CALENDAR CSS -->
+
+    <link
+        rel="stylesheet"
+        href="../css/calendar.css">
+
+
+    <!-- FONT AWESOME -->
+
+    <link
+        rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 </head>
 
+
 <body>
+
+
+<!-- =====================================
+     AUTH CHECK
+===================================== -->
+
 <script src="../js/auth.js"></script>
-<!-- ================= NAVBAR ================= -->
+
+
+<script>
+
+const role =
+    localStorage.getItem("role");
+
+
+if (!role) {
+
+    window.location.href =
+        "../login.html";
+
+}
+
+
+if (role !== "admin") {
+
+    window.location.href =
+        "timesheet.html";
+
+}
+
+</script>
+
+
+
+<!-- =====================================
+     NAVBAR
+===================================== -->
 
 <nav class="navbar">
+
+
+    <!-- LOGO -->
 
     <div class="logo">
 
         <div class="logo-icon">
-            <i class="fa-regular fa-clock"></i>
+
+            <i
+                class="fa-regular fa-clock">
+            </i>
+
         </div>
 
-        <h2>DCUTS.TS</h2>
+
+        <h2>
+            DCUTS.TS
+        </h2>
 
     </div>
+
+
+
+    <!-- MENU -->
 
     <ul class="menu">
 
+
+        <!-- HOME -->
+
         <li>
+
             <a href="../index.html">
-                <i class="fa-solid fa-house"></i>
+
+                <i
+                    class="fa-solid fa-house">
+                </i>
+
                 Home
+
             </a>
+
         </li>
 
+
+
+        <!-- DASHBOARD -->
+
         <li>
+
             <a href="dashboard.html">
-                <i class="fa-solid fa-table-columns"></i>
+
+                <i
+                    class="fa-solid fa-table-columns">
+                </i>
+
                 Dashboard
+
             </a>
+
         </li>
 
+
+
+        <!-- TIMESHEET -->
+
         <li>
+
             <a href="timesheet.html">
-                <i class="fa-regular fa-clock"></i>
+
+                <i
+                    class="fa-regular fa-clock">
+                </i>
+
                 Timesheet
+
             </a>
+
         </li>
 
+
+
+        <!-- REPORTS -->
+
         <li>
+
             <a href="reports.html">
-                <i class="fa-regular fa-file-lines"></i>
+
+                <i
+                    class="fa-regular fa-file-lines">
+                </i>
+
                 Reports
+
             </a>
+
         </li>
+
+
+
+        <!-- CALENDAR -->
 
         <li class="active">
+
             <a href="calendar.html">
-                <i class="fa-solid fa-calendar-days"></i>
+
+                <i
+                    class="fa-solid fa-calendar-days">
+                </i>
+
                 Calendar
+
             </a>
+
         </li>
 
+
+
+        <!-- EMPLOYEES -->
+
         <li>
+
             <a href="employees.html">
-                <i class="fa-solid fa-users"></i>
+
+                <i
+                    class="fa-solid fa-users">
+                </i>
+
                 Employees
+
             </a>
+
         </li>
 
+
+
+        <!-- CLIENTS -->
+
         <li>
+
             <a href="clients.html">
-                <i class="fa-solid fa-user-tie"></i>
+
+                <i
+                    class="fa-solid fa-user-tie">
+                </i>
+
                 Clients
+
             </a>
+
         </li>
 
+
+
+        <!-- SETTINGS -->
+
         <li>
+
             <a href="settings.html">
-                <i class="fa-solid fa-gear"></i>
+
+                <i
+                    class="fa-solid fa-gear">
+                </i>
+
                 Settings
+
             </a>
+
         </li>
+
 
     </ul>
 
+
+
+    <!-- PROFILE -->
+
     <div class="profile">
-        <p>Dcuts</p>
+
+        <p>
+            Dcuts
+        </p>
+
         <span>
-            <i class="fa-solid fa-shield-halved"></i>
+
+            <i
+                class="fa-solid fa-shield-halved">
+            </i>
+
             Admin
+
         </span>
+
     </div>
+
 
 </nav>
 
+
+
+<!-- =====================================
+     CALENDAR PAGE
+===================================== -->
+
 <div class="calendar-page">
+
+
+
+    <!-- =================================
+         CALENDAR HEADER
+    ================================== -->
 
     <div class="calendar-header">
 
-        <h1>Work Calendar</h1>
 
-        <button onclick="openEventBox()">
-            <i class="fa-solid fa-plus"></i>
+        <div>
+
+            <h1>
+                Work Calendar
+            </h1>
+
+            <p>
+                Manage your daily work schedule
+            </p>
+
+        </div>
+
+
+
+        <!-- ADD WORK -->
+
+        <button
+            type="button"
+            onclick="openEventBox()">
+
+            <i
+                class="fa-solid fa-plus">
+            </i>
+
             Add Work
+
         </button>
 
+
     </div>
+
+
+
+    <!-- =================================
+         CALENDAR CARD
+    ================================== -->
 
     <div class="calendar-card">
 
+
+
+        <!-- MONTH TITLE -->
+
         <div class="month-title">
-            <h2 id="monthYear"></h2>
+
+
+            <!-- PREVIOUS -->
+
+            <button
+                type="button"
+                onclick="previousMonth()">
+
+                <i
+                    class="fa-solid fa-chevron-left">
+                </i>
+
+            </button>
+
+
+
+            <!-- MONTH -->
+
+            <h2 id="monthYear">
+                August 2026
+            </h2>
+
+
+
+            <!-- NEXT -->
+
+            <button
+                type="button"
+                onclick="nextMonth()">
+
+                <i
+                    class="fa-solid fa-chevron-right">
+                </i>
+
+            </button>
+
+
         </div>
+
+
+
+        <!-- =================================
+             WEEK DAYS
+        ================================== -->
 
         <div class="weekdays">
 
-            <div>Sun</div>
-            <div>Mon</div>
-            <div>Tue</div>
-            <div>Wed</div>
-            <div>Thu</div>
-            <div>Fri</div>
-            <div>Sat</div>
+
+            <div>
+                Sun
+            </div>
+
+
+            <div>
+                Mon
+            </div>
+
+
+            <div>
+                Tue
+            </div>
+
+
+            <div>
+                Wed
+            </div>
+
+
+            <div>
+                Thu
+            </div>
+
+
+            <div>
+                Fri
+            </div>
+
+
+            <div>
+                Sat
+            </div>
+
 
         </div>
 
-        <div id="calendarGrid" class="calendar-grid"></div>
+
+
+        <!-- =================================
+             CALENDAR GRID
+        ================================== -->
+
+        <div
+            id="calendarGrid"
+            class="calendar-grid">
+
+        </div>
+
 
     </div>
 
+
+
 </div>
 
-<div id="eventModal" class="modal">
+
+
+<!-- =====================================
+     ADD / EDIT WORK MODAL
+===================================== -->
+
+<div
+    id="eventModal"
+    class="modal">
+
 
     <div class="modal-box">
 
-        <h2>Add Daily Work</h2>
+
+        <!-- MODAL TITLE -->
+
+        <h2 id="modalTitle">
+            Add Daily Work
+        </h2>
+
+
+
+        <!-- DATE -->
 
         <input
             type="date"
             id="eventDate">
+
+
+
+        <!-- WORK DETAILS -->
 
         <input
             type="text"
             id="eventTitle"
             placeholder="Work Details">
 
-        <button onclick="saveEvent()">
-            Save
+
+
+        <!-- SAVE / UPDATE -->
+
+        <button
+            type="button"
+            id="saveEventBtn"
+            onclick="saveEvent()">
+
+            <i
+                class="fa-solid fa-floppy-disk">
+            </i>
+
+            Save Work
+
         </button>
 
-        <button onclick="closeEventBox()">
+
+
+        <!-- CANCEL -->
+
+        <button
+            type="button"
+            onclick="closeEventBox()">
+
+            <i
+                class="fa-solid fa-xmark">
+            </i>
+
             Cancel
+
         </button>
+
 
     </div>
 
+
 </div>
 
-<script src="../js/auth.js"></script>
-<script src="../js/sidebar.js"></script>
-<script src="../js/calendar.js"></script>
+
+
+<!-- =====================================
+     JAVASCRIPT
+===================================== -->
+
+<script
+    src="../js/navbar.js">
+</script>
+
+
+<script
+    src="../js/sidebar.js">
+</script>
+
+
+<script
+    src="../js/calendar.js">
+</script>
+
+
 
 </body>
+
 </html>

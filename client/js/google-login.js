@@ -1,98 +1,238 @@
-import { initializeApp } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+/* ==========================================
+   THE D CUTS
+   FIREBASE GOOGLE LOGIN
+========================================== */
 
 
 import {
-
-getAuth,
-
-GoogleAuthProvider,
-
-signInWithPopup
-
+    initializeApp
 }
-
 from 
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
+
+import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup
+}
+from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 
 
-
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDP6-N1ttRIaGuouYm6luo5eFnukTGjTL8",
-  authDomain: "the-dcuts.firebaseapp.com",
-  projectId: "the-dcuts",
-  storageBucket: "the-dcuts.firebasestorage.app",
-  messagingSenderId: "549784640907",
-  appId: "1:549784640907:web:677d6c6670d16e9001638e",
-  measurementId: "G-Q91HC5F105"
+
+    apiKey:
+    "AIzaSyDP6-N1ttRIaGuouYm6luo5eFnukTGjTL8",
+
+    authDomain:
+    "the-dcuts.firebaseapp.com",
+
+    projectId:
+    "the-dcuts",
+
+    storageBucket:
+    "the-dcuts.firebasestorage.app",
+
+    messagingSenderId:
+    "549784640907",
+
+    appId:
+    "1:549784640907:web:677d6c6670d16e9001638e",
+
+    measurementId:
+    "G-Q91HC5F105"
+
 };
 
 
-const app = initializeApp(firebaseConfig);
 
-
-const auth = getAuth(app);
-
-
-const provider = new GoogleAuthProvider();
+const app =
+initializeApp(firebaseConfig);
 
 
 
-
-
-window.googleLogin=function(){
-
-
-
-signInWithPopup(auth,provider)
-
-.then((result)=>{
+const auth =
+getAuth(app);
 
 
 
-const user=result.user;
+const provider =
+new GoogleAuthProvider();
 
 
 
-let email=user.email;
+console.log(
+    "🔥 GOOGLE LOGIN JS LOADED"
+);
 
 
 
-/*
-ADMIN EMAIL
-*/
+window.googleLogin = async function(){
 
 
-const adminEmail="dcutsdigitalsolutions@gmail.com";
-
-
-
-
-
-let role;
+console.log(
+    "GOOGLE BUTTON CLICKED"
+);
 
 
 
-if(email===adminEmail){
+const message =
+document.getElementById("message");
 
+
+
+try{
+
+
+if(message){
+
+message.innerText =
+"Opening Google Login...";
+
+}
+
+
+
+const result =
+await signInWithPopup(
+    auth,
+    provider
+);
+
+
+
+const user =
+result.user;
+
+
+
+console.log(
+    "GOOGLE USER",
+    user
+);
+
+
+
+const email =
+user.email
+.toLowerCase()
+.trim();
+
+
+
+let role="employee";
+
+
+
+if(
+email ===
+"dcutsdigitalsolutions@gmail.com"
+){
 
 role="admin";
 
-
-}
-
-else{
-
-
-role="employee";
-
-
 }
 
 
+
+
+const userData={
+
+name:
+user.displayName,
+
+email:
+email,
+
+role:
+role
+
+};
+
+/* ==========================================
+   SEND GOOGLE USER TO BACKEND
+========================================== */
+
+const backendResponse =
+await fetch(
+"http://localhost:5000/api/auth/google",
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":
+"application/json"
+
+},
+
+body:JSON.stringify({
+
+name:
+user.displayName,
+
+email:
+email
+
+})
+
+}
+);
+
+
+
+const backendData =
+await backendResponse.json();
+
+
+
+console.log(
+"BACKEND RESPONSE",
+backendData
+);
+
+
+
+if(
+!backendData.success
+){
+
+throw new Error(
+backendData.message ||
+"Backend login failed"
+);
+
+}
+
+
+
+/* ==========================================
+   SAVE BACKEND JWT TOKEN
+========================================== */
+
+
+localStorage.setItem(
+
+"token",
+
+backendData.token
+
+);
+
+
+
+localStorage.setItem(
+
+"user",
+
+JSON.stringify(
+backendData.user
+)
+
+);
 
 
 
@@ -100,15 +240,58 @@ localStorage.setItem(
 
 "loggedUser",
 
-JSON.stringify({
+JSON.stringify(
+backendData.user
+)
 
-name:user.displayName,
+);
 
-email:user.email,
 
-role:role
 
-})
+localStorage.setItem(
+
+"role",
+
+backendData.user.role
+
+);
+
+
+
+localStorage.setItem(
+
+"userName",
+
+backendData.user.name
+
+);
+
+
+
+localStorage.setItem(
+
+"userEmail",
+
+backendData.user.email
+
+);
+
+
+localStorage.setItem(
+
+"user",
+
+JSON.stringify(userData)
+
+);
+
+
+
+localStorage.setItem(
+
+"loggedUser",
+
+JSON.stringify(userData)
 
 );
 
@@ -124,6 +307,7 @@ role
 
 
 
+
 localStorage.setItem(
 
 "userName",
@@ -134,14 +318,30 @@ user.displayName
 
 
 
+localStorage.setItem(
+
+"userEmail",
+
+email
+
+);
+
+
+
+
+console.log(
+"LOGIN SUCCESS",
+userData
+);
+
+
 
 
 if(role==="admin"){
 
 
-
-window.location.href="index.html";
-
+window.location.href =
+"./index.html";
 
 
 }
@@ -149,24 +349,33 @@ window.location.href="index.html";
 else{
 
 
-window.location.href="pages/timesheet.html";
+window.location.href =
+"./pages/timesheet.html";
 
 
 }
 
 
 
+}
 
-})
-
-
-.catch((error)=>{
+catch(error){
 
 
-alert(error.message);
+console.error(
+"GOOGLE ERROR",
+error
+);
 
 
-});
+
+alert(
+error.message
+);
+
+
+
+}
 
 
 }

@@ -2,106 +2,56 @@ const express = require("express");
 
 const router = express.Router();
 
-
 const authMiddleware =
-require("../middleware/authMiddleware");
-
+    require("../middleware/authMiddleware");
 
 
 const {
 
-    employeePDF,
+    generateTimesheetPDF,
 
-    attendancePDF,
+    generateEmployeePDF,
 
-    timesheetPDF,
+    generateClientPDF
 
-    projectReportPDF
-
-}
-=
-require("../controllers/pdfController");
+} = require("../controllers/pdfController");
 
 
-
-
-
-// ===============================
-// EMPLOYEE PDF
-// ===============================
+/* ==========================================
+   TIMESHEET PDF
+========================================== */
 
 router.get(
+    "/timesheets",
+    authMiddleware,
+    generateTimesheetPDF
+);
 
+
+/* ==========================================
+   EMPLOYEE PDF
+========================================== */
+
+router.get(
     "/employees",
-
     authMiddleware,
-
-    employeePDF
-
+    generateEmployeePDF
 );
 
 
-
-
-
-
-// ===============================
-// ATTENDANCE PDF
-// ===============================
+/* ==========================================
+   CLIENT PDF
+========================================== */
 
 router.get(
-
-    "/attendance",
-
+    "/clients",
     authMiddleware,
-
-    attendancePDF
-
+    generateClientPDF
 );
 
 
-
-
-
-
-// ===============================
-// TIMESHEET PDF
-// ===============================
-
-router.get(
-
-    "/timesheet",
-
-    authMiddleware,
-
-    timesheetPDF
-
-);
-
-
-
-
-
-
-
-// ===============================
-// PROJECT REPORT PDF
-// ===============================
-
-router.get(
-
-    "/project-report",
-
-    authMiddleware,
-
-    projectReportPDF
-
-);
-
-
-
-
-
-
+/* ==========================================
+   EXPORT
+========================================== */
 
 module.exports = router;

@@ -1,306 +1,188 @@
-/* =====================================
-   THE D CUTS TIMESHEET
-===================================== */
+const mongoose = require("mongoose");
 
 
+const timesheetSchema = new mongoose.Schema(
 
-let timesheets =
+    {
 
-JSON.parse(
+        /* =====================================
+           EMPLOYEE
+        ===================================== */
 
-localStorage.getItem("timesheets")
+        employee: {
 
-) || [];
+            type:
+                mongoose.Schema.Types.ObjectId,
 
+            ref: "Employee",
 
+            required: true
 
+        },
 
 
+        /* =====================================
+           PROJECT
+        ===================================== */
 
+        project: {
 
+            type: String,
 
-/* ===============================
- LOAD CLIENT PROJECTS
-================================ */
+            required: true,
 
+            trim: true
 
-function loadProjects(){
+        },
 
 
+        projectName: {
 
-let clients =
+            type: String,
 
-JSON.parse(
+            required: true,
 
-localStorage.getItem("clients")
+            trim: true
 
-) || [];
+        },
 
 
+        /* =====================================
+           DATE
+        ===================================== */
 
+        date: {
 
-let projectSelect =
+            type: Date,
 
-document.getElementById("project");
+            required: true
 
+        },
 
 
-if(!projectSelect)
+        /* =====================================
+           VIDEO DETAILS
+        ===================================== */
 
-return;
+        totalVideos: {
 
+            type: Number,
 
+            default: 0,
 
+            min: 0
 
+        },
 
-projectSelect.innerHTML = `
 
+        completedVideos: {
 
-<option value="">
+            type: Number,
 
+            default: 0,
 
-Select Project
+            min: 0
 
+        },
 
-</option>
 
+        balanceVideos: {
 
-`;
+            type: Number,
 
+            default: 0,
 
+            min: 0
 
+        },
 
 
+        /* =====================================
+           COMMENTS
+        ===================================== */
 
-clients.forEach(client=>{
+        comments: {
 
+            type: String,
 
-projectSelect.innerHTML +=`
+            default: "",
 
+            trim: true
 
-<option value="${client.code}">
+        },
 
 
-${client.code} - ${client.name}
+        /* =====================================
+           STATUS
+        ===================================== */
 
+        status: {
 
-</option>
+            type: String,
 
+            enum: [
 
-`;
+                "Pending",
 
+                "Approved",
 
+                "Rejected",
 
-});
+                "Completed"
 
+            ],
 
+            default: "Pending"
 
-}
+        }
 
+    },
 
+    {
 
+        timestamps: true
 
-loadProjects();
-
-
-
-
-
-
-
-
-
-
-/* ===============================
- DATE
-================================ */
-
-
-
-let dateInput =
-
-document.getElementById("date");
-
-
-
-if(dateInput){
-
-
-dateInput.value =
-
-new Date()
-
-.toISOString()
-
-.split("T")[0];
-
-
-}
-
-
-
-
-
-
-
-
-
-/* ===============================
- SAVE TIMESHEET
-================================ */
-
-
-
-function saveTimesheet(){
-
-
-
-let employee =
-
-document.getElementById("employeeName").value;
-
-
-
-let project =
-
-document.getElementById("project").value;
-
-
-
-let task =
-
-document.getElementById("task").value;
-
-
-
-let hours =
-
-document.getElementById("hours").value;
-
-
-
-let comments =
-
-document.getElementById("comments").value;
-
-
-
-let date =
-
-document.getElementById("date").value;
-
-
-
-
-
-
-
-if(
-employee==="" ||
-project==="" ||
-task==="" ||
-hours===""
-){
-
-
-alert("Please fill required fields");
-
-
-return;
-
-
-}
-
-
-
-
-
-
-let data={
-
-
-id:Date.now(),
-
-employee,
-
-date,
-
-project,
-
-task,
-
-hours,
-
-comments
-
-
-};
-
-
-
-
-
-
-
-timesheets.push(data);
-
-
-
-
-localStorage.setItem(
-
-"timesheets",
-
-JSON.stringify(timesheets)
+    }
 
 );
 
 
+/* ==========================================
+   AUTO CALCULATE BALANCE
+========================================== */
+
+timesheetSchema.pre(
+    "save",
+    function () {
+
+        const total =
+            Number(
+                this.totalVideos
+            ) || 0;
 
 
+        const completed =
+            Number(
+                this.completedVideos
+            ) || 0;
 
-alert(
 
-"Timesheet Saved Successfully ✅"
+        this.balanceVideos =
+            Math.max(
+                total - completed,
+                0
+            );
 
+    }
 );
 
 
+/* ==========================================
+   MODEL
+========================================== */
 
-
-
-clearForm();
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-/* ===============================
- CLEAR
-================================ */
-
-
-
-function clearForm(){
-
-
-document.getElementById("task").value="";
-
-
-document.getElementById("hours").value="";
-
-
-document.getElementById("comments").value="";
-
-
-
-}
+module.exports =
+    mongoose.model(
+        "Timesheet",
+        timesheetSchema
+    );

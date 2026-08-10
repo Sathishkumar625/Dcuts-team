@@ -186,13 +186,472 @@ if(role!=="admin"){
 
     </aside>
 
-    <main class="settings-content">
+   <main class="settings-content">
 
-        <!-- உங்கள் Profile, Company, Employees, Projects, Clients, Security,
-        Notifications, Appearance, Backup, About sections அனைத்தும்
-        மாற்றமில்லாமல் இங்கே அதேபடி இருக்கும் -->
 
-    </main>
+<!-- PROFILE -->
+
+<div class="settings-card" id="profile">
+
+
+<h2>
+<i class="fa-solid fa-user"></i>
+Profile
+</h2>
+
+
+<label>
+Admin Name
+</label>
+
+<input id="adminName"
+type="text">
+
+
+<label>
+Admin Email
+</label>
+
+<input id="adminEmail"
+type="email">
+
+
+<button onclick="saveProfile()">
+Save Profile
+</button>
+
+
+</div>
+
+
+
+
+
+<!-- COMPANY -->
+
+<div class="settings-card hidden" id="company">
+
+
+<h2>
+<i class="fa-solid fa-building"></i>
+Company Settings
+</h2>
+
+
+<label>
+Company Name
+</label>
+
+<input id="companyName">
+
+
+<label>
+Phone
+</label>
+
+<input id="companyPhone">
+
+
+<label>
+Email
+</label>
+
+<input id="companyEmail">
+
+
+<label>
+Address
+</label>
+
+<textarea id="companyAddress"></textarea>
+
+
+
+<button onclick="saveCompany()">
+Save Company
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+<!-- EMPLOYEE -->
+
+<div class="settings-card hidden" id="employees">
+
+
+<h2>
+<i class="fa-solid fa-users"></i>
+Employees
+</h2>
+
+
+
+<input 
+id="newEmployeeName"
+placeholder="Employee Name">
+
+
+
+<input 
+id="newEmployeeEmail"
+placeholder="Employee Email">
+
+
+
+<button onclick="addEmployee()">
+
+Add Employee
+
+</button>
+
+
+<div id="employeeList">
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- PROJECT -->
+
+<div class="settings-card hidden" id="projects">
+
+
+<h2>
+Projects
+</h2>
+
+
+
+<input
+id="newProjectName"
+placeholder="Project Name">
+
+
+<input
+id="newProjectCode"
+placeholder="Project Code">
+
+
+<button onclick="addProject()">
+
+Add Project
+
+</button>
+
+
+
+<div id="projectList">
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- CLIENT -->
+
+<div class="settings-card hidden" id="clients">
+
+
+<h2>
+Clients
+</h2>
+
+
+
+<input
+id="newClientName"
+placeholder="Client Name">
+
+
+<input
+id="newClientCode"
+placeholder="Client Code">
+
+
+<input
+id="newClientLocation"
+placeholder="Location">
+
+
+
+<button onclick="addClient()">
+
+Add Client
+
+</button>
+
+
+<div id="clientList">
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<!-- SECURITY -->
+
+<div class="settings-card hidden" id="security">
+
+
+<h2>
+Security
+</h2>
+
+
+<input
+type="password"
+id="currentPassword"
+placeholder="Current Password">
+
+
+<input
+type="password"
+id="newPassword"
+placeholder="New Password">
+
+
+<input
+type="password"
+id="confirmPassword"
+placeholder="Confirm Password">
+
+
+<button onclick="changePassword()">
+
+Change Password
+
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<!-- NOTIFICATIONS -->
+
+
+<div class="settings-card hidden"
+id="notifications">
+
+
+<h2>
+Notifications
+</h2>
+
+
+<label>
+
+<input
+type="checkbox"
+id="emailNotifications">
+
+Email Notification
+
+</label>
+
+
+
+<label>
+
+<input
+type="checkbox"
+id="reportNotifications">
+
+Report Notification
+
+</label>
+
+
+
+<label>
+
+<input
+type="checkbox"
+id="reminderNotifications">
+
+Reminder
+
+</label>
+
+
+
+<button onclick="saveNotifications()">
+
+Save
+
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<!-- APPEARANCE -->
+
+
+<div class="settings-card hidden"
+id="appearance">
+
+
+<h2>
+Appearance
+</h2>
+
+
+
+<select id="themeSelect">
+
+
+<option value="dark">
+Dark
+</option>
+
+
+<option value="light">
+Light
+</option>
+
+
+</select>
+
+
+<button onclick="saveAppearance()">
+
+Save
+
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- BACKUP -->
+
+<div class="settings-card hidden"
+id="backup">
+
+
+<h2>
+Backup
+</h2>
+
+
+
+<button onclick="backupData()">
+
+Download Backup
+
+</button>
+
+
+
+<br><br>
+
+
+<input 
+type="file"
+id="restoreFile">
+
+
+<button onclick="restoreData()">
+
+Restore
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- ABOUT -->
+
+
+<div class="settings-card hidden"
+id="about">
+
+
+<h2>
+THE D CUTS
+</h2>
+
+
+<p>
+Timesheet Management System
+</p>
+
+
+<p>
+Version 2.0
+</p>
+
+
+</div>
+
+
+
+</main>
 
 </div>
 

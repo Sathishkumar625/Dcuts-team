@@ -1,141 +1,240 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
 
-<title>Timesheet | THE D CUTS</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="../css/style.css">
-<link rel="stylesheet" href="../css/timesheet.css">
+    <title>
+        Timesheet | THE D CUTS
+    </title>
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css">
+
+
+    <link
+        rel="stylesheet"
+        href="../css/timesheet.css">
+
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 </head>
 
+
 <body>
 
-<script src="../js/auth.js"></script>
 
-<div id="navbar-container"></div>
+    <!-- AUTH -->
 
-<div class="timesheet-page">
+    <script src="../js/auth.js"></script>
 
-<h1>Daily Timesheet</h1>
 
-<p class="subtitle">
+    <!-- NAVBAR -->
 
-Manage Daily Project Work
+    <div id="navbar-container"></div>
 
-</p>
 
-<div class="timesheet-card">
+    <div class="timesheet-page">
 
-<label>Employee</label>
 
-<select id="employeeName">
+        <h1>
+            Daily Timesheet
+        </h1>
 
-<option value="">Select Employee</option>
 
-<option value="Sathish Kumar">Sathish Kumar</option>
+        <p class="subtitle">
+            Manage Daily Project Work
+        </p>
 
-<option value="Naveen">Naveen</option>
 
-</select>
+        <!-- ==========================================
+             FORM
+        =========================================== -->
 
-<label>Date</label>
+        <div class="timesheet-card">
 
-<input
-type="date"
-id="date">
 
-<!-- Dynamic Project Container -->
+            <label>
+                Employee
+            </label>
 
-<div id="projectContainer">
 
-</div>
+            <select id="employeeName">
 
-<div class="btn-group">
+                <option value="">
+                    Loading...
+                </option>
 
-<button
-class="add-btn"
-onclick="addProjectCard()">
+            </select>
 
-<i class="fa-solid fa-plus"></i>
 
-Add Project
+            <small
+                id="employeeHelp"
+                style="
+                    display:block;
+                    margin-top:6px;
+                    opacity:.7;
+                ">
+            </small>
 
-</button>
 
-<button
-class="save-btn"
-onclick="saveTimesheet()">
+            <label>
+                Date
+            </label>
 
-<i class="fa-solid fa-floppy-disk"></i>
 
-Save
+            <input
+                type="date"
+                id="date">
 
-</button>
 
-<button
-class="update-btn"
-id="updateBtn"
-onclick="updateTimesheet()">
+            <!-- PROJECTS -->
 
-<i class="fa-solid fa-pen"></i>
+            <div id="projectContainer">
+            </div>
 
-Update
 
-</button>
+            <!-- BUTTONS -->
 
-</div>
+            <div class="btn-group">
 
-</div>
 
-<div class="table-card">
+                <button
+                    type="button"
+                    class="add-btn"
+                    onclick="addProjectCard()">
 
-<h2>Timesheet Records</h2>
+                    <i class="fa-solid fa-plus"></i>
 
-<table>
+                    Add Project
 
-<thead>
+                </button>
 
-<tr>
 
-<th>Employee</th>
+                <button
+                    type="button"
+                    class="save-btn"
+                    id="saveBtn"
+                    onclick="saveTimesheet()">
 
-<th>Date</th>
+                    <i class="fa-solid fa-floppy-disk"></i>
 
-<th>Project</th>
+                    Save
 
-<th>Total</th>
+                </button>
 
-<th>Completed</th>
 
-<th>Balance</th>
+                <button
+                    type="button"
+                    class="update-btn"
+                    id="updateBtn"
+                    onclick="updateTimesheet()">
 
-<th>Action</th>
+                    <i class="fa-solid fa-pen"></i>
 
-</tr>
+                    Update
 
-</thead>
+                </button>
 
-<tbody id="timesheetTable">
 
-</tbody>
+            </div>
 
-</table>
 
-</div>
+        </div>
 
-</div>
 
-<script src="../js/navbar.js"></script>
-<script src="../js/sidebar.js"></script>
-<script src="../js/timesheet.js"></script>
+        <!-- ==========================================
+             RECORDS
+        =========================================== -->
+
+        <div class="table-card">
+
+
+            <h2>
+                Timesheet Records
+            </h2>
+
+
+            <div
+                style="
+                    overflow-x:auto;
+                ">
+
+
+                <table>
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Employee
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Project
+                            </th>
+
+                            <th>
+                                Total
+                            </th>
+
+                            <th>
+                                Completed
+                            </th>
+
+                            <th>
+                                Balance
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="timesheetTable">
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    <script src="../js/navbar.js"></script>
+
+    <script src="../js/sidebar.js"></script>
+
+    <script src="../js/timesheet.js"></script>
+
 
 </body>
 

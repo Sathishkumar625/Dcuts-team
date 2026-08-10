@@ -1,215 +1,828 @@
-.calendar-page{
-
-padding:40px;
-
-}
-
+/* =====================================
+   THE D CUTS WORK CALENDAR
+   COMPLETE CALENDAR CSS
+===================================== */
 
 
-.calendar-header{
+/* =====================================
+   PAGE
+===================================== */
 
-display:flex;
+.calendar-page {
 
-justify-content:space-between;
+    padding: 40px;
 
-align-items:center;
-
-}
-
-
-
-.calendar-header h1{
-
-font-size:42px;
+    min-height: calc(100vh - 80px);
 
 }
 
 
+/* =====================================
+   HEADER
+===================================== */
 
-.calendar-header button{
+.calendar-header {
 
-background:#2563eb;
+    display: flex;
 
-color:white;
+    justify-content: space-between;
 
-border:none;
+    align-items: center;
 
-padding:15px 25px;
-
-border-radius:15px;
-
-cursor:pointer;
-
-}
-
-
-
-
-.calendar-card{
-
-margin-top:35px;
-
-background:rgba(255,255,255,.06);
-
-padding:30px;
-
-border-radius:25px;
-
-border:1px solid rgba(255,255,255,.1);
+    gap: 20px;
 
 }
 
 
+.calendar-header h1 {
+
+    font-size: 42px;
+
+    margin: 0;
+
+}
 
 
+.calendar-header p {
+
+    color: #94a3b8;
+
+    margin-top: 8px;
+
+}
+
+
+/* =====================================
+   ADD WORK BUTTON
+===================================== */
+
+.calendar-header button {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    background: #2563eb;
+
+    color: white;
+
+    border: none;
+
+    padding: 15px 25px;
+
+    border-radius: 15px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    transition: .3s;
+
+}
+
+
+.calendar-header button:hover {
+
+    background: #1d4ed8;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 25px rgba(37, 99, 235, .3);
+
+}
+
+
+/* =====================================
+   CALENDAR CARD
+===================================== */
+
+.calendar-card {
+
+    margin-top: 35px;
+
+    background: rgba(255,255,255,.06);
+
+    padding: 30px;
+
+    border-radius: 25px;
+
+    border: 1px solid rgba(255,255,255,.1);
+
+    backdrop-filter: blur(15px);
+
+}
+
+
+/* =====================================
+   MONTH HEADER
+===================================== */
+
+.month-title {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 25px;
+
+}
+
+
+.month-title h2 {
+
+    font-size: 26px;
+
+    margin: 0;
+
+}
+
+
+/* =====================================
+   MONTH NAVIGATION
+===================================== */
+
+.month-navigation {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.month-navigation button {
+
+    width: 42px;
+
+    height: 42px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #1e293b;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+    transition: .3s;
+
+}
+
+
+.month-navigation button:hover {
+
+    background: #2563eb;
+
+    transform: translateY(-2px);
+
+}
+
+
+/* =====================================
+   WEEK DAYS
+===================================== */
 
 .weekdays,
-.calendar-grid{
+.calendar-grid {
 
+    display: grid;
 
-display:grid;
+    grid-template-columns:
+        repeat(7, minmax(0, 1fr));
 
-grid-template-columns:repeat(7,1fr);
-
-gap:15px;
-
-}
-
-
-
-
-
-.weekdays div{
-
-text-align:center;
-
-color:#60a5fa;
-
-font-weight:bold;
+    gap: 15px;
 
 }
 
 
+.weekdays {
 
-.day{
-
-
-min-height:100px;
-
-background:#111827;
-
-border-radius:15px;
-
-padding:15px;
-
-cursor:pointer;
+    margin-bottom: 10px;
 
 }
 
 
+.weekdays div {
 
-.day:hover{
+    text-align: center;
 
-background:#1e40af;
+    color: #60a5fa;
 
-}
+    font-weight: bold;
 
-
-
-.event{
-
-background:#2563eb;
-
-padding:5px;
-
-border-radius:8px;
-
-font-size:12px;
-
-margin-top:8px;
+    padding: 10px;
 
 }
 
 
+/* =====================================
+   CALENDAR EMPTY BOX
+===================================== */
 
+.calendar-empty {
 
+    min-height: 110px;
 
-
-
-.modal{
-
-
-display:none;
-
-position:fixed;
-
-top:0;
-
-left:0;
-
-width:100%;
-
-height:100%;
-
-background:rgba(0,0,0,.7);
-
-align-items:center;
-
-justify-content:center;
+    background: transparent;
 
 }
 
 
+/* =====================================
+   DAY
+===================================== */
 
-.modal-box{
+.day {
 
+    min-height: 110px;
 
-background:#111827;
+    background: #111827;
 
-padding:30px;
+    border-radius: 15px;
 
-border-radius:20px;
+    padding: 12px;
 
-display:flex;
+    cursor: pointer;
 
-flex-direction:column;
+    border: 1px solid transparent;
 
-gap:15px;
+    transition: .3s;
 
-width:350px;
-
-}
-
-
-
-.modal-box input{
-
-
-padding:15px;
-
-background:#1e293b;
-
-border:none;
-
-color:white;
-
-border-radius:10px;
+    overflow: hidden;
 
 }
 
 
+.day:hover {
 
-.modal-box button{
+    background: #172554;
+
+    border-color: #2563eb;
+
+    transform: translateY(-2px);
+
+}
 
 
-padding:12px;
+/* =====================================
+   DAY NUMBER
+===================================== */
 
-border:none;
+.day strong {
 
-border-radius:10px;
+    display: flex;
 
-background:#2563eb;
+    align-items: center;
 
-color:white;
+    justify-content: center;
+
+    width: 30px;
+
+    height: 30px;
+
+    border-radius: 50%;
+
+    font-size: 14px;
+
+    margin-bottom: 5px;
+
+}
+
+
+/* =====================================
+   TODAY
+===================================== */
+
+.day.today {
+
+    border: 1px solid #2563eb;
+
+    box-shadow:
+        0 0 15px rgba(37,99,235,.18);
+
+}
+
+
+.day.today strong {
+
+    background: #2563eb;
+
+    color: white;
+
+}
+
+
+/* =====================================
+   EVENT
+===================================== */
+
+.event {
+
+    background: #2563eb;
+
+    padding: 7px 8px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+
+    margin-top: 7px;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 6px;
+
+    cursor: default;
+
+    border-left: 3px solid #60a5fa;
+
+}
+
+
+/* =====================================
+   EVENT TEXT
+===================================== */
+
+.event span {
+
+    flex: 1;
+
+    min-width: 0;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+}
+
+
+/* =====================================
+   EVENT ACTIONS
+===================================== */
+
+.event-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    flex-shrink: 0;
+
+}
+
+
+/* =====================================
+   EDIT / DELETE BUTTON
+===================================== */
+
+.event-actions button {
+
+    width: 24px;
+
+    height: 24px;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 6px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    cursor: pointer;
+
+    color: white;
+
+    font-size: 11px;
+
+    transition: .2s;
+
+}
+
+
+/* EDIT */
+
+.event-actions button:first-child {
+
+    background: #f59e0b;
+
+}
+
+
+.event-actions button:first-child:hover {
+
+    background: #d97706;
+
+    transform: scale(1.08);
+
+}
+
+
+/* DELETE */
+
+.event-actions button:last-child {
+
+    background: #ef4444;
+
+}
+
+
+.event-actions button:last-child:hover {
+
+    background: #dc2626;
+
+    transform: scale(1.08);
+
+}
+
+
+/* =====================================
+   MODAL
+===================================== */
+
+.modal {
+
+    display: none;
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    background: rgba(0,0,0,.75);
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 9999;
+
+    padding: 20px;
+
+}
+
+
+/* =====================================
+   MODAL BOX
+===================================== */
+
+.modal-box {
+
+    background: #111827;
+
+    padding: 30px;
+
+    border-radius: 20px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+
+    width: 350px;
+
+    max-width: 100%;
+
+    border: 1px solid rgba(255,255,255,.1);
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.5);
+
+    animation:
+        modalOpen .25s ease;
+
+}
+
+
+@keyframes modalOpen {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(20px)
+                   scale(.96);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0)
+                   scale(1);
+
+    }
+
+}
+
+
+/* =====================================
+   MODAL TITLE
+===================================== */
+
+.modal-box h2 {
+
+    margin: 0 0 5px;
+
+    font-size: 24px;
+
+}
+
+
+/* =====================================
+   MODAL INPUT
+===================================== */
+
+.modal-box input {
+
+    width: 100%;
+
+    padding: 15px;
+
+    background: #1e293b;
+
+    border: 1px solid transparent;
+
+    color: white;
+
+    border-radius: 10px;
+
+    outline: none;
+
+    font-size: 14px;
+
+}
+
+
+.modal-box input:focus {
+
+    border-color: #2563eb;
+
+}
+
+
+/* =====================================
+   MODAL BUTTONS
+===================================== */
+
+.modal-box button {
+
+    padding: 13px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition: .3s;
+
+}
+
+
+.modal-box button:hover {
+
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* CANCEL BUTTON
+   If your HTML has a second button
+*/
+
+.modal-box button:last-child {
+
+    background: #334155;
+
+}
+
+
+.modal-box button:last-child:hover {
+
+    background: #475569;
+
+}
+
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media (max-width: 900px) {
+
+    .calendar-page {
+
+        padding: 25px;
+
+    }
+
+
+    .calendar-header h1 {
+
+        font-size: 32px;
+
+    }
+
+
+    .calendar-card {
+
+        padding: 20px;
+
+    }
+
+
+    .weekdays,
+    .calendar-grid {
+
+        gap: 8px;
+
+    }
+
+
+    .day {
+
+        min-height: 90px;
+
+        padding: 8px;
+
+    }
+
+
+    .calendar-empty {
+
+        min-height: 90px;
+
+    }
+
+}
+
+
+/* =====================================
+   MOBILE SMALL
+===================================== */
+
+@media (max-width: 600px) {
+
+    .calendar-page {
+
+        padding: 15px;
+
+    }
+
+
+    .calendar-header {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .calendar-header h1 {
+
+        font-size: 28px;
+
+    }
+
+
+    .calendar-header button {
+
+        width: 100%;
+
+    }
+
+
+    .calendar-card {
+
+        padding: 12px;
+
+        border-radius: 18px;
+
+    }
+
+
+    .weekdays,
+    .calendar-grid {
+
+        gap: 5px;
+
+    }
+
+
+    .weekdays div {
+
+        font-size: 11px;
+
+        padding: 6px 2px;
+
+    }
+
+
+    .day {
+
+        min-height: 75px;
+
+        padding: 5px;
+
+        border-radius: 9px;
+
+    }
+
+
+    .calendar-empty {
+
+        min-height: 75px;
+
+    }
+
+
+    .day strong {
+
+        width: 25px;
+
+        height: 25px;
+
+        font-size: 11px;
+
+    }
+
+
+    .event {
+
+        padding: 5px;
+
+        font-size: 10px;
+
+        border-radius: 6px;
+
+    }
+
+
+    .event-actions button {
+
+        width: 20px;
+
+        height: 20px;
+
+        font-size: 9px;
+
+    }
+
+
+    .modal-box {
+
+        width: 100%;
+
+        padding: 22px;
+
+    }
 
 }
