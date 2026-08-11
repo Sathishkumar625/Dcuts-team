@@ -1,279 +1,611 @@
-.report-page{
+/* =====================================================
+   THE D CUTS
+   TIMESHEET REPORTS
+===================================================== */
 
+.report-page {
 
-padding:40px;
+    padding: 40px;
 
-
-}
-
-
-
-
-.report-header h1{
-
-
-font-size:42px;
-
+    min-height: calc(100vh - 80px);
 
 }
 
 
+/* =====================================================
+   HEADER
+===================================================== */
 
+.report-header {
 
-.report-header p{
+    display: flex;
 
+    align-items: center;
 
-color:#94a3b8;
+    justify-content: space-between;
 
+    gap: 20px;
 
-}
-
-
-
-
-
-
-
-.report-grid{
-
-
-display:grid;
-
-
-grid-template-columns:
-
-repeat(auto-fit,minmax(320px,1fr));
-
-
-gap:30px;
-
-
-margin-top:40px;
-
+    margin-bottom: 30px;
 
 }
 
 
+.report-header h1 {
 
+    margin: 0;
 
+    font-size: 42px;
 
-
-
-.report-card{
-
-
-background:
-
-rgba(255,255,255,0.06);
-
-
-border:
-
-1px solid rgba(255,255,255,.12);
-
-
-border-radius:25px;
-
-
-padding:30px;
-
-
-transition:.3s;
-
+    font-weight: 700;
 
 }
 
 
+.report-header p {
 
-.report-card:hover{
+    margin-top: 8px;
 
+    color: #94a3b8;
 
-transform:translateY(-8px);
-
-
-border-color:#2563eb;
-
+    font-size: 15px;
 
 }
 
 
+/* =====================================================
+   REFRESH BUTTON
+===================================================== */
 
+.refresh-btn {
 
+    border: none;
 
+    outline: none;
 
-.report-icon{
+    cursor: pointer;
 
+    padding: 12px 20px;
 
-width:70px;
+    border-radius: 12px;
 
+    background: #2563eb;
 
-height:70px;
+    color: white;
 
+    font-size: 14px;
 
-background:#2563eb;
+    font-weight: 600;
 
+    display: flex;
 
-border-radius:20px;
+    align-items: center;
 
+    gap: 8px;
 
-display:flex;
-
-
-align-items:center;
-
-
-justify-content:center;
-
-
-font-size:30px;
-
-
-color:white;
-
+    transition: 0.3s;
 
 }
 
 
+.refresh-btn:hover {
 
+    transform: translateY(-2px);
 
-
-
-.report-card h2{
-
-
-font-size:38px;
-
-
-color:#60a5fa;
-
-
-margin-bottom:5px;
-
+    opacity: 0.9;
 
 }
 
 
+/* =====================================================
+   SUMMARY
+===================================================== */
 
+.report-summary {
 
-.report-card h3{
+    display: grid;
 
+    grid-template-columns:
+        repeat(4, minmax(180px, 1fr));
 
-font-size:22px;
+    gap: 20px;
 
-
-}
-
-
-
-
-
-
-.location{
-
-
-color:#cbd5e1;
-
+    margin-bottom: 30px;
 
 }
 
 
+.summary-card {
 
+    background:
+        rgba(255, 255, 255, 0.06);
 
-.report-box{
+    border:
+        1px solid rgba(255, 255, 255, 0.12);
 
+    border-radius: 20px;
 
-display:flex;
+    padding: 22px;
 
+    display: flex;
 
-gap:15px;
+    align-items: center;
 
+    gap: 16px;
 
-margin-top:25px;
-
-
-}
-
-
-
-.report-box div{
-
-
-background:#111827;
-
-
-padding:20px;
-
-
-border-radius:15px;
-
-
-flex:1;
-
-
-text-align:center;
-
+    transition: 0.3s;
 
 }
 
 
+.summary-card:hover {
 
+    transform: translateY(-4px);
 
-
-.report-box span{
-
-
-display:block;
-
-
-color:#94a3b8;
-
+    border-color: #2563eb;
 
 }
 
 
+.summary-icon {
 
+    width: 55px;
 
+    height: 55px;
 
-.report-box strong{
+    border-radius: 15px;
 
+    background: #2563eb;
 
-font-size:28px;
+    display: flex;
 
+    align-items: center;
 
-color:white;
+    justify-content: center;
 
+    color: white;
 
-}
+    font-size: 22px;
 
-
-
-
-
-.details{
-
-
-margin-top:25px;
-
-
-background:#0f172a;
-
-
-padding:15px;
-
-
-border-radius:15px;
-
+    flex-shrink: 0;
 
 }
 
 
-.details p{
+.summary-card span {
+
+    display: block;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+    margin-bottom: 5px;
+
+}
 
 
-color:#cbd5e1;
+.summary-card strong {
+
+    display: block;
+
+    color: white;
+
+    font-size: 28px;
+
+}
 
 
-font-size:14px;
+/* =====================================================
+   MAIN REPORT CARD
+===================================================== */
 
+.report-card {
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.12);
+
+    border-radius: 22px;
+
+    overflow: hidden;
+
+}
+
+
+/* =====================================================
+   TABLE HEADER
+===================================================== */
+
+.table-header {
+
+    padding: 22px 25px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.10);
+
+}
+
+
+.table-header h2 {
+
+    margin: 0;
+
+    font-size: 22px;
+
+}
+
+
+.table-header span {
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+}
+
+
+/* =====================================================
+   TABLE WRAPPER
+===================================================== */
+
+.table-wrapper {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.report-table {
+
+    width: 100%;
+
+    min-width: 950px;
+
+    border-collapse: collapse;
+
+}
+
+
+.report-table thead {
+
+    background:
+        rgba(15, 23, 42, 0.75);
+
+}
+
+
+.report-table th {
+
+    padding: 16px 15px;
+
+    text-align: left;
+
+    color: #cbd5e1;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.10);
+
+}
+
+
+.report-table td {
+
+    padding: 16px 15px;
+
+    color: #e2e8f0;
+
+    font-size: 14px;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.07);
+
+    vertical-align: middle;
+
+}
+
+
+.report-table tbody tr {
+
+    transition: 0.2s;
+
+}
+
+
+.report-table tbody tr:hover {
+
+    background:
+        rgba(37, 99, 235, 0.08);
+
+}
+
+
+/* =====================================================
+   PROJECT BADGE
+===================================================== */
+
+.project-badge {
+
+    display: inline-block;
+
+    padding: 6px 12px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(37, 99, 235, 0.18);
+
+    color: #60a5fa;
+
+    font-weight: 600;
+
+    font-size: 12px;
+
+}
+
+
+/* =====================================================
+   COMPLETED
+===================================================== */
+
+.completed-badge {
+
+    display: inline-block;
+
+    min-width: 35px;
+
+    padding: 5px 9px;
+
+    text-align: center;
+
+    border-radius: 7px;
+
+    background:
+        rgba(34, 197, 94, 0.15);
+
+    color: #4ade80;
+
+    font-weight: 600;
+
+}
+
+
+/* =====================================================
+   BALANCE
+===================================================== */
+
+.balance-badge {
+
+    display: inline-block;
+
+    min-width: 35px;
+
+    padding: 5px 9px;
+
+    text-align: center;
+
+    border-radius: 7px;
+
+    background:
+        rgba(245, 158, 11, 0.15);
+
+    color: #fbbf24;
+
+    font-weight: 600;
+
+}
+
+
+/* =====================================================
+   COMMENTS
+===================================================== */
+
+.comment-text {
+
+    display: block;
+
+    max-width: 250px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    color: #cbd5e1;
+
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+.loading-cell {
+
+    text-align: center !important;
+
+    padding: 50px !important;
+
+    color: #94a3b8 !important;
+
+}
+
+
+/* =====================================================
+   EMPTY
+===================================================== */
+
+.empty-cell {
+
+    text-align: center !important;
+
+    padding: 60px !important;
+
+    color: #94a3b8 !important;
+
+    font-size: 15px !important;
+
+}
+
+
+.empty-cell i {
+
+    font-size: 35px;
+
+    color: #64748b;
+
+}
+
+
+/* =====================================================
+   ERROR
+===================================================== */
+
+.error-cell {
+
+    text-align: center !important;
+
+    padding: 60px !important;
+
+    color: #f87171 !important;
+
+}
+
+
+.error-cell i {
+
+    font-size: 30px;
+
+}
+
+
+/* =====================================================
+   SCROLLBAR
+===================================================== */
+
+.table-wrapper::-webkit-scrollbar {
+
+    height: 7px;
+
+}
+
+
+.table-wrapper::-webkit-scrollbar-track {
+
+    background: #0f172a;
+
+}
+
+
+.table-wrapper::-webkit-scrollbar-thumb {
+
+    background: #334155;
+
+    border-radius: 10px;
+
+}
+
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+
+    background: #475569;
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1000px) {
+
+    .report-summary {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .report-page {
+
+        padding: 20px;
+
+    }
+
+
+    .report-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+
+    .report-header h1 {
+
+        font-size: 30px;
+
+    }
+
+
+    .refresh-btn {
+
+        width: 100%;
+
+        justify-content: center;
+
+    }
+
+
+    .report-summary {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .summary-card {
+
+        padding: 18px;
+
+    }
+
+
+    .table-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
 
 }
