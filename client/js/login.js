@@ -1,6 +1,21 @@
-const API =
-    "http://localhost:5000/api";
+/* ==========================================
+   THE D CUTS
+   LOGIN
+   RENDER BACKEND
+========================================== */
 
+
+/* ==========================================
+   BACKEND API
+========================================== */
+
+const API =
+    "https://dcuts-team.onrender.com/api";
+
+
+/* ==========================================
+   PAGE LOAD
+========================================== */
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -18,6 +33,8 @@ document.addEventListener(
             );
 
 
+        /* LOGIN BUTTON */
+
         if (button) {
 
             button.addEventListener(
@@ -27,6 +44,8 @@ document.addEventListener(
 
         }
 
+
+        /* ENTER KEY */
 
         if (password) {
 
@@ -51,18 +70,22 @@ document.addEventListener(
 );
 
 
+/* ==========================================
+   LOGIN FUNCTION
+========================================== */
+
 async function login() {
 
-    const email =
+    const emailInput =
         document.getElementById(
             "email"
-        ).value.trim();
+        );
 
 
-    const password =
+    const passwordInput =
         document.getElementById(
             "password"
-        ).value.trim();
+        );
 
 
     const message =
@@ -72,29 +95,68 @@ async function login() {
 
 
     if (
-        !email ||
-        !password
+        !emailInput ||
+        !passwordInput
     ) {
 
-        message.innerText =
-            "Please enter email and password.";
+        console.error(
+            "Login input fields not found"
+        );
 
         return;
 
     }
 
 
-    message.innerText =
-        "Logging in...";
+    const email =
+        emailInput.value
+        .trim()
+        .toLowerCase();
 
+
+    const password =
+        passwordInput.value
+        .trim();
+
+
+    /* ==========================================
+       VALIDATION
+    ========================================== */
+
+    if (
+        !email ||
+        !password
+    ) {
+
+        if (message) {
+
+            message.innerText =
+                "Please enter email and password.";
+
+        }
+
+        return;
+
+    }
+
+
+    if (message) {
+
+        message.innerText =
+            "Logging in...";
+
+    }
+
+
+    /* ==========================================
+       BACKEND LOGIN
+    ========================================== */
 
     try {
 
         const response =
             await fetch(
-
                 `${API}/auth/login`,
-
                 {
 
                     method:
@@ -119,7 +181,6 @@ async function login() {
                         })
 
                 }
-
             );
 
 
@@ -133,14 +194,22 @@ async function login() {
         );
 
 
+        /* ==========================================
+           LOGIN ERROR
+        ========================================== */
+
         if (
             !response.ok ||
             !data.success
         ) {
 
-            message.innerText =
-                data.message ||
-                "Login failed.";
+            if (message) {
+
+                message.innerText =
+                    data.message ||
+                    "Login failed.";
+
+            }
 
             return;
 
@@ -148,17 +217,50 @@ async function login() {
 
 
         /* ==========================================
-           SAVE LOGIN
+           CHECK USER
+        ========================================== */
+
+        if (!data.user) {
+
+            if (message) {
+
+                message.innerText =
+                    "User information missing.";
+
+            }
+
+            return;
+
+        }
+
+
+        const role =
+            String(
+                data.user.role || "employee"
+            )
+            .toLowerCase();
+
+
+        /* ==========================================
+           CLEAR OLD LOGIN
         ========================================== */
 
         localStorage.clear();
 
+
+        /* ==========================================
+           SAVE JWT TOKEN
+        ========================================== */
 
         localStorage.setItem(
             "token",
             data.token
         );
 
+
+        /* ==========================================
+           SAVE USER
+        ========================================== */
 
         localStorage.setItem(
             "user",
@@ -176,36 +278,49 @@ async function login() {
         );
 
 
+        /* ==========================================
+           SAVE ROLE
+        ========================================== */
+
         localStorage.setItem(
             "role",
-            String(
-                data.user.role
-            ).toLowerCase()
+            role
         );
 
 
+        /* ==========================================
+           SAVE USER DETAILS
+        ========================================== */
+
         localStorage.setItem(
             "userName",
-            data.user.name
+            data.user.name || ""
         );
 
 
         localStorage.setItem(
             "userEmail",
-            data.user.email
+            data.user.email || email
         );
 
 
-        message.innerText =
-            "Login successful...";
+        console.log(
+            "LOGIN SUCCESS:",
+            data.user
+        );
 
 
-        const role =
-            String(
-                data.user.role
-            )
-            .toLowerCase();
+        if (message) {
 
+            message.innerText =
+                "Login successful...";
+
+        }
+
+
+        /* ==========================================
+           REDIRECT
+        ========================================== */
 
         setTimeout(
             function () {
@@ -232,6 +347,11 @@ async function login() {
 
     }
 
+
+    /* ==========================================
+       SERVER / NETWORK ERROR
+    ========================================== */
+
     catch (error) {
 
         console.error(
@@ -240,8 +360,17 @@ async function login() {
         );
 
 
-        message.innerText =
-            "Cannot connect to server. Make sure server is running.";
+        if (message) {
+
+            message.innerText =
+                "Cannot connect to server.";
+
+        }
+
+
+        alert(
+            "Cannot connect to THE D CUTS server.\n\nPlease try again."
+        );
 
     }
 
