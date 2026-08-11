@@ -2,147 +2,108 @@
    THE D CUTS TIMESHEET SERVER
 ========================================== */
 
-
 require("dotenv").config();
-
 
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 
-
-
 const app = express();
-
-
 
 /* ==========================================
    PORT
 ========================================== */
 
-const PORT =
-    process.env.PORT || 5000;
-
-
+const PORT = process.env.PORT || 5000;
 
 
 /* ==========================================
    MIDDLEWARE
 ========================================== */
 
-
 app.use(cors());
 
-
-app.use(
-    express.json()
-);
-
+app.use(express.json());
 
 app.use(
     express.urlencoded({
-        extended:true
+        extended: true
     })
 );
-
-
 
 
 /* ==========================================
    FRONTEND CONNECT
 ========================================== */
 
-
 app.use(
     "/client",
     express.static(
-        path.join(
-            __dirname,
-            "../client"
-        )
+        path.join(__dirname, "../client")
     )
 );
-
-
 
 
 /* ==========================================
    ROUTES
 ========================================== */
 
-
 const authRoutes =
     require("./routes/authRoutes");
-
 
 const employeeRoutes =
     require("./routes/employeeRoutes");
 
-
 const clientRoutes =
     require("./routes/clientRoutes");
-
 
 const timesheetRoutes =
     require("./routes/timesheetRoutes");
 
-
 const reportRoutes =
     require("./routes/reportRoutes");
-
 
 const dashboardRoutes =
     require("./routes/dashboardRoutes");
 
-
 const settingRoutes =
     require("./routes/settingRoutes");
-
-
-
 
 
 /* ==========================================
    API ROUTES
 ========================================== */
 
-
 app.use(
     "/api/auth",
     authRoutes
 );
-
 
 app.use(
     "/api/employees",
     employeeRoutes
 );
 
-
 app.use(
     "/api/clients",
     clientRoutes
 );
-
 
 app.use(
     "/api/timesheets",
     timesheetRoutes
 );
 
-
 app.use(
     "/api/reports",
     reportRoutes
 );
 
-
 app.use(
     "/api/dashboard",
     dashboardRoutes
 );
-
 
 app.use(
     "/api/settings",
@@ -150,156 +111,110 @@ app.use(
 );
 
 
-
-
-
 /* ==========================================
    HEALTH CHECK
 ========================================== */
 
-
 app.get(
     "/api/health",
-    (req,res)=>{
-
+    (req, res) => {
 
         res.json({
 
-            success:true,
+            success: true,
 
             message:
-            "THE D CUTS Server Running",
+                "THE D CUTS Server Running",
 
             time:
-            new Date()
+                new Date()
 
         });
 
-
     }
 );
-
-
-
-
 
 
 /* ==========================================
    HOME
+   OPEN LOGIN PAGE
 ========================================== */
-
 
 app.get(
     "/",
-    (req,res)=>{
+    (req, res) => {
 
-
-        res.send(`
-
-        <h2>
-        THE D CUTS SERVER RUNNING 🚀
-        </h2>
-
-        <p>
-        Open:
-        /client/login.html
-        </p>
-
-        `);
-
+        res.sendFile(
+            path.join(
+                __dirname,
+                "../client/login.html"
+            )
+        );
 
     }
 );
-
-
-
-
 
 
 /* ==========================================
    API ERROR
 ========================================== */
 
-
 app.use(
     "/api",
-    (req,res)=>{
-
+    (req, res) => {
 
         res.status(404).json({
 
-            success:false,
+            success: false,
 
             message:
-            "API Not Found"
+                "API Not Found"
 
         });
 
-
     }
 );
-
-
-
-
 
 
 /* ==========================================
    ERROR HANDLER
 ========================================== */
 
-
 app.use(
-(err,req,res,next)=>{
+    (err, req, res, next) => {
 
+        console.error(err);
 
-    console.error(
-        err
-    );
+        res.status(500).json({
 
+            success: false,
 
-    res.status(500).json({
+            message:
+                "Server Error"
 
-        success:false,
+        });
 
-        message:
-        "Server Error"
-
-    });
-
-
-});
-
-
-
-
-
+    }
+);
 
 
 /* ==========================================
    DATABASE
 ========================================== */
 
-
 const MONGO_URI =
-process.env.MONGO_URI;
+    process.env.MONGO_URI;
 
 
-
-if(!MONGO_URI){
-
+if (!MONGO_URI) {
 
     console.log(
         "Mongo URI Missing"
     );
 
-
     process.exit(1);
 
-
 }
-
-
 
 
 console.log(
@@ -308,59 +223,50 @@ console.log(
 );
 
 
-
-
+/* ==========================================
+   MONGODB CONNECTION
+========================================== */
 
 mongoose
-.connect(
-    MONGO_URI
-)
+    .connect(MONGO_URI)
+
+    .then(() => {
+
+        console.log(
+            "✅ MongoDB Connected"
+        );
 
 
-.then(()=>{
+        /* ==========================================
+           START SERVER
+        ========================================== */
+
+        app.listen(
+            PORT,
+            () => {
+
+                console.log(
+                    `🚀 Server running on port ${PORT}`
+                );
+
+                console.log(
+                    `🌐 http://localhost:${PORT}`
+                );
+
+            }
+        );
+
+    })
 
 
-    console.log(
-        "✅ MongoDB Connected"
-    );
+    .catch((error) => {
 
+        console.log(
+            "❌ MongoDB Error"
+        );
 
+        console.log(
+            error.message
+        );
 
-    app.listen(
-        PORT,
-        ()=>{
-
-
-            console.log(
-                `🚀 Server running on port ${PORT}`
-            );
-
-
-            console.log(
-                `🌐 http://localhost:${PORT}`
-            );
-
-
-        }
-    );
-
-
-
-})
-
-
-
-.catch((error)=>{
-
-
-    console.log(
-        "❌ MongoDB Error"
-    );
-
-
-    console.log(
-        error.message
-    );
-
-
-});
+    });
