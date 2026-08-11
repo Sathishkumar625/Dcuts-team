@@ -199,81 +199,107 @@ THE D CUTS Timesheet Management System
 
 <section class="quick">
 
-<h2>Quick Access</h2>
+    <h2>Quick Access</h2>
 
-<div class="cards">
+    <div class="cards">
 
-<div class="card">
-<i class="fa-solid fa-table-columns"></i>
-<h3>Dashboard</h3>
-<p>Overview & Stats</p>
-</div>
+        <!-- DASHBOARD -->
+        <div class="card"
+             onclick="location.href='pages/dashboard.html'">
 
-<div class="card">
-<i class="fa-regular fa-clock"></i>
-<h3>Timesheet</h3>
-<p>Log your time</p>
-</div>
+            <i class="fa-solid fa-table-columns"></i>
 
-<div class="card">
-<i class="fa-regular fa-file-lines"></i>
-<h3>Reports</h3>
-<p>Daily / Weekly</p>
-</div>
+            <h3>Dashboard</h3>
+
+            <p>Overview & Stats</p>
+
+        </div>
 
 
-<div class="card">
-<i class="fa-solid fa-calendar-days"></i>
-<h3>Calendar</h3>
-<p>Events</p>
-</div>
+        <!-- TIMESHEET -->
+        <div class="card"
+             onclick="location.href='pages/timesheet.html'">
 
-<div class="card">
-<i class="fa-solid fa-users"></i>
-<h3>Employees</h3>
-<p>Manage Team</p>
-</div>
-<div class="quick-card admin-menu"
-onclick="location.href='clients.html'">
+            <i class="fa-regular fa-clock"></i>
+
+            <h3>Timesheet</h3>
+
+            <p>Log your time</p>
+
+        </div>
 
 
-<div class="icon-box">
+        <!-- REPORTS -->
+        <div class="card"
+             onclick="location.href='pages/reports.html'">
 
-<i class="fa-solid fa-store"></i>
+            <i class="fa-regular fa-file-lines"></i>
 
-</div>
+            <h3>Reports</h3>
 
+            <p>Daily / Weekly</p>
 
-
-<h2>
-
-Clients
-
-</h2>
+        </div>
 
 
-<p>
+        <!-- CALENDAR -->
+        <div class="card"
+             onclick="location.href='pages/calendar.html'">
 
-Manage Clients
+            <i class="fa-solid fa-calendar-days"></i>
 
-</p>
+            <h3>Calendar</h3>
+
+            <p>Events</p>
+
+        </div>
 
 
-</div>
+        <!-- EMPLOYEES -->
+        <div class="card admin-menu"
+             onclick="location.href='pages/employees.html'">
 
-<div class="card">
-<i class="fa-solid fa-gear"></i>
-<h3>Settings</h3>
-<p>Application</p>
-</div>
+            <i class="fa-solid fa-users"></i>
 
-</div>
+            <h3>Employees</h3>
+
+            <p>Manage Team</p>
+
+        </div>
+
+
+        <!-- CLIENTS -->
+        <div class="card admin-menu"
+             onclick="location.href='pages/clients.html'">
+
+            <i class="fa-solid fa-store"></i>
+
+            <h3>Clients</h3>
+
+            <p>Manage Clients</p>
+
+        </div>
+
+
+        <!-- SETTINGS -->
+        <div class="card admin-menu"
+             onclick="location.href='pages/settings.html'">
+
+            <i class="fa-solid fa-gear"></i>
+
+            <h3>Settings</h3>
+
+            <p>Application</p>
+
+        </div>
+
+    </div>
 
 </section>
+
 
 <script src="js/app.js"></script>
 <script src="js/home.js"></script>
 <script src="js/auth.js"></script>
-
 </body>
 </html>
