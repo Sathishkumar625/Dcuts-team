@@ -4,24 +4,16 @@
    RENDER BACKEND
 ========================================== */
 
-
-/* ==========================================
-   FIREBASE
-========================================== */
-
 import {
     initializeApp
-}
-from
+} from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
 
 import {
     getAuth,
     GoogleAuthProvider,
     signInWithPopup
-}
-from
+} from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 
@@ -60,19 +52,22 @@ const firebaseConfig = {
 ========================================== */
 
 const app =
-    initializeApp(
-        firebaseConfig
-    );
-
+    initializeApp(firebaseConfig);
 
 const auth =
-    getAuth(
-        app
-    );
+    getAuth(app);
 
+
+/* ==========================================
+   GOOGLE PROVIDER
+========================================== */
 
 const provider =
     new GoogleAuthProvider();
+
+provider.setCustomParameters({
+    prompt: "select_account"
+});
 
 
 console.log(
@@ -138,13 +133,23 @@ window.googleLogin =
             ========================================== */
 
             const email =
-                user.email
+                (user.email || "")
                     .toLowerCase()
                     .trim();
 
 
+            if (!email) {
+
+                throw new Error(
+                    "Google account email not available."
+                );
+
+            }
+
+
             /* ==========================================
-               BACKEND
+               RENDER BACKEND
+               DO NOT CHANGE
             ========================================== */
 
             const backendURL =
@@ -174,7 +179,7 @@ window.googleLogin =
                             JSON.stringify({
 
                                 name:
-                                    user.displayName,
+                                    user.displayName || "",
 
                                 email:
                                     email
@@ -189,8 +194,22 @@ window.googleLogin =
                BACKEND RESPONSE
             ========================================== */
 
-            const backendData =
-                await backendResponse.json();
+            let backendData;
+
+            try {
+
+                backendData =
+                    await backendResponse.json();
+
+            }
+
+            catch (jsonError) {
+
+                throw new Error(
+                    "Server returned an invalid response."
+                );
+
+            }
 
 
             console.log(
@@ -217,7 +236,7 @@ window.googleLogin =
 
 
             /* ==========================================
-               USER
+               BACKEND USER
             ========================================== */
 
             const backendUser =
@@ -235,6 +254,7 @@ window.googleLogin =
 
             /* ==========================================
                ROLE
+               ADMIN PROCESS UNCHANGED
             ========================================== */
 
             const role =
@@ -335,6 +355,7 @@ window.googleLogin =
 
             /* ==========================================
                REDIRECT
+               ADMIN / EMPLOYEE PROCESS UNCHANGED
             ========================================== */
 
             setTimeout(
@@ -379,12 +400,60 @@ window.googleLogin =
 
                 message.innerText =
                     "Google login failed.";
+            }
+
+
+            /* ==========================================
+               USER-FRIENDLY ERROR
+            ========================================== */
+
+            let errorMessage =
+                error.message ||
+                "Google login failed.";
+
+            if (
+                error.code ===
+                "auth/unauthorized-domain"
+            ) {
+
+                errorMessage =
+                    "This Vercel domain is not authorized in Firebase.";
+
+            }
+
+            else if (
+                error.code ===
+                "auth/popup-blocked"
+            ) {
+
+                errorMessage =
+                    "Google login popup was blocked by the browser.";
+
+            }
+
+            else if (
+                error.code ===
+                "auth/popup-closed-by-user"
+            ) {
+
+                errorMessage =
+                    "Google login window was closed.";
+
+            }
+
+            else if (
+                error.code ===
+                "auth/operation-not-allowed"
+            ) {
+
+                errorMessage =
+                    "Google Sign-In is not enabled in Firebase.";
 
             }
 
 
             alert(
-                error.message
+                errorMessage
             );
 
         }
