@@ -1,13 +1,17 @@
 const mongoose = require("mongoose");
 
 
+/* =====================================================
+   TIMESHEET SCHEMA
+===================================================== */
+
 const timesheetSchema = new mongoose.Schema(
 
     {
 
-        /* =====================================
+        /* ==========================================
            EMPLOYEE
-        ===================================== */
+        ========================================== */
 
         employee: {
 
@@ -21,35 +25,37 @@ const timesheetSchema = new mongoose.Schema(
         },
 
 
-        /* =====================================
-           PROJECT
-        ===================================== */
+        /* ==========================================
+           EMPLOYEE DISPLAY INFO
+           01 - Naveen
+           02 - Sathish
+        ========================================== */
 
-        project: {
+        employeeCode: {
 
             type: String,
 
-            required: true,
+            trim: true,
 
-            trim: true
+            default: ""
 
         },
 
 
-        projectName: {
+        employeeName: {
 
             type: String,
 
-            required: true,
+            trim: true,
 
-            trim: true
+            default: ""
 
         },
 
 
-        /* =====================================
+        /* ==========================================
            DATE
-        ===================================== */
+        ========================================== */
 
         date: {
 
@@ -60,9 +66,186 @@ const timesheetSchema = new mongoose.Schema(
         },
 
 
-        /* =====================================
-           VIDEO DETAILS
-        ===================================== */
+        /* ==========================================
+           CHECK IN
+        ========================================== */
+
+        checkIn: {
+
+            type: String,
+
+            required: true,
+
+            trim: true
+
+        },
+
+
+        /* ==========================================
+           LUNCH BREAK START
+        ========================================== */
+
+        lunchStart: {
+
+            type: String,
+
+            required: true,
+
+            trim: true
+
+        },
+
+
+        /* ==========================================
+           LUNCH BREAK END
+        ========================================== */
+
+        lunchEnd: {
+
+            type: String,
+
+            required: true,
+
+            trim: true
+
+        },
+
+
+        /* ==========================================
+           CHECK OUT
+        ========================================== */
+
+        checkOut: {
+
+            type: String,
+
+            required: true,
+
+            trim: true
+
+        },
+
+
+        /* ==========================================
+           WORKING HOURS
+        ========================================== */
+
+        workingHours: {
+
+            minutes: {
+
+                type: Number,
+
+                default: 0,
+
+                min: 0
+
+            },
+
+            formatted: {
+
+                type: String,
+
+                default: "0h 0m",
+
+                trim: true
+
+            }
+
+        },
+
+
+        /* ==========================================
+           TOTAL TASK
+        ========================================== */
+
+        totalTask: {
+
+            type: Number,
+
+            default: 0,
+
+            min: 0
+
+        },
+
+
+        /* ==========================================
+           TASKS
+           
+           Example:
+           [
+             "Wedding Video Editing",
+             "Instagram Reel Editing"
+           ]
+        ========================================== */
+
+        tasks: {
+
+            type: [
+
+                {
+
+                    type: String,
+
+                    trim: true
+
+                }
+
+            ],
+
+            default: []
+
+        },
+
+
+        /* ==========================================
+           COMMENTS
+        ========================================== */
+
+        comments: {
+
+            type: String,
+
+            default: "",
+
+            trim: true
+
+        },
+
+
+        /* ==========================================
+           OLD PROJECT FIELDS
+           Kept temporarily for compatibility
+           with existing records/API.
+        ========================================== */
+
+        project: {
+
+            type: String,
+
+            default: "",
+
+            trim: true
+
+        },
+
+
+        projectName: {
+
+            type: String,
+
+            default: "",
+
+            trim: true
+
+        },
+
+
+        /* ==========================================
+           OLD VIDEO FIELDS
+           Kept for existing data compatibility.
+        ========================================== */
 
         totalVideos: {
 
@@ -97,24 +280,9 @@ const timesheetSchema = new mongoose.Schema(
         },
 
 
-        /* =====================================
-           COMMENTS
-        ===================================== */
-
-        comments: {
-
-            type: String,
-
-            default: "",
-
-            trim: true
-
-        },
-
-
-        /* =====================================
+        /* ==========================================
            STATUS
-        ===================================== */
+        ========================================== */
 
         status: {
 
@@ -138,6 +306,7 @@ const timesheetSchema = new mongoose.Schema(
 
     },
 
+
     {
 
         timestamps: true
@@ -147,13 +316,43 @@ const timesheetSchema = new mongoose.Schema(
 );
 
 
-/* ==========================================
-   AUTO CALCULATE BALANCE
-========================================== */
+/* =====================================================
+   AUTO CALCULATE TOTAL TASK
+===================================================== */
 
 timesheetSchema.pre(
     "save",
-    function () {
+    function (next) {
+
+        if (
+            Array.isArray(
+                this.tasks
+            )
+        ) {
+
+            this.tasks =
+                this.tasks
+                    .map(
+                        task =>
+                            String(
+                                task
+                            ).trim()
+                    )
+                    .filter(
+                        task =>
+                            task.length > 0
+                    );
+
+
+            this.totalTask =
+                this.tasks.length;
+
+        }
+
+
+        /* ==========================================
+           OLD VIDEO BALANCE
+        ========================================== */
 
         const total =
             Number(
@@ -173,13 +372,16 @@ timesheetSchema.pre(
                 0
             );
 
+
+        next();
+
     }
 );
 
 
-/* ==========================================
+/* =====================================================
    MODEL
-========================================== */
+===================================================== */
 
 module.exports =
     mongoose.model(
