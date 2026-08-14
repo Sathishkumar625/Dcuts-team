@@ -1,6 +1,18 @@
 /* =====================================================
    THE D CUTS - TIMESHEET CONTROLLER
    ADMIN / EMPLOYEE ACCESS CONTROL
+
+   Includes:
+   - Employee
+   - Check-in
+   - Lunch start
+   - Lunch end
+   - Check-out
+   - Working hours
+   - Total task
+   - Multiple tasks
+   - Comments
+   - Status
 ===================================================== */
 
 const mongoose =
@@ -29,38 +41,62 @@ const isAdmin = (req) => {
 
     return (
         req.user &&
-        req.user.role === "admin"
+        String(req.user.role).toLowerCase() ===
+        "admin"
     );
 
 };
 
 
 /* =====================================================
-   FIND EMPLOYEE OF LOGGED-IN USER
+   FIND LOGGED-IN EMPLOYEE
 ===================================================== */
 
-const getLoggedInEmployee = async (req) => {
+const getLoggedInEmployee =
+    async (req) => {
 
-    if (!req.user || !req.user.email) {
-        return null;
-    }
+        try {
 
+            if (
+                !req.user ||
+                !req.user.email
+            ) {
 
-    const email =
-        req.user.email
-            .toLowerCase()
-            .trim();
+                return null;
 
-
-    const employee =
-        await Employee.findOne({
-            email: email
-        });
+            }
 
 
-    return employee;
+            const email =
+                String(
+                    req.user.email
+                )
+                .toLowerCase()
+                .trim();
 
-};
+
+            const employee =
+                await Employee.findOne({
+                    email: email
+                });
+
+
+            return employee;
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "GET LOGGED EMPLOYEE ERROR:",
+                error
+            );
+
+            return null;
+
+        }
+
+    };
 
 
 /* =====================================================
@@ -68,31 +104,271 @@ const getLoggedInEmployee = async (req) => {
 ===================================================== */
 
 const userCanAccessTimesheet =
-    async (req, timesheet) => {
+    async (
+        req,
+        timesheet
+    ) => {
 
         /* ADMIN */
 
-        if (isAdmin(req)) {
+        if (
+            isAdmin(req)
+        ) {
+
             return true;
+
         }
 
 
         /* EMPLOYEE */
 
         const employee =
-            await getLoggedInEmployee(req);
+            await getLoggedInEmployee(
+                req
+            );
 
 
         if (!employee) {
+
             return false;
+
         }
 
 
         return (
+
             timesheet.employee &&
-            timesheet.employee.toString() ===
+
+            timesheet.employee
+                .toString() ===
             employee._id.toString()
+
         );
+
+    };
+
+
+/* =====================================================
+   CALCULATE WORKING HOURS
+===================================================== */
+
+const calculateWorkingHours =
+    (
+        checkIn,
+        lunchStart,
+        lunchEnd,
+        checkOut
+    ) => {
+
+        const toMinutes =
+            (time) => {
+
+                if (!time) {
+                    return null;
+                }
+
+
+                const parts =
+                    String(time)
+                        .split(":");
+
+
+                if (
+                    parts.length < 2
+                ) {
+
+                    return null;
+
+                }
+
+
+                const hours =
+                    Number(
+                        parts[0]
+                    );
+
+
+                const minutes =
+                    Number(
+                        parts[1]
+                    );
+
+
+                if (
+                    Number.isNaN(
+                        hours
+                    ) ||
+                    Number.isNaN(
+                        minutes
+                    )
+                ) {
+
+                    return null;
+
+                }
+
+
+                return (
+                    hours * 60 +
+                    minutes
+                );
+
+            };
+
+
+        const inMinutes =
+            toMinutes(
+                checkIn
+            );
+
+
+        const lunchStartMinutes =
+            toMinutes(
+                lunchStart
+            );
+
+
+        const lunchEndMinutes =
+            toMinutes(
+                lunchEnd
+            );
+
+
+        const outMinutes =
+            toMinutes(
+                checkOut
+            );
+
+
+        if (
+            inMinutes === null ||
+            lunchStartMinutes === null ||
+            lunchEndMinutes === null ||
+            outMinutes === null
+        ) {
+
+            return null;
+
+        }
+
+
+        if (
+            lunchStartMinutes <=
+            inMinutes
+        ) {
+
+            throw new Error(
+                "Lunch start must be after Check-in."
+            );
+
+        }
+
+
+        if (
+            lunchEndMinutes <=
+            lunchStartMinutes
+        ) {
+
+            throw new Error(
+                "Lunch end must be after Lunch start."
+            );
+
+        }
+
+
+        if (
+            outMinutes <=
+            lunchEndMinutes
+        ) {
+
+            throw new Error(
+                "Check-out must be after Lunch end."
+            );
+
+        }
+
+
+        const totalOfficeMinutes =
+            outMinutes -
+            inMinutes;
+
+
+        const lunchMinutes =
+            lunchEndMinutes -
+            lunchStartMinutes;
+
+
+        const workingMinutes =
+            totalOfficeMinutes -
+            lunchMinutes;
+
+
+        if (
+            workingMinutes < 0
+        ) {
+
+            throw new Error(
+                "Invalid working hours."
+            );
+
+        }
+
+
+        const hours =
+            Math.floor(
+                workingMinutes / 60
+            );
+
+
+        const minutes =
+            workingMinutes % 60;
+
+
+        return {
+
+            minutes:
+                workingMinutes,
+
+            formatted:
+                `${hours}h ${minutes}m`
+
+        };
+
+    };
+
+
+/* =====================================================
+   NORMALIZE TASKS
+===================================================== */
+
+const normalizeTasks =
+    (tasks) => {
+
+        if (
+            !Array.isArray(
+                tasks
+            )
+        ) {
+
+            return [];
+
+        }
+
+
+        return tasks
+
+            .map(
+                task =>
+                    String(
+                        task
+                    )
+                    .trim()
+            )
+
+            .filter(
+                task =>
+                    task.length > 0
+            );
 
     };
 
@@ -102,7 +378,10 @@ const userCanAccessTimesheet =
 ===================================================== */
 
 const createTimesheet =
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
 
@@ -110,58 +389,208 @@ const createTimesheet =
 
                 employee,
 
+                employeeCode,
+
+                employeeName,
+
+                date,
+
+                checkIn,
+
+                lunchStart,
+
+                lunchEnd,
+
+                checkOut,
+
+                tasks,
+
+                comments,
+
+                /* OLD FIELDS */
+
                 project,
 
                 projectName,
 
-                date,
-
                 totalVideos,
 
-                completedVideos,
-
-                comments
+                completedVideos
 
             } = req.body;
 
 
-            /* ==========================================
-               BASIC VALIDATION
-            ========================================== */
+            /* =========================================
+               BASIC REQUIRED VALIDATION
+            ========================================= */
 
-            if (
-                !project ||
-                !date
-            ) {
+            if (!date) {
 
-                return res.status(400).json({
+                return res.status(
+                    400
+                ).json({
 
                     success: false,
 
                     message:
-                        "Project and Date are required."
+                        "Date is required."
 
                 });
 
             }
 
 
-            /* ==========================================
+            if (!checkIn) {
+
+                return res.status(
+                    400
+                ).json({
+
+                    success: false,
+
+                    message:
+                        "Check-in time is required."
+
+                });
+
+            }
+
+
+            if (!lunchStart) {
+
+                return res.status(
+                    400
+                ).json({
+
+                    success: false,
+
+                    message:
+                        "Lunch start time is required."
+
+                });
+
+            }
+
+
+            if (!lunchEnd) {
+
+                return res.status(
+                    400
+                ).json({
+
+                    success: false,
+
+                    message:
+                        "Lunch end time is required."
+
+                });
+
+            }
+
+
+            if (!checkOut) {
+
+                return res.status(
+                    400
+                ).json({
+
+                    success: false,
+
+                    message:
+                        "Check-out time is required."
+
+                });
+
+            }
+
+
+            /* =========================================
+               TASKS
+            ========================================= */
+
+            const normalizedTasks =
+                normalizeTasks(
+                    tasks
+                );
+
+
+            if (
+                normalizedTasks.length === 0
+            ) {
+
+                return res.status(
+                    400
+                ).json({
+
+                    success: false,
+
+                    message:
+                        "At least one task is required."
+
+                });
+
+            }
+
+
+            /* =========================================
+               WORKING HOURS
+            ========================================= */
+
+            let workingHours;
+
+            try {
+
+                workingHours =
+                    calculateWorkingHours(
+
+                        checkIn,
+
+                        lunchStart,
+
+                        lunchEnd,
+
+                        checkOut
+
+                    );
+
+            }
+
+            catch (error) {
+
+                return res.status(
+                    400
+                ).json({
+
+                    success: false,
+
+                    message:
+                        error.message
+
+                });
+
+            }
+
+
+            /* =========================================
                FIND EMPLOYEE
-            ========================================== */
+            ========================================= */
 
             let employeeId;
 
 
-            /* ------------------------------------------
-               ADMIN CAN SELECT ANY EMPLOYEE
-            ------------------------------------------ */
+            /* -----------------------------------------
+               ADMIN
+            ----------------------------------------- */
 
-            if (isAdmin(req)) {
+            if (
+                isAdmin(req)
+            ) {
 
                 if (!employee) {
 
-                    return res.status(400).json({
+                    return res.status(
+                        400
+                    ).json({
 
                         success: false,
 
@@ -179,7 +608,9 @@ const createTimesheet =
                     )
                 ) {
 
-                    return res.status(400).json({
+                    return res.status(
+                        400
+                    ).json({
 
                         success: false,
 
@@ -199,7 +630,9 @@ const createTimesheet =
 
                 if (!employeeData) {
 
-                    return res.status(404).json({
+                    return res.status(
+                        404
+                    ).json({
 
                         success: false,
 
@@ -217,20 +650,24 @@ const createTimesheet =
             }
 
 
-            /* ------------------------------------------
+            /* -----------------------------------------
                EMPLOYEE
                IGNORE FRONTEND EMPLOYEE ID
-            ------------------------------------------ */
+            ----------------------------------------- */
 
             else {
 
                 const employeeData =
-                    await getLoggedInEmployee(req);
+                    await getLoggedInEmployee(
+                        req
+                    );
 
 
                 if (!employeeData) {
 
-                    return res.status(403).json({
+                    return res.status(
+                        403
+                    ).json({
 
                         success: false,
 
@@ -248,34 +685,54 @@ const createTimesheet =
             }
 
 
-            /* ==========================================
-               VIDEO VALUES
-            ========================================== */
+            /* =========================================
+               OLD VIDEO VALUES
+            ========================================= */
 
             const total =
                 Math.max(
-                    Number(totalVideos) || 0,
+                    Number(
+                        totalVideos
+                    ) || 0,
                     0
                 );
 
 
             const completed =
                 Math.max(
-                    Number(completedVideos) || 0,
+                    Number(
+                        completedVideos
+                    ) || 0,
                     0
                 );
 
 
             const balance =
                 Math.max(
-                    total - completed,
+                    total -
+                    completed,
                     0
                 );
 
 
-            /* ==========================================
+            /* =========================================
+               COMMENTS
+            ========================================= */
+
+            const finalComments =
+                comments
+                    ? String(
+                        comments
+                    ).trim()
+
+                    : normalizedTasks.join(
+                        " | "
+                    );
+
+
+            /* =========================================
                CREATE
-            ========================================== */
+            ========================================= */
 
             const timesheet =
                 await Timesheet.create({
@@ -283,32 +740,93 @@ const createTimesheet =
                     employee:
                         employeeId,
 
-                    project:
-                        String(project).trim(),
+                    employeeCode:
+                        employeeCode
+                        ? String(
+                            employeeCode
+                        ).trim()
+                        : "",
 
-                    projectName:
+                    employeeName:
+                        employeeName
+                        ? String(
+                            employeeName
+                        ).trim()
+                        : "",
+
+                    date:
+
+                        date,
+
+                    checkIn:
+
                         String(
-                            projectName ||
-                            project
+                            checkIn
                         ).trim(),
 
-                    date,
+                    lunchStart:
+
+                        String(
+                            lunchStart
+                        ).trim(),
+
+                    lunchEnd:
+
+                        String(
+                            lunchEnd
+                        ).trim(),
+
+                    checkOut:
+
+                        String(
+                            checkOut
+                        ).trim(),
+
+                    workingHours:
+
+                        workingHours,
+
+                    totalTask:
+
+                        normalizedTasks.length,
+
+                    tasks:
+
+                        normalizedTasks,
+
+                    comments:
+
+                        finalComments,
+
+                    /* OLD */
+
+                    project:
+
+                        project
+                        ? String(
+                            project
+                        ).trim()
+                        : "",
+
+                    projectName:
+
+                        projectName
+                        ? String(
+                            projectName
+                        ).trim()
+                        : "",
 
                     totalVideos:
+
                         total,
 
                     completedVideos:
+
                         completed,
 
                     balanceVideos:
-                        balance,
 
-                    comments:
-                        comments
-                            ? String(
-                                comments
-                              ).trim()
-                            : "",
+                        balance,
 
                     status:
                         "Pending"
@@ -316,22 +834,30 @@ const createTimesheet =
                 });
 
 
-            /* ==========================================
+            /* =========================================
                POPULATE
-            ========================================== */
+            ========================================= */
 
             const savedTimesheet =
                 await Timesheet
+
                     .findById(
                         timesheet._id
                     )
+
                     .populate(
                         "employee",
                         employeePopulate
                     );
 
 
-            return res.status(201).json({
+            /* =========================================
+               RESPONSE
+            ========================================= */
+
+            return res.status(
+                201
+            ).json({
 
                 success: true,
 
@@ -353,7 +879,9 @@ const createTimesheet =
             );
 
 
-            return res.status(500).json({
+            return res.status(
+                500
+            ).json({
 
                 success: false,
 
@@ -376,26 +904,31 @@ const createTimesheet =
 ===================================================== */
 
 const getTimesheets =
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
 
             let query = {};
 
 
-            /* ==========================================
-               EMPLOYEE FILTER
-            ========================================== */
-
-            if (!isAdmin(req)) {
+            if (
+                !isAdmin(req)
+            ) {
 
                 const employee =
-                    await getLoggedInEmployee(req);
+                    await getLoggedInEmployee(
+                        req
+                    );
 
 
                 if (!employee) {
 
-                    return res.status(200).json({
+                    return res.status(
+                        200
+                    ).json({
 
                         success: true,
 
@@ -418,17 +951,18 @@ const getTimesheets =
             }
 
 
-            /* ==========================================
-               FIND
-            ========================================== */
-
             const timesheets =
                 await Timesheet
-                    .find(query)
+
+                    .find(
+                        query
+                    )
+
                     .populate(
                         "employee",
                         employeePopulate
                     )
+
                     .sort({
 
                         date: -1,
@@ -438,7 +972,9 @@ const getTimesheets =
                     });
 
 
-            return res.status(200).json({
+            return res.status(
+                200
+            ).json({
 
                 success: true,
 
@@ -459,7 +995,9 @@ const getTimesheets =
             );
 
 
-            return res.status(500).json({
+            return res.status(
+                500
+            ).json({
 
                 success: false,
 
@@ -475,19 +1013,24 @@ const getTimesheets =
 
 
 /* =====================================================
-   GET SINGLE
+   GET SINGLE TIMESHEET
 ===================================================== */
 
 const getTimesheetById =
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
 
             const timesheet =
                 await Timesheet
+
                     .findById(
                         req.params.id
                     )
+
                     .populate(
                         "employee",
                         employeePopulate
@@ -496,7 +1039,9 @@ const getTimesheetById =
 
             if (!timesheet) {
 
-                return res.status(404).json({
+                return res.status(
+                    404
+                ).json({
 
                     success: false,
 
@@ -508,10 +1053,6 @@ const getTimesheetById =
             }
 
 
-            /* ==========================================
-               ACCESS CHECK
-            ========================================== */
-
             const allowed =
                 await userCanAccessTimesheet(
                     req,
@@ -521,7 +1062,9 @@ const getTimesheetById =
 
             if (!allowed) {
 
-                return res.status(403).json({
+                return res.status(
+                    403
+                ).json({
 
                     success: false,
 
@@ -533,7 +1076,9 @@ const getTimesheetById =
             }
 
 
-            return res.status(200).json({
+            return res.status(
+                200
+            ).json({
 
                 success: true,
 
@@ -551,7 +1096,9 @@ const getTimesheetById =
             );
 
 
-            return res.status(500).json({
+            return res.status(
+                500
+            ).json({
 
                 success: false,
 
@@ -571,7 +1118,10 @@ const getTimesheetById =
 ===================================================== */
 
 const updateTimesheet =
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
 
@@ -579,19 +1129,35 @@ const updateTimesheet =
 
                 employee,
 
+                employeeCode,
+
+                employeeName,
+
+                date,
+
+                checkIn,
+
+                lunchStart,
+
+                lunchEnd,
+
+                checkOut,
+
+                tasks,
+
+                comments,
+
+                status,
+
+                /* OLD */
+
                 project,
 
                 projectName,
 
-                date,
-
                 totalVideos,
 
-                completedVideos,
-
-                comments,
-
-                status
+                completedVideos
 
             } = req.body;
 
@@ -604,7 +1170,9 @@ const updateTimesheet =
 
             if (!existing) {
 
-                return res.status(404).json({
+                return res.status(
+                    404
+                ).json({
 
                     success: false,
 
@@ -616,9 +1184,9 @@ const updateTimesheet =
             }
 
 
-            /* ==========================================
-               ACCESS CHECK
-            ========================================== */
+            /* =========================================
+               ACCESS
+            ========================================= */
 
             const allowed =
                 await userCanAccessTimesheet(
@@ -629,7 +1197,9 @@ const updateTimesheet =
 
             if (!allowed) {
 
-                return res.status(403).json({
+                return res.status(
+                    403
+                ).json({
 
                     success: false,
 
@@ -641,9 +1211,9 @@ const updateTimesheet =
             }
 
 
-            /* ==========================================
+            /* =========================================
                EMPLOYEE CHANGE
-            ========================================== */
+            ========================================= */
 
             if (
                 employee !== undefined &&
@@ -656,7 +1226,9 @@ const updateTimesheet =
                     )
                 ) {
 
-                    return res.status(400).json({
+                    return res.status(
+                        400
+                    ).json({
 
                         success: false,
 
@@ -676,7 +1248,9 @@ const updateTimesheet =
 
                 if (!employeeData) {
 
-                    return res.status(404).json({
+                    return res.status(
+                        404
+                    ).json({
 
                         success: false,
 
@@ -694,9 +1268,230 @@ const updateTimesheet =
             }
 
 
-            /* ==========================================
-               PROJECT
-            ========================================== */
+            /* =========================================
+               EMPLOYEE DISPLAY
+            ========================================= */
+
+            if (
+                employeeCode !== undefined
+            ) {
+
+                existing.employeeCode =
+                    String(
+                        employeeCode
+                    ).trim();
+
+            }
+
+
+            if (
+                employeeName !== undefined
+            ) {
+
+                existing.employeeName =
+                    String(
+                        employeeName
+                    ).trim();
+
+            }
+
+
+            /* =========================================
+               DATE
+            ========================================= */
+
+            if (
+                date !== undefined
+            ) {
+
+                existing.date =
+                    date;
+
+            }
+
+
+            /* =========================================
+               ATTENDANCE TIMES
+            ========================================= */
+
+            if (
+                checkIn !== undefined
+            ) {
+
+                existing.checkIn =
+                    String(
+                        checkIn
+                    ).trim();
+
+            }
+
+
+            if (
+                lunchStart !== undefined
+            ) {
+
+                existing.lunchStart =
+                    String(
+                        lunchStart
+                    ).trim();
+
+            }
+
+
+            if (
+                lunchEnd !== undefined
+            ) {
+
+                existing.lunchEnd =
+                    String(
+                        lunchEnd
+                    ).trim();
+
+            }
+
+
+            if (
+                checkOut !== undefined
+            ) {
+
+                existing.checkOut =
+                    String(
+                        checkOut
+                    ).trim();
+
+            }
+
+
+            /* =========================================
+               RE-CALCULATE WORKING HOURS
+            ========================================= */
+
+            const finalCheckIn =
+                existing.checkIn;
+
+
+            const finalLunchStart =
+                existing.lunchStart;
+
+
+            const finalLunchEnd =
+                existing.lunchEnd;
+
+
+            const finalCheckOut =
+                existing.checkOut;
+
+
+            if (
+                finalCheckIn &&
+                finalLunchStart &&
+                finalLunchEnd &&
+                finalCheckOut
+            ) {
+
+                try {
+
+                    existing.workingHours =
+                        calculateWorkingHours(
+
+                            finalCheckIn,
+
+                            finalLunchStart,
+
+                            finalLunchEnd,
+
+                            finalCheckOut
+
+                        );
+
+                }
+
+                catch (error) {
+
+                    return res.status(
+                        400
+                    ).json({
+
+                        success: false,
+
+                        message:
+                            error.message
+
+                    });
+
+                }
+
+            }
+
+
+            /* =========================================
+               TASKS
+            ========================================= */
+
+            if (
+                tasks !== undefined
+            ) {
+
+                const normalizedTasks =
+                    normalizeTasks(
+                        tasks
+                    );
+
+
+                if (
+                    normalizedTasks.length === 0
+                ) {
+
+                    return res.status(
+                        400
+                    ).json({
+
+                        success: false,
+
+                        message:
+                            "At least one task is required."
+
+                    });
+
+                }
+
+
+                existing.tasks =
+                    normalizedTasks;
+
+
+                existing.totalTask =
+                    normalizedTasks.length;
+
+
+                existing.comments =
+                    normalizedTasks.join(
+                        " | "
+                    );
+
+            }
+
+
+            /* =========================================
+               COMMENTS
+            ========================================= */
+
+            if (
+                comments !== undefined &&
+                tasks === undefined
+            ) {
+
+                existing.comments =
+                    String(
+                        comments
+                    ).trim();
+
+            }
+
+
+            /* =========================================
+               OLD PROJECT
+            ========================================= */
 
             if (
                 project !== undefined
@@ -710,10 +1505,6 @@ const updateTimesheet =
             }
 
 
-            /* ==========================================
-               PROJECT NAME
-            ========================================== */
-
             if (
                 projectName !== undefined
             ) {
@@ -726,23 +1517,9 @@ const updateTimesheet =
             }
 
 
-            /* ==========================================
-               DATE
-            ========================================== */
-
-            if (
-                date !== undefined
-            ) {
-
-                existing.date =
-                    date;
-
-            }
-
-
-            /* ==========================================
-               VIDEOS
-            ========================================== */
+            /* =========================================
+               OLD VIDEO VALUES
+            ========================================= */
 
             if (
                 totalVideos !== undefined
@@ -774,10 +1551,6 @@ const updateTimesheet =
             }
 
 
-            /* ==========================================
-               BALANCE
-            ========================================== */
-
             existing.balanceVideos =
                 Math.max(
 
@@ -796,25 +1569,9 @@ const updateTimesheet =
                 );
 
 
-            /* ==========================================
-               COMMENTS
-            ========================================== */
-
-            if (
-                comments !== undefined
-            ) {
-
-                existing.comments =
-                    String(
-                        comments
-                    ).trim();
-
-            }
-
-
-            /* ==========================================
+            /* =========================================
                STATUS
-            ========================================== */
+            ========================================= */
 
             if (
                 status !== undefined
@@ -839,7 +1596,9 @@ const updateTimesheet =
                     )
                 ) {
 
-                    return res.status(400).json({
+                    return res.status(
+                        400
+                    ).json({
 
                         success: false,
 
@@ -851,11 +1610,13 @@ const updateTimesheet =
                 }
 
 
-                /* Only Admin changes status */
+                if (
+                    !isAdmin(req)
+                ) {
 
-                if (!isAdmin(req)) {
-
-                    return res.status(403).json({
+                    return res.status(
+                        403
+                    ).json({
 
                         success: false,
 
@@ -873,21 +1634,33 @@ const updateTimesheet =
             }
 
 
+            /* =========================================
+               SAVE
+            ========================================= */
+
             await existing.save();
 
 
+            /* =========================================
+               POPULATE
+            ========================================= */
+
             const updated =
                 await Timesheet
+
                     .findById(
                         existing._id
                     )
+
                     .populate(
                         "employee",
                         employeePopulate
                     );
 
 
-            return res.status(200).json({
+            return res.status(
+                200
+            ).json({
 
                 success: true,
 
@@ -909,7 +1682,9 @@ const updateTimesheet =
             );
 
 
-            return res.status(500).json({
+            return res.status(
+                500
+            ).json({
 
                 success: false,
 
@@ -925,11 +1700,14 @@ const updateTimesheet =
 
 
 /* =====================================================
-   DELETE
+   DELETE TIMESHEET
 ===================================================== */
 
 const deleteTimesheet =
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
 
@@ -941,7 +1719,9 @@ const deleteTimesheet =
 
             if (!timesheet) {
 
-                return res.status(404).json({
+                return res.status(
+                    404
+                ).json({
 
                     success: false,
 
@@ -962,7 +1742,9 @@ const deleteTimesheet =
 
             if (!allowed) {
 
-                return res.status(403).json({
+                return res.status(
+                    403
+                ).json({
 
                     success: false,
 
@@ -974,16 +1756,14 @@ const deleteTimesheet =
             }
 
 
-            /* ==========================================
-               DELETE
-            ========================================== */
-
             await Timesheet.findByIdAndDelete(
                 req.params.id
             );
 
 
-            return res.status(200).json({
+            return res.status(
+                200
+            ).json({
 
                 success: true,
 
@@ -1002,7 +1782,9 @@ const deleteTimesheet =
             );
 
 
-            return res.status(500).json({
+            return res.status(
+                500
+            ).json({
 
                 success: false,
 
@@ -1023,13 +1805,20 @@ const deleteTimesheet =
 ===================================================== */
 
 const updateStatus =
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
 
-            if (!isAdmin(req)) {
+            if (
+                !isAdmin(req)
+            ) {
 
-                return res.status(403).json({
+                return res.status(
+                    403
+                ).json({
 
                     success: false,
 
@@ -1065,7 +1854,9 @@ const updateStatus =
                 )
             ) {
 
-                return res.status(400).json({
+                return res.status(
+                    400
+                ).json({
 
                     success: false,
 
@@ -1079,6 +1870,7 @@ const updateStatus =
 
             const timesheet =
                 await Timesheet
+
                     .findByIdAndUpdate(
 
                         req.params.id,
@@ -1089,10 +1881,13 @@ const updateStatus =
 
                         {
                             new: true,
+
                             runValidators: true
+
                         }
 
                     )
+
                     .populate(
                         "employee",
                         employeePopulate
@@ -1101,7 +1896,9 @@ const updateStatus =
 
             if (!timesheet) {
 
-                return res.status(404).json({
+                return res.status(
+                    404
+                ).json({
 
                     success: false,
 
@@ -1113,7 +1910,9 @@ const updateStatus =
             }
 
 
-            return res.status(200).json({
+            return res.status(
+                200
+            ).json({
 
                 success: true,
 
@@ -1134,7 +1933,9 @@ const updateStatus =
             );
 
 
-            return res.status(500).json({
+            return res.status(
+                500
+            ).json({
 
                 success: false,
 
