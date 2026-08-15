@@ -7,29 +7,27 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0">
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>
         Timesheet | THE D CUTS
     </title>
 
-
-    <!-- MAIN CSS -->
     <link
         rel="stylesheet"
-        href="../css/style.css">
+        href="../css/style.css"
+    >
 
-
-    <!-- TIMESHEET CSS -->
     <link
         rel="stylesheet"
-        href="../css/timesheet.css">
+        href="../css/timesheet.css"
+    >
 
-
-    <!-- FONT AWESOME -->
     <link
         rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
 
 </head>
 
@@ -37,56 +35,434 @@
 <body>
 
 
+<!-- AUTH -->
+<script src="../js/auth.js"></script>
+
+
+<!-- NAVBAR -->
+<div id="navbar-container"></div>
+
+
+<div class="timesheet-page">
+
+
+    <h1>
+        Daily Timesheet
+    </h1>
+
+
+    <p class="subtitle">
+        Manage Daily Employee Work
+    </p>
+
+
+
     <!-- ==========================================
-         AUTH
+         FORM
     =========================================== -->
 
-    <script src="../js/auth.js"></script>
+    <div class="timesheet-card">
 
 
-    <!-- ==========================================
-         NAVBAR
-    =========================================== -->
+        <!-- EMPLOYEE -->
 
-    <div id="navbar-container"></div>
+        <label for="employeeName">
+
+            Employee
+
+            <span style="color:red;">
+                *
+            </span>
+
+        </label>
 
 
-    <!-- ==========================================
-         PAGE
-    =========================================== -->
+        <select
+            id="employeeName"
+            required
+        >
 
-    <main class="timesheet-page">
+            <option value="">
+                Select Employee
+            </option>
+
+        </select>
+
+
+
+        <!-- DATE -->
+
+        <label for="date">
+
+            Date
+
+            <span style="color:red;">
+                *
+            </span>
+
+        </label>
+
+
+        <input
+            type="date"
+            id="date"
+            required
+        >
+
 
 
         <!-- ======================================
-             HEADER
+             ATTENDANCE
         ======================================= -->
 
-        <div class="page-header">
+        <div class="attendance-section">
+
+
+            <h2>
+
+                <i class="fa-solid fa-clock"></i>
+
+                Attendance Time
+
+            </h2>
+
+
+
+            <div class="time-grid">
+
+
+                <!-- CHECK IN -->
+
+                <div class="time-field">
+
+                    <label for="checkIn">
+
+                        Check-in
+
+                        <span style="color:red;">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="checkIn"
+                        class="flexible-time"
+                        placeholder="9:00 AM / 9.00 / 09:00"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <small>
+                        Example: 9:00 AM, 9.30, 0930
+                    </small>
+
+                </div>
+
+
+
+                <!-- LUNCH START -->
+
+                <div class="time-field">
+
+                    <label for="lunchStart">
+
+                        Lunch Start
+
+                        <span style="color:red;">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="lunchStart"
+                        class="flexible-time"
+                        placeholder="1:00 PM / 1.00"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <small>
+                        Example: 1:00 PM, 1.00
+                    </small>
+
+                </div>
+
+
+
+                <!-- LUNCH END -->
+
+                <div class="time-field">
+
+                    <label for="lunchEnd">
+
+                        Lunch End
+
+                        <span style="color:red;">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="lunchEnd"
+                        class="flexible-time"
+                        placeholder="2:00 PM / 2.00"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <small>
+                        Example: 2:00 PM, 2.00
+                    </small>
+
+                </div>
+
+
+
+                <!-- CHECK OUT -->
+
+                <div class="time-field">
+
+                    <label for="checkOut">
+
+                        Check-out
+
+                        <span style="color:red;">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="checkOut"
+                        class="flexible-time"
+                        placeholder="6:00 PM / 18:00"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <small>
+                        Example: 6:00 PM, 18:00, 1830
+                    </small>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ==================================
+                 HOURS
+            =================================== -->
+
+            <div class="hours-summary">
+
+
+                <div class="hours-box">
+
+                    <span>
+                        Office Hours
+                    </span>
+
+                    <strong id="officeHours">
+                        0h 0m
+                    </strong>
+
+                </div>
+
+
+
+                <div class="hours-box">
+
+                    <span>
+                        Lunch Break
+                    </span>
+
+                    <strong id="lunchHours">
+                        0h 0m
+                    </strong>
+
+                </div>
+
+
+
+                <div class="hours-box">
+
+                    <span>
+                        Working Hours
+                    </span>
+
+                    <strong id="workingHours">
+                        0h 0m
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ======================================
+             TASKS
+        ======================================= -->
+
+        <div class="task-section">
+
+
+            <div class="task-header">
+
+                <h2>
+
+                    <i class="fa-solid fa-list-check"></i>
+
+                    TOTAL TASK
+
+                </h2>
+
+
+                <button
+                    type="button"
+                    class="add-btn"
+                    onclick="addProjectCard()"
+                >
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    ADD
+
+                </button>
+
+            </div>
+
+
+            <p class="task-help">
+
+                Enter all tasks completed by the employee.
+
+            </p>
+
+
+            <div
+                id="projectContainer"
+                class="task-container"
+            >
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ======================================
+             COMMENTS
+        ======================================= -->
+
+        <label for="comments">
+
+            Comments
+
+        </label>
+
+
+        <textarea
+            id="comments"
+            rows="4"
+            placeholder="Additional comments..."
+        ></textarea>
+
+
+
+        <!-- ======================================
+             BUTTONS
+        ======================================= -->
+
+        <div class="btn-group">
+
+
+            <button
+                type="button"
+                class="save-btn"
+                id="saveBtn"
+                onclick="saveTimesheet()"
+            >
+
+                <i class="fa-solid fa-floppy-disk"></i>
+
+                Save
+
+            </button>
+
+
+
+            <button
+                type="button"
+                class="update-btn"
+                id="updateBtn"
+                onclick="updateTimesheet()"
+                style="display:none;"
+            >
+
+                <i class="fa-solid fa-pen"></i>
+
+                Update
+
+            </button>
+
+
+
+            <button
+                type="button"
+                class="cancel-btn"
+                onclick="resetForm()"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+                Clear
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ==========================================
+         RECORDS
+    =========================================== -->
+
+    <div class="table-card">
+
+
+        <div class="records-header">
 
             <div>
 
-                <div class="page-title-row">
+                <h2>
+                    Timesheet Records
+                </h2>
 
-                    <div class="title-icon">
-
-                        <i class="fa-solid fa-clock"></i>
-
-                    </div>
-
-                    <div>
-
-                        <h1>
-                            Daily Timesheet
-                        </h1>
-
-                        <p>
-                            Manage Daily Employee Work
-                        </p>
-
-                    </div>
-
-                </div>
+                <p>
+                    Employee daily attendance and tasks
+                </p>
 
             </div>
 
@@ -94,548 +470,74 @@
 
 
 
-        <!-- ======================================
-             MAIN FORM CARD
-        ======================================= -->
+        <div style="overflow-x:auto;">
 
-        <section class="timesheet-card">
 
+            <table>
 
-            <!-- ==================================
-                 EMPLOYEE + DATE
-            =================================== -->
 
-            <div class="top-fields">
+                <thead>
 
+                    <tr>
 
-                <div class="field-group">
+                        <th>
+                            Employee
+                        </th>
 
-                    <label for="employeeName">
+                        <th>
+                            Date
+                        </th>
 
-                        Employee
+                        <th>
+                            Total Task
+                        </th>
 
-                        <span>*</span>
+                        <th>
+                            Office Hours
+                        </th>
 
-                    </label>
+                        <th>
+                            Working Hours
+                        </th>
 
+                        <th>
+                            Lunch Break
+                        </th>
 
-                    <select
-                        id="employeeName"
-                        required>
+                        <th>
+                            Action
+                        </th>
 
-                        <option value="">
-                            Select Employee
-                        </option>
+                    </tr>
 
-                        <option value="01 - Naveen">
-                            01 - Naveen
-                        </option>
+                </thead>
 
-                        <option value="02 - Sathish">
-                            02 - Sathish
-                        </option>
 
-                    </select>
 
-                </div>
+                <tbody
+                    id="timesheetTable"
+                >
+                </tbody>
 
 
+            </table>
 
-                <div class="field-group">
 
-                    <label for="date">
+        </div>
 
-                        Date
 
-                        <span>*</span>
+    </div>
 
-                    </label>
 
+</div>
 
-                    <input
-                        type="date"
-                        id="date"
-                        required>
 
-                </div>
 
+<script src="../js/navbar.js"></script>
 
-            </div>
+<script src="../js/sidebar.js"></script>
 
-
-
-            <!-- ==================================
-                 ATTENDANCE
-            =================================== -->
-
-            <div class="section-block">
-
-
-                <div class="section-heading">
-
-                    <div class="section-heading-left">
-
-                        <div class="heading-icon">
-
-                            <i class="fa-solid fa-clock"></i>
-
-                        </div>
-
-                        <div>
-
-                            <h2>
-                                Attendance Time
-                            </h2>
-
-                            <p>
-                                Enter your office attendance timing
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- TIME FIELDS -->
-
-                <div class="attendance-grid">
-
-
-                    <!-- CHECK IN -->
-
-                    <div class="field-group">
-
-                        <label for="checkIn">
-
-                            Check-in
-
-                            <span>*</span>
-
-                        </label>
-
-
-                        <div class="time-input-wrap">
-
-                            <input
-                                type="time"
-                                id="checkIn"
-                                required>
-
-                            <i class="fa-regular fa-clock"></i>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- LUNCH START -->
-
-                    <div class="field-group">
-
-                        <label for="lunchStart">
-
-                            Lunch Start
-
-                            <span>*</span>
-
-                        </label>
-
-
-                        <div class="time-input-wrap">
-
-                            <input
-                                type="time"
-                                id="lunchStart"
-                                required>
-
-                            <i class="fa-regular fa-clock"></i>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- LUNCH END -->
-
-                    <div class="field-group">
-
-                        <label for="lunchEnd">
-
-                            Lunch End
-
-                            <span>*</span>
-
-                        </label>
-
-
-                        <div class="time-input-wrap">
-
-                            <input
-                                type="time"
-                                id="lunchEnd"
-                                required>
-
-                            <i class="fa-regular fa-clock"></i>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- CHECK OUT -->
-
-                    <div class="field-group">
-
-                        <label for="checkOut">
-
-                            Check-out
-
-                            <span>*</span>
-
-                        </label>
-
-
-                        <div class="time-input-wrap">
-
-                            <input
-                                type="time"
-                                id="checkOut"
-                                required>
-
-                            <i class="fa-regular fa-clock"></i>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- ==================================
-                     CALCULATED HOURS
-                =================================== -->
-
-                <div class="hours-summary">
-
-
-                    <div class="hours-card office">
-
-                        <div class="hours-icon">
-
-                            <i class="fa-solid fa-building"></i>
-
-                        </div>
-
-                        <div>
-
-                            <small>
-                                Office Hours
-                            </small>
-
-                            <strong id="officeHours">
-                                0h 0m
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <div class="hours-card lunch">
-
-                        <div class="hours-icon">
-
-                            <i class="fa-solid fa-utensils"></i>
-
-                        </div>
-
-                        <div>
-
-                            <small>
-                                Lunch Break
-                            </small>
-
-                            <strong id="lunchBreak">
-                                0h 0m
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <div class="hours-card working">
-
-                        <div class="hours-icon">
-
-                            <i class="fa-solid fa-briefcase"></i>
-
-                        </div>
-
-                        <div>
-
-                            <small>
-                                Working Hours
-                            </small>
-
-                            <strong id="workingHours">
-                                0h 0m
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-            </div>
-
-
-
-            <!-- ==================================
-                 TOTAL TASK
-            =================================== -->
-
-            <div class="section-block task-section">
-
-
-                <div class="section-heading">
-
-                    <div class="section-heading-left">
-
-                        <div class="heading-icon">
-
-                            <i class="fa-solid fa-list-check"></i>
-
-                        </div>
-
-                        <div>
-
-                            <h2>
-                                TOTAL TASK
-                                <span class="required-star">*</span>
-                            </h2>
-
-                            <p>
-                                Enter all tasks completed by the employee
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        id="taskCount"
-                        class="task-count">
-
-                        0 Tasks
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- TASK TEXTAREA -->
-
-                <div class="task-input-wrap">
-
-                    <textarea
-                        id="taskInput"
-                        rows="7"
-                        placeholder="Enter task..."
-                        required></textarea>
-
-                </div>
-
-
-                <div class="task-bottom">
-
-                    <span>
-
-                        <i class="fa-solid fa-circle-info"></i>
-
-                        Press Enter to move to the next task
-
-                    </span>
-
-                </div>
-
-
-            </div>
-
-
-
-            <!-- ==================================
-                 BUTTONS
-            =================================== -->
-
-            <div class="form-actions">
-
-
-                <button
-                    type="button"
-                    id="saveBtn"
-                    class="primary-btn">
-
-                    <i class="fa-solid fa-floppy-disk"></i>
-
-                    Save
-
-                </button>
-
-
-                <button
-                    type="button"
-                    id="clearBtn"
-                    class="secondary-btn">
-
-                    <i class="fa-solid fa-xmark"></i>
-
-                    Clear
-
-                </button>
-
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- ======================================
-             RECORDS
-        ======================================= -->
-
-        <section class="records-card">
-
-
-            <div class="records-header">
-
-                <div>
-
-                    <h2>
-
-                        <i class="fa-solid fa-table-list"></i>
-
-                        Timesheet Records
-
-                    </h2>
-
-                    <p>
-                        Employee daily attendance and tasks
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- TABLE -->
-
-            <div class="table-wrapper">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Employee
-                            </th>
-
-                            <th>
-                                Date
-                            </th>
-
-                            <th>
-                                Tasks
-                            </th>
-
-                            <th>
-                                Total Task
-                            </th>
-
-                            <th>
-                                Office Hours
-                            </th>
-
-                            <th>
-                                Working Hours
-                            </th>
-
-                            <th>
-                                Lunch Break
-                            </th>
-
-                            <th>
-                                Action
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody
-                        id="timesheetTable">
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-
-            <!-- EMPTY STATE -->
-
-            <div
-                id="emptyState"
-                class="empty-state">
-
-                <i class="fa-solid fa-calendar-xmark"></i>
-
-                <h3>
-                    No Timesheet Records
-                </h3>
-
-                <p>
-                    Saved employee timesheets will appear here.
-                </p>
-
-            </div>
-
-
-        </section>
-
-
-    </main>
-
-
-
-    <!-- ==========================================
-         JS
-    =========================================== -->
-
-    <script src="../js/navbar.js"></script>
-
-    <script src="../js/sidebar.js"></script>
-
-    <script src="../js/timesheet.js"></script>
+<script src="../js/timesheet.js"></script>
 
 
 </body>
