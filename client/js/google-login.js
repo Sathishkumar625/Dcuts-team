@@ -2,18 +2,36 @@
    THE D CUTS
    FIREBASE GOOGLE LOGIN
    RENDER BACKEND
+
+   FIX:
+   - auth/cancelled-popup-request
+   - Prevent multiple popup requests
+   - Prevent double click
+   - Keep Admin / Employee role process unchanged
+========================================== */
+
+
+/* ==========================================
+   FIREBASE APP
 ========================================== */
 
 import {
     initializeApp
-} from
+}
+from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+
+/* ==========================================
+   FIREBASE AUTH
+========================================== */
 
 import {
     getAuth,
     GoogleAuthProvider,
     signInWithPopup
-} from
+}
+from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 
@@ -48,14 +66,23 @@ const firebaseConfig = {
 
 
 /* ==========================================
-   FIREBASE INITIALIZE
+   INITIALIZE FIREBASE
 ========================================== */
 
 const app =
-    initializeApp(firebaseConfig);
+    initializeApp(
+        firebaseConfig
+    );
+
+
+/* ==========================================
+   FIREBASE AUTH
+========================================== */
 
 const auth =
-    getAuth(app);
+    getAuth(
+        app
+    );
 
 
 /* ==========================================
@@ -65,10 +92,41 @@ const auth =
 const provider =
     new GoogleAuthProvider();
 
+
+/*
+   Force Google account selection.
+   This also helps avoid confusion when
+   multiple Google accounts are logged in.
+*/
+
 provider.setCustomParameters({
+
     prompt: "select_account"
+
 });
 
+
+/* ==========================================
+   LOGIN LOCK
+========================================== */
+
+/*
+   VERY IMPORTANT
+
+   Prevents two signInWithPopup()
+   requests from running at the same time.
+
+   This fixes:
+
+   auth/cancelled-popup-request
+*/
+
+let googleLoginInProgress = false;
+
+
+/* ==========================================
+   LOG
+========================================== */
 
 console.log(
     "🔥 GOOGLE LOGIN JS LOADED"
@@ -76,40 +134,207 @@ console.log(
 
 
 /* ==========================================
+   FIND LOGIN BUTTON
+========================================== */
+
+function getGoogleLoginButton() {
+
+    return (
+
+        document.getElementById(
+            "googleLoginBtn"
+        )
+
+        ||
+
+        document.getElementById(
+            "googleLogin"
+        )
+
+        ||
+
+        document.querySelector(
+            ".google-login-btn"
+        )
+
+        ||
+
+        document.querySelector(
+            'button[onclick*="googleLogin"]'
+        )
+
+        ||
+
+        null
+
+    );
+
+}
+
+
+/* ==========================================
+   BUTTON STATE
+========================================== */
+
+function setLoginButtonState(
+    disabled
+) {
+
+    const button =
+        getGoogleLoginButton();
+
+
+    if (!button) {
+        return;
+    }
+
+
+    button.disabled =
+        disabled;
+
+
+    if (disabled) {
+
+        button.dataset.originalText =
+            button.innerHTML;
+
+
+        button.innerHTML =
+            "Opening Google...";
+
+
+        button.style.pointerEvents =
+            "none";
+
+        button.style.opacity =
+            "0.7";
+
+    }
+
+    else {
+
+        if (
+            button.dataset.originalText
+        ) {
+
+            button.innerHTML =
+                button.dataset.originalText;
+
+        }
+
+
+        button.style.pointerEvents =
+            "";
+
+
+        button.style.opacity =
+            "";
+
+
+        button.disabled =
+            false;
+
+    }
+
+}
+
+
+/* ==========================================
+   MESSAGE
+========================================== */
+
+function setMessage(
+    text
+) {
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    if (message) {
+
+        message.innerText =
+            text;
+
+    }
+
+}
+
+
+/* ==========================================
    GOOGLE LOGIN
 ========================================== */
 
 window.googleLogin =
-    async function () {
+    async function (
+        event
+    ) {
+
+        /*
+           Stop form submit if this button
+           is inside a form.
+        */
+
+        if (event) {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+        }
+
+
+        /* ======================================
+           PREVENT DOUBLE CLICK
+        ====================================== */
+
+        if (
+            googleLoginInProgress
+        ) {
+
+            console.log(
+                "Google login already running..."
+            );
+
+            return;
+
+        }
+
+
+        /* ======================================
+           LOCK LOGIN
+        ====================================== */
+
+        googleLoginInProgress =
+            true;
+
+
+        setLoginButtonState(
+            true
+        );
+
 
         console.log(
             "GOOGLE BUTTON CLICKED"
         );
 
 
-        const message =
-            document.getElementById(
-                "message"
+        try {
+
+            /* ==================================
+               MESSAGE
+            ================================== */
+
+            setMessage(
+                "Opening Google Login..."
             );
 
 
-        try {
-
-            /* ==========================================
-               MESSAGE
-            ========================================== */
-
-            if (message) {
-
-                message.innerText =
-                    "Opening Google Login...";
-
-            }
-
-
-            /* ==========================================
+            /* ==================================
                FIREBASE GOOGLE LOGIN
-            ========================================== */
+            ================================== */
 
             const result =
                 await signInWithPopup(
@@ -117,6 +342,10 @@ window.googleLogin =
                     provider
                 );
 
+
+            /* ==================================
+               GOOGLE USER
+            ================================== */
 
             const user =
                 result.user;
@@ -128,17 +357,14 @@ window.googleLogin =
             );
 
 
-            /* ==========================================
+            /* ==================================
                EMAIL
-            ========================================== */
+            ================================== */
 
-            const email =
-                (user.email || "")
-                    .toLowerCase()
-                    .trim();
-
-
-            if (!email) {
+            if (
+                !user ||
+                !user.email
+            ) {
 
                 throw new Error(
                     "Google account email not available."
@@ -147,22 +373,34 @@ window.googleLogin =
             }
 
 
-            /* ==========================================
-               RENDER BACKEND
-               DO NOT CHANGE
-            ========================================== */
+            const email =
+                user.email
+                    .toLowerCase()
+                    .trim();
+
+
+            /* ==================================
+               BACKEND URL
+            ================================== */
 
             const backendURL =
                 "https://dcuts-team.onrender.com";
 
 
-            /* ==========================================
+            /* ==================================
                SEND GOOGLE USER TO BACKEND
-            ========================================== */
+            ================================== */
+
+            setMessage(
+                "Checking your account..."
+            );
+
 
             const backendResponse =
                 await fetch(
+
                     `${backendURL}/api/auth/google`,
+
                     {
 
                         method:
@@ -179,7 +417,8 @@ window.googleLogin =
                             JSON.stringify({
 
                                 name:
-                                    user.displayName || "",
+                                    user.displayName ||
+                                    "",
 
                                 email:
                                     email
@@ -187,14 +426,16 @@ window.googleLogin =
                             })
 
                     }
+
                 );
 
 
-            /* ==========================================
-               BACKEND RESPONSE
-            ========================================== */
+            /* ==================================
+               BACKEND JSON
+            ================================== */
 
             let backendData;
+
 
             try {
 
@@ -203,10 +444,18 @@ window.googleLogin =
 
             }
 
-            catch (jsonError) {
+            catch (
+                jsonError
+            ) {
+
+                console.error(
+                    "BACKEND JSON ERROR:",
+                    jsonError
+                );
+
 
                 throw new Error(
-                    "Server returned an invalid response."
+                    "Server did not return a valid response."
                 );
 
             }
@@ -218,26 +467,36 @@ window.googleLogin =
             );
 
 
-            /* ==========================================
-               BACKEND LOGIN ERROR
-            ========================================== */
+            /* ==================================
+               BACKEND ERROR
+            ================================== */
 
             if (
-                !backendResponse.ok ||
+
+                !backendResponse.ok
+
+                ||
+
                 !backendData.success
+
             ) {
 
                 throw new Error(
-                    backendData.message ||
+
+                    backendData.message
+
+                    ||
+
                     "Backend Google login failed."
+
                 );
 
             }
 
 
-            /* ==========================================
+            /* ==================================
                BACKEND USER
-            ========================================== */
+            ================================== */
 
             const backendUser =
                 backendData.user;
@@ -252,113 +511,151 @@ window.googleLogin =
             }
 
 
-            /* ==========================================
+            /* ==================================
                ROLE
-               ADMIN PROCESS UNCHANGED
-            ========================================== */
+
+               ADMIN PROCESS IS NOT CHANGED
+            ================================== */
 
             const role =
                 String(
-                    backendUser.role ||
+
+                    backendUser.role
+
+                    ||
+
                     "employee"
+
                 )
                 .toLowerCase();
 
 
-            /* ==========================================
+            /* ==================================
                CLEAR OLD LOGIN
-            ========================================== */
+            ================================== */
 
             localStorage.clear();
 
 
-            /* ==========================================
-               SAVE JWT TOKEN
-            ========================================== */
+            /* ==================================
+               SAVE JWT
+            ================================== */
 
             localStorage.setItem(
+
                 "token",
+
                 backendData.token
+
             );
 
 
-            /* ==========================================
-               SAVE BACKEND USER
-            ========================================== */
+            /* ==================================
+               SAVE USER
+            ================================== */
 
             localStorage.setItem(
+
                 "user",
+
                 JSON.stringify(
                     backendUser
                 )
+
             );
 
 
             localStorage.setItem(
+
                 "loggedUser",
+
                 JSON.stringify(
                     backendUser
                 )
+
             );
 
 
-            /* ==========================================
+            /* ==================================
                SAVE ROLE
-            ========================================== */
+            ================================== */
 
             localStorage.setItem(
+
                 "role",
+
                 role
+
             );
 
 
-            /* ==========================================
+            /* ==================================
                SAVE NAME
-            ========================================== */
+            ================================== */
 
             localStorage.setItem(
+
                 "userName",
-                backendUser.name ||
-                user.displayName ||
+
+                backendUser.name
+
+                ||
+
+                user.displayName
+
+                ||
+
                 ""
+
             );
 
 
-            /* ==========================================
+            /* ==================================
                SAVE EMAIL
-            ========================================== */
+            ================================== */
 
             localStorage.setItem(
+
                 "userEmail",
-                backendUser.email ||
+
+                backendUser.email
+
+                ||
+
                 email
+
             );
 
+
+            /* ==================================
+               LOGIN SUCCESS
+            ================================== */
 
             console.log(
-                "GOOGLE LOGIN SUCCESS:",
+                "✅ GOOGLE LOGIN SUCCESS:",
                 backendUser
             );
 
 
-            /* ==========================================
-               SUCCESS MESSAGE
-            ========================================== */
-
-            if (message) {
-
-                message.innerText =
-                    "Login successful...";
-
-            }
+            setMessage(
+                "Login successful..."
+            );
 
 
-            /* ==========================================
+            /* ==================================
                REDIRECT
-               ADMIN / EMPLOYEE PROCESS UNCHANGED
-            ========================================== */
+               
+               ADMIN:
+               ./index.html
+
+               EMPLOYEE:
+               ./pages/timesheet.html
+
+               DO NOT CHANGE
+            ================================== */
 
             setTimeout(
+
                 function () {
 
                     if (
@@ -378,17 +675,22 @@ window.googleLogin =
                     }
 
                 },
+
                 500
+
             );
+
 
         }
 
 
-        /* ==========================================
+        /* ======================================
            GOOGLE LOGIN ERROR
-        ========================================== */
+        ====================================== */
 
-        catch (error) {
+        catch (
+            error
+        ) {
 
             console.error(
                 "GOOGLE LOGIN ERROR:",
@@ -396,66 +698,240 @@ window.googleLogin =
             );
 
 
-            if (message) {
-
-                message.innerText =
-                    "Google login failed.";
-            }
-
-
-            /* ==========================================
-               USER-FRIENDLY ERROR
-            ========================================== */
-
-            let errorMessage =
-                error.message ||
-                "Google login failed.";
+            /* ==================================
+               CANCELLED POPUP REQUEST
+            ================================== */
 
             if (
+
                 error.code ===
-                "auth/unauthorized-domain"
+                "auth/cancelled-popup-request"
+
             ) {
 
-                errorMessage =
-                    "This Vercel domain is not authorized in Firebase.";
+                console.warn(
+                    "Google popup request was cancelled because another popup request was started."
+                );
+
+
+                setMessage(
+                    "Google login is already opening. Please wait..."
+                );
+
+
+                return;
 
             }
 
-            else if (
-                error.code ===
-                "auth/popup-blocked"
-            ) {
 
-                errorMessage =
-                    "Google login popup was blocked by the browser.";
+            /* ==================================
+               POPUP CLOSED
+            ================================== */
 
-            }
+            if (
 
-            else if (
                 error.code ===
                 "auth/popup-closed-by-user"
+
             ) {
 
-                errorMessage =
-                    "Google login window was closed.";
+                console.log(
+                    "Google login popup closed by user."
+                );
+
+
+                setMessage(
+                    "Google login cancelled."
+                );
+
+
+                return;
 
             }
 
-            else if (
+
+            /* ==================================
+               POPUP BLOCKED
+            ================================== */
+
+            if (
+
                 error.code ===
-                "auth/operation-not-allowed"
+                "auth/popup-blocked"
+
             ) {
 
-                errorMessage =
-                    "Google Sign-In is not enabled in Firebase.";
+                setMessage(
+                    "Google popup was blocked. Please allow popups for this website."
+                );
+
+
+                alert(
+                    "Google Login popup was blocked by your browser. Please allow popups and try again."
+                );
+
+
+                return;
 
             }
+
+
+            /* ==================================
+               UNAUTHORIZED DOMAIN
+            ================================== */
+
+            if (
+
+                error.code ===
+                "auth/unauthorized-domain"
+
+            ) {
+
+                setMessage(
+                    "This website is not authorized in Firebase."
+                );
+
+
+                alert(
+                    "Firebase Unauthorized Domain. Add this website domain in Firebase Authentication → Settings → Authorized domains."
+                );
+
+
+                return;
+
+            }
+
+
+            /* ==================================
+               GENERAL ERROR
+            ================================== */
+
+            setMessage(
+                "Google login failed."
+            );
 
 
             alert(
-                errorMessage
+
+                error.message
+
+                ||
+
+                "Google login failed."
+
+            );
+
+        }
+
+
+        /* ======================================
+           UNLOCK LOGIN
+           
+           IMPORTANT:
+           Don't unlock during successful
+           redirect too early.
+        ====================================== */
+
+        finally {
+
+            /*
+               If page is still here,
+               unlock the button.
+            */
+
+            setTimeout(
+
+                function () {
+
+                    googleLoginInProgress =
+                        false;
+
+
+                    setLoginButtonState(
+                        false
+                    );
+
+                },
+
+                800
+
             );
 
         }
 
     };
+
+
+/* ==========================================
+   EXTRA PROTECTION
+========================================== */
+
+/*
+   If the Google button is a normal HTML
+   button inside a form, this prevents
+   accidental form submission.
+*/
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const button =
+            getGoogleLoginButton();
+
+
+        if (!button) {
+            return;
+        }
+
+
+        /*
+           Make sure button doesn't submit
+           the login form accidentally.
+        */
+
+        if (
+            button.tagName ===
+            "BUTTON"
+        ) {
+
+            button.type =
+                "button";
+
+        }
+
+
+        /*
+           Prevent rapid double clicks.
+        */
+
+        button.addEventListener(
+
+            "click",
+
+            function (event) {
+
+                if (
+                    googleLoginInProgress
+                ) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    return false;
+
+                }
+
+            },
+
+            true
+
+        );
+
+    }
+
+);
+
+
+

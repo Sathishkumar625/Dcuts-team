@@ -1,376 +1,1117 @@
-/* ==========================================
-   THE D CUTS TIMESHEET V2
-========================================== */
+/* =====================================================
+   THE D CUTS
+   DAILY TIMESHEET
+===================================================== */
 
-.timesheet-page{
 
-padding:35px;
+/* =====================================================
+   PAGE
+===================================================== */
 
-max-width:1500px;
+.timesheet-page {
 
-margin:auto;
+    width: min(
+        1450px,
+        calc(100% - 40px)
+    );
 
-}
+    margin: 30px auto 60px;
 
-.timesheet-page h1{
-
-font-size:38px;
-
-font-weight:700;
-
-}
-
-.subtitle{
-
-margin-top:8px;
-
-color:#94a3b8;
+    color: #ffffff;
 
 }
 
-/* =========================
-CARD
-========================= */
+
+/* =====================================================
+   PAGE HEADER
+===================================================== */
+
+.page-header {
+
+    margin-bottom: 25px;
+
+}
+
+
+.page-title-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+}
+
+
+.title-icon {
+
+    width: 54px;
+
+    height: 54px;
+
+    border-radius: 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #d4af37,
+            #a77c13
+        );
+
+    color: #101522;
+
+    font-size: 23px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(212,175,55,.18);
+
+}
+
+
+.page-header h1 {
+
+    margin: 0;
+
+    font-size: 30px;
+
+    font-weight: 800;
+
+}
+
+
+.page-header p {
+
+    margin: 5px 0 0;
+
+    color: #8e99ad;
+
+    font-size: 14px;
+
+}
+
+
+/* =====================================================
+   MAIN CARD
+===================================================== */
 
 .timesheet-card,
-.table-card{
+.records-card {
 
-margin-top:30px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(19,28,47,.97),
+            rgba(8,16,31,.97)
+        );
 
-padding:30px;
+    border:
+        1px solid
+        rgba(255,255,255,.09);
 
-border-radius:20px;
+    border-radius: 22px;
 
-background:#111827;
-
-border:1px solid rgba(255,255,255,.08);
-
-box-shadow:0 10px 25px rgba(0,0,0,.25);
-
-}
-
-/* =========================
-FORM
-========================= */
-
-label{
-
-display:block;
-
-margin-top:18px;
-
-margin-bottom:8px;
-
-font-weight:600;
-
-font-size:15px;
+    box-shadow:
+        0 20px 50px
+        rgba(0,0,0,.28);
 
 }
 
-select,
-input,
-textarea{
 
-width:100%;
+.timesheet-card {
 
-padding:14px;
-
-background:#1e293b;
-
-border:1px solid #334155;
-
-border-radius:10px;
-
-color:white;
-
-font-size:15px;
-
-transition:.3s;
+    padding: 28px;
 
 }
 
-select:focus,
-input:focus,
-textarea:focus{
 
-outline:none;
+/* =====================================================
+   TOP FIELDS
+===================================================== */
 
-border-color:#3b82f6;
+.top-fields {
 
-box-shadow:0 0 0 3px rgba(59,130,246,.25);
+    display: grid;
 
-}
+    grid-template-columns:
+        1fr
+        1fr;
 
-textarea{
+    gap: 22px;
 
-min-height:110px;
-
-resize:vertical;
-
-}
-
-/* =========================
-PROJECT BLOCK
-========================= */
-
-.project-card{
-
-margin-top:25px;
-
-padding:25px;
-
-border-radius:18px;
-
-background:#0f172a;
-
-border:1px solid rgba(255,255,255,.08);
+    margin-bottom: 28px;
 
 }
 
-.project-title{
 
-display:flex;
+/* =====================================================
+   FIELD
+===================================================== */
 
-justify-content:space-between;
+.field-group {
 
-align-items:center;
-
-margin-bottom:20px;
-
-}
-
-.project-title h3{
-
-font-size:18px;
+    width: 100%;
 
 }
 
-.project-grid{
 
-display:grid;
+.field-group label {
 
-grid-template-columns:repeat(2,1fr);
+    display: block;
 
-gap:18px;
+    margin-bottom: 8px;
 
-}
+    font-size: 13px;
 
-.full-width{
+    font-weight: 700;
 
-grid-column:1/-1;
-
-}
-
-/* =========================
-BUTTONS
-========================= */
-
-.btn-group{
-
-display:flex;
-
-gap:15px;
-
-margin-top:30px;
-
-flex-wrap:wrap;
+    color: #e9edf5;
 
 }
 
-.save-btn,
-.add-btn,
-.update-btn{
 
-border:none;
+.field-group label span {
 
-padding:14px 26px;
-
-border-radius:10px;
-
-cursor:pointer;
-
-font-size:15px;
-
-font-weight:600;
-
-transition:.3s;
+    color: #ff5353;
 
 }
 
-.save-btn{
 
-background:#2563eb;
+.field-group input,
+.field-group select {
 
-color:white;
+    width: 100%;
 
-}
+    height: 48px;
 
-.save-btn:hover{
+    padding:
+        0 14px;
 
-background:#1d4ed8;
+    box-sizing: border-box;
 
-}
+    border-radius: 11px;
 
-.add-btn{
+    border:
+        1px solid
+        rgba(255,255,255,.12);
 
-background:#16a34a;
+    background:
+        #151e2f;
 
-color:white;
+    color: #ffffff;
 
-}
+    outline: none;
 
-.add-btn:hover{
+    font-family: inherit;
 
-background:#15803d;
+    font-size: 14px;
 
-}
-
-.update-btn{
-
-background:#ea580c;
-
-color:white;
-
-display:none;
+    transition:
+        .2s ease;
 
 }
 
-.update-btn:hover{
 
-background:#c2410c;
+.field-group input:focus,
+.field-group select:focus {
 
-}
+    border-color:
+        #d4af37;
 
-.delete-project{
-
-background:#dc2626;
-
-color:white;
-
-border:none;
-
-padding:10px 15px;
-
-border-radius:8px;
-
-cursor:pointer;
+    box-shadow:
+        0 0 0 3px
+        rgba(212,175,55,.10);
 
 }
 
-/* =========================
-TABLE
-========================= */
 
-table{
+/* =====================================================
+   SECTION
+===================================================== */
 
-width:100%;
+.section-block {
 
-margin-top:20px;
+    margin-top: 25px;
 
-border-collapse:collapse;
+    padding: 24px;
 
-}
+    border-radius: 17px;
 
-thead{
+    border:
+        1px solid
+        rgba(255,255,255,.07);
 
-background:#1e293b;
-
-}
-
-th{
-
-padding:15px;
-
-font-size:14px;
+    background:
+        rgba(255,255,255,.025);
 
 }
 
-td{
 
-padding:14px;
+/* =====================================================
+   SECTION HEADING
+===================================================== */
 
-border-bottom:1px solid rgba(255,255,255,.08);
+.section-heading {
 
-}
+    display: flex;
 
-tr:hover{
+    align-items: center;
 
-background:#172554;
+    justify-content: space-between;
 
-}
+    gap: 15px;
 
-/* =========================
-ACTION BUTTONS
-========================= */
-
-.edit-btn{
-
-background:#f59e0b;
-
-color:white;
-
-border:none;
-
-padding:8px 15px;
-
-border-radius:8px;
-
-cursor:pointer;
-
-margin-right:8px;
+    margin-bottom: 22px;
 
 }
 
-.delete-btn{
 
-background:#ef4444;
+.section-heading-left {
 
-color:white;
+    display: flex;
 
-border:none;
+    align-items: center;
 
-padding:8px 15px;
-
-border-radius:8px;
-
-cursor:pointer;
+    gap: 12px;
 
 }
 
-/* =========================
-MOBILE
-========================= */
 
-@media(max-width:768px){
+.heading-icon {
 
-.project-grid{
+    width: 40px;
 
-grid-template-columns:1fr;
+    height: 40px;
 
-}
+    border-radius: 11px;
 
-.btn-group{
+    display: flex;
 
-flex-direction:column;
+    align-items: center;
 
-}
+    justify-content: center;
 
-.save-btn,
-.add-btn,
-.update-btn{
+    background:
+        rgba(212,175,55,.12);
 
-width:100%;
+    color:
+        #d4af37;
 
 }
 
-table{
 
-display:block;
+.section-heading h2 {
 
-overflow-x:auto;
+    margin: 0;
 
-white-space:nowrap;
+    font-size: 20px;
+
+    font-weight: 800;
 
 }
+
+
+.section-heading p {
+
+    margin: 4px 0 0;
+
+    color: #7f899d;
+
+    font-size: 12px;
+
+}
+
+
+.required-star {
+
+    color: #ff4f4f;
+
+}
+
+
+/* =====================================================
+   ATTENDANCE GRID
+===================================================== */
+
+.attendance-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 16px;
+
+}
+
+
+/* =====================================================
+   TIME INPUT
+===================================================== */
+
+.time-input-wrap {
+
+    position: relative;
+
+}
+
+
+.time-input-wrap input {
+
+    padding-right: 42px;
+
+}
+
+
+.time-input-wrap i {
+
+    position: absolute;
+
+    right: 14px;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    color: #707b90;
+
+    pointer-events: none;
+
+}
+
+
+/* =====================================================
+   HOURS SUMMARY
+===================================================== */
+
+.hours-summary {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+
+    margin-top: 20px;
+
+}
+
+
+.hours-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 17px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,255,255,.035);
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+}
+
+
+.hours-icon {
+
+    width: 42px;
+
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background:
+        rgba(212,175,55,.10);
+
+    color:
+        #d4af37;
+
+}
+
+
+.hours-card small {
+
+    display: block;
+
+    color: #8490a4;
+
+    font-size: 11px;
+
+    margin-bottom: 4px;
+
+}
+
+
+.hours-card strong {
+
+    display: block;
+
+    color: #ffffff;
+
+    font-size: 17px;
+
+}
+
+
+/* =====================================================
+   TOTAL TASK
+===================================================== */
+
+.task-section {
+
+    margin-top: 25px;
+
+}
+
+
+.task-count {
+
+    padding:
+        7px 12px;
+
+    border-radius: 9px;
+
+    background:
+        rgba(212,175,55,.10);
+
+    color:
+        #d4af37;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+}
+
+
+/* =====================================================
+   TASK TEXTAREA
+===================================================== */
+
+.task-input-wrap {
+
+    position: relative;
+
+}
+
+
+#taskInput {
+
+    display: block;
+
+    width: 100%;
+
+    min-height: 170px;
+
+    box-sizing: border-box;
+
+    padding: 16px 18px;
+
+    border-radius: 14px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.13);
+
+    background:
+        #121b2b;
+
+    color: #ffffff;
+
+    outline: none;
+
+    resize: vertical;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size: 15px;
+
+    line-height: 1.8;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+
+}
+
+
+#taskInput:focus {
+
+    border-color:
+        #d4af37;
+
+    background:
+        #162033;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(212,175,55,.10);
+
+}
+
+
+#taskInput::placeholder {
+
+    color: #6f7a8f;
+
+}
+
+
+/* =====================================================
+   TASK BOTTOM
+===================================================== */
+
+.task-bottom {
+
+    margin-top: 10px;
+
+    color: #778399;
+
+    font-size: 12px;
+
+}
+
+
+.task-bottom i {
+
+    margin-right: 5px;
+
+    color: #d4af37;
+
+}
+
+
+/* =====================================================
+   FORM ACTIONS
+===================================================== */
+
+.form-actions {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: 25px;
+
+}
+
+
+.primary-btn,
+.secondary-btn {
+
+    min-width: 115px;
+
+    height: 45px;
+
+    padding:
+        0 20px;
+
+    border-radius: 11px;
+
+    border: none;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    transition:
+        .2s ease;
+
+}
+
+
+.primary-btn {
+
+    background:
+        linear-gradient(
+            135deg,
+            #d4af37,
+            #a77b12
+        );
+
+    color: #101522;
+
+}
+
+
+.primary-btn:hover {
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 8px 22px
+        rgba(212,175,55,.20);
+
+}
+
+
+.secondary-btn {
+
+    background:
+        rgba(255,255,255,.07);
+
+    border:
+        1px solid
+        rgba(255,255,255,.10);
+
+    color: #d8deea;
+
+}
+
+
+.secondary-btn:hover {
+
+    background:
+        rgba(255,255,255,.11);
+
+}
+
+
+/* =====================================================
+   RECORDS
+===================================================== */
+
+.records-card {
+
+    margin-top: 25px;
+
+    overflow: hidden;
+
+}
+
+
+.records-header {
+
+    padding: 25px 28px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.07);
+
+}
+
+
+.records-header h2 {
+
+    margin: 0;
+
+    font-size: 21px;
+
+}
+
+
+.records-header h2 i {
+
+    color: #d4af37;
+
+    margin-right: 7px;
+
+}
+
+
+.records-header p {
+
+    margin: 6px 0 0;
+
+    color: #7f899d;
+
+    font-size: 13px;
+
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.table-wrapper {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+}
+
+
+table {
+
+    width: 100%;
+
+    min-width: 1050px;
+
+    border-collapse: collapse;
+
+}
+
+
+thead {
+
+    background:
+        linear-gradient(
+            135deg,
+            #243e87,
+            #1d3679
+        );
+
+}
+
+
+th {
+
+    padding: 17px 14px;
+
+    text-align: left;
+
+    color: #ffffff;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+}
+
+
+td {
+
+    padding: 18px 14px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.06);
+
+    color: #dfe5f0;
+
+    font-size: 13px;
+
+    vertical-align: top;
+
+}
+
+
+tbody tr {
+
+    transition:
+        background .2s ease;
+
+}
+
+
+tbody tr:hover {
+
+    background:
+        rgba(255,255,255,.025);
+
+}
+
+
+/* =====================================================
+   TASKS IN TABLE
+===================================================== */
+
+.record-tasks {
+
+    min-width: 300px;
+
+    max-width: 450px;
+
+}
+
+
+.record-task {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    line-height: 1.5;
+
+}
+
+
+.record-task:last-child {
+
+    margin-bottom: 0;
+
+}
+
+
+/* =====================================================
+   BADGE
+===================================================== */
+
+.total-task-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 34px;
+
+    height: 30px;
+
+    padding:
+        0 8px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(212,175,55,.12);
+
+    color:
+        #d4af37;
+
+    font-weight: 800;
+
+}
+
+
+/* =====================================================
+   ACTION BUTTONS
+===================================================== */
+
+.record-actions {
+
+    display: flex;
+
+    gap: 7px;
+
+}
+
+
+.record-action {
+
+    width: 34px;
+
+    height: 34px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transition:
+        .2s ease;
+
+}
+
+
+.edit-action {
+
+    background:
+        rgba(56,132,255,.15);
+
+    color:
+        #69a5ff;
+
+}
+
+
+.delete-action {
+
+    background:
+        rgba(255,74,74,.14);
+
+    color:
+        #ff6b6b;
+
+}
+
+
+.record-action:hover {
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.empty-state {
+
+    padding: 55px 20px;
+
+    text-align: center;
+
+    color: #7f899d;
+
+}
+
+
+.empty-state i {
+
+    font-size: 38px;
+
+    color: #59667d;
+
+    margin-bottom: 12px;
+
+}
+
+
+.empty-state h3 {
+
+    margin: 0 0 5px;
+
+    color: #d7dce6;
+
+}
+
+
+.empty-state p {
+
+    margin: 0;
+
+    font-size: 13px;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .attendance-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .timesheet-page {
+
+        width:
+            calc(100% - 24px);
+
+        margin-top: 18px;
+
+    }
+
+
+    .timesheet-card {
+
+        padding: 17px;
+
+    }
+
+
+    .top-fields {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .attendance-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .hours-summary {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .section-block {
+
+        padding: 17px;
+
+    }
+
+
+    .section-heading {
+
+        align-items: flex-start;
+
+    }
+
+
+    .form-actions {
+
+        flex-direction: column;
+
+    }
+
+
+    .primary-btn,
+    .secondary-btn {
+
+        width: 100%;
+
+    }
+
+
+    .page-header h1 {
+
+        font-size: 24px;
+
+    }
 
 }
