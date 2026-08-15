@@ -13,7 +13,8 @@ const authMiddleware =
 const {
     adminOnly,
     authenticatedUser
-} = require("../middleware/authMiddleware");
+} =
+    require("../middleware/authMiddleware");
 
 
 /* =====================================================
@@ -23,11 +24,20 @@ const {
 const {
     createTimesheet,
     getTimesheets,
-    getTimesheetById,
+
+    /*
+     * IMPORTANT:
+     * Controller function is named getTimesheet.
+     * Do NOT use getTimesheetById here.
+     */
+    getTimesheet,
+
     updateTimesheet,
     deleteTimesheet,
     updateStatus
-} = require("../controllers/timesheetController");
+
+} =
+    require("../controllers/timesheetController");
 
 
 /* =====================================================
@@ -40,8 +50,7 @@ const {
    EMPLOYEE:
    - Can create own timesheet
 
-   Actual employee ownership should be checked
-   inside timesheetController using req.user.id.
+   Ownership is checked inside controller.
 ===================================================== */
 
 router.post(
@@ -57,11 +66,10 @@ router.post(
 =====================================================
 
    ADMIN:
-   - Can see ALL employee timesheets
+   - Can see all employee timesheets
 
    EMPLOYEE:
-   - Controller must return ONLY that employee's
-     own timesheets.
+   - Can see only own timesheets
 ===================================================== */
 
 router.get(
@@ -80,14 +88,17 @@ router.get(
    - Can view any timesheet
 
    EMPLOYEE:
-   - Can view ONLY own timesheet
+   - Can view only own timesheet
+
+   IMPORTANT:
+   - Controller function is getTimesheet
 ===================================================== */
 
 router.get(
     "/:id",
     authMiddleware,
     authenticatedUser,
-    getTimesheetById
+    getTimesheet
 );
 
 
@@ -99,7 +110,7 @@ router.get(
    - Can update any employee timesheet
 
    EMPLOYEE:
-   - Can update ONLY own timesheet
+   - Can update only own timesheet
 ===================================================== */
 
 router.put(
@@ -118,7 +129,7 @@ router.put(
    - Can update status
 
    EMPLOYEE:
-   - Controller should verify ownership
+   - Ownership checked inside controller
 ===================================================== */
 
 router.put(
@@ -134,11 +145,10 @@ router.put(
 =====================================================
 
    ADMIN:
-   - Can delete any timesheet
+   - Can delete any employee timesheet
 
    EMPLOYEE:
-   - Controller should allow delete only if
-     the timesheet belongs to that employee.
+   - Can delete only own timesheet
 ===================================================== */
 
 router.delete(
@@ -150,7 +160,7 @@ router.delete(
 
 
 /* =====================================================
-   EXPORT
+   EXPORT ROUTER
 ===================================================== */
 
 module.exports = router;
