@@ -1,7 +1,7 @@
 /* =====================================================
    THE D CUTS
    DAILY TIMESHEET
-   PREMIUM DARK GLASS UI
+   PREMIUM DARK UI
 ===================================================== */
 
 
@@ -11,94 +11,60 @@
 
 .timesheet-page {
 
-    width: min(
-        1450px,
-        calc(100% - 40px)
-    );
+    width:
+        min(
+            1450px,
+            calc(100% - 40px)
+        );
 
-    margin: 35px auto 70px;
+    margin:
+        30px auto 60px;
 
-    color: #ffffff;
+    color:
+        #ffffff;
 
 }
 
 
 /* =====================================================
-   HEADER
+   PAGE HEADER
 ===================================================== */
 
 .page-header {
 
-    margin-bottom: 25px;
-
-}
-
-
-.page-title-row {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 16px;
-
-}
-
-
-.title-icon {
-
-    width: 58px;
-
-    height: 58px;
-
-    flex-shrink: 0;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 17px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #e4c35a,
-            #a87b13
-        );
-
-    color: #101522;
-
-    font-size: 24px;
-
-    box-shadow:
-        0 12px 35px
-        rgba(212,175,55,.20);
+    margin-bottom:
+        24px;
 
 }
 
 
 .page-header h1 {
 
-    margin: 0;
+    margin:
+        0;
 
-    font-size: 32px;
+    font-size:
+        32px;
 
-    font-weight: 850;
+    font-weight:
+        850;
 
-    letter-spacing: -.5px;
+    color:
+        #ffffff;
 
 }
 
 
 .page-header p {
 
-    margin: 5px 0 0;
+    margin:
+        6px 0 0;
 
-    color: #8995ab;
+    color:
+        #8290a8;
 
-    font-size: 14px;
+    font-size:
+        14px;
 
 }
 
@@ -110,38 +76,31 @@
 .timesheet-card,
 .records-card {
 
-    border:
+    background:
+        linear-gradient(
+            145deg,
+            rgba(18,28,47,.98),
+            rgba(7,16,31,.98)
+        );
 
+    border:
         1px solid
         rgba(255,255,255,.09);
 
-    background:
-
-        linear-gradient(
-            145deg,
-            rgba(19,29,49,.96),
-            rgba(7,15,29,.98)
-        );
+    border-radius:
+        22px;
 
     box-shadow:
-
-        0 25px 70px
+        0 20px 55px
         rgba(0,0,0,.28);
-
-    backdrop-filter:
-        blur(20px);
-
-    -webkit-backdrop-filter:
-        blur(20px);
 
 }
 
 
 .timesheet-card {
 
-    padding: 30px;
-
-    border-radius: 24px;
+    padding:
+        30px;
 
 }
 
@@ -152,14 +111,17 @@
 
 .top-fields {
 
-    display: grid;
+    display:
+        grid;
 
     grid-template-columns:
-        1fr 1fr;
+        repeat(2, 1fr);
 
-    gap: 22px;
+    gap:
+        22px;
 
-    margin-bottom: 26px;
+    margin-bottom:
+        25px;
 
 }
 
@@ -170,143 +132,122 @@
 
 .field-group {
 
-    width: 100%;
+    width:
+        100%;
 
 }
 
 
 .field-group label {
 
-    display: block;
+    display:
+        block;
 
-    margin-bottom: 8px;
+    margin-bottom:
+        8px;
 
-    color: #e9edf6;
+    color:
+        #e9edf5;
 
-    font-size: 13px;
+    font-size:
+        13px;
 
-    font-weight: 750;
+    font-weight:
+        750;
 
 }
 
 
 .field-group label span {
 
-    color: #ff5c63;
+    color:
+        #ff4d4d;
 
 }
 
 
 .field-group input,
 .field-group select,
-.field-group textarea {
+.comments-group textarea {
 
-    width: 100%;
+    width:
+        100%;
 
-    box-sizing: border-box;
+    height:
+        48px;
 
-    border:
-        1px solid
-        rgba(255,255,255,.11);
-
-    border-radius: 12px;
-
-    outline: none;
-
-    background:
-        rgba(9,17,31,.88);
-
-    color: #ffffff;
-
-    font-family: inherit;
-
-    transition:
-        border-color .2s ease,
-        box-shadow .2s ease,
-        background .2s ease,
-        transform .2s ease;
-
-}
-
-
-.field-group input,
-.field-group select {
-
-    height: 48px;
+    box-sizing:
+        border-box;
 
     padding:
         0 14px;
 
-}
+    border:
+        1px solid
+        rgba(255,255,255,.12);
 
+    border-radius:
+        11px;
 
-.field-group textarea {
+    background:
+        #141f31;
 
-    min-height: 120px;
+    color:
+        #ffffff;
 
-    padding: 14px;
+    outline:
+        none;
 
-    resize: vertical;
+    font-family:
+        inherit;
 
-    line-height: 1.6;
+    font-size:
+        14px;
 
-}
-
-
-.field-group input::placeholder,
-.field-group textarea::placeholder {
-
-    color: #5f6c82;
+    transition:
+        .2s ease;
 
 }
 
 
 .field-group input:focus,
 .field-group select:focus,
-.field-group textarea:focus {
+.comments-group textarea:focus {
 
     border-color:
-        rgba(212,175,55,.75);
-
-    background:
-        rgba(15,26,45,.98);
+        #d4af37;
 
     box-shadow:
-        0 0 0 4px
-        rgba(212,175,55,.08);
-
-}
-
-
-.field-group small {
-
-    display: block;
-
-    margin-top: 7px;
-
-    color: #69768d;
-
-    font-size: 11px;
-
-}
-
-
-/* =====================================================
-   SELECT
-===================================================== */
-
-.field-group select {
-
-    cursor: pointer;
+        0 0 0 3px
+        rgba(212,175,55,.09);
 
 }
 
 
 .field-group select option {
 
-    background: #111b2c;
+    background:
+        #111b2d;
 
-    color: #ffffff;
+    color:
+        #ffffff;
+
+}
+
+
+.field-group small {
+
+    display:
+        block;
+
+    margin-top:
+        6px;
+
+    color:
+        #71809a;
+
+    font-size:
+        11px;
 
 }
 
@@ -317,15 +258,18 @@
 
 .section-block {
 
-    margin-top: 24px;
+    margin-top:
+        25px;
 
-    padding: 24px;
-
-    border-radius: 18px;
+    padding:
+        25px;
 
     border:
         1px solid
         rgba(255,255,255,.07);
+
+    border-radius:
+        18px;
 
     background:
         rgba(255,255,255,.025);
@@ -339,75 +283,108 @@
 
 .section-heading {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    justify-content: space-between;
+    justify-content:
+        space-between;
 
-    gap: 15px;
+    gap:
+        18px;
 
-    margin-bottom: 22px;
+    margin-bottom:
+        22px;
 
 }
 
 
 .section-heading-left {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    gap: 12px;
+    gap:
+        14px;
 
 }
 
 
 .heading-icon {
 
-    width: 42px;
+    width:
+        48px;
 
-    height: 42px;
+    height:
+        48px;
 
-    flex-shrink: 0;
+    min-width:
+        48px;
 
-    display: flex;
+    border-radius:
+        13px;
 
-    align-items: center;
+    display:
+        flex;
 
-    justify-content: center;
+    align-items:
+        center;
 
-    border-radius: 12px;
+    justify-content:
+        center;
 
     background:
-        rgba(212,175,55,.11);
+        rgba(212,175,55,.12);
 
     color:
         #d4af37;
+
+    font-size:
+        20px;
 
 }
 
 
 .section-heading h2 {
 
-    margin: 0;
+    margin:
+        0;
 
-    color: #ffffff;
+    color:
+        #ffffff;
 
-    font-size: 19px;
+    font-size:
+        21px;
 
-    font-weight: 850;
+    font-weight:
+        850;
 
 }
 
 
 .section-heading p {
 
-    margin: 4px 0 0;
+    margin:
+        5px 0 0;
 
-    color: #758198;
+    color:
+        #7d8ca6;
 
-    font-size: 12px;
+    font-size:
+        13px;
+
+}
+
+
+.required-star {
+
+    color:
+        #ff4d4d;
 
 }
 
@@ -418,87 +395,98 @@
 
 .attendance-grid {
 
-    display: grid;
+    display:
+        grid;
 
     grid-template-columns:
         repeat(4, 1fr);
 
-    gap: 16px;
+    gap:
+        16px;
 
 }
 
 
-/* =====================================================
-   TIME INPUT
-===================================================== */
-
 .time-input-wrap {
 
-    position: relative;
+    position:
+        relative;
 
 }
 
 
 .time-input-wrap input {
 
-    padding-right: 44px;
+    padding-right:
+        42px;
 
 }
 
 
 .time-input-wrap i {
 
-    position: absolute;
+    position:
+        absolute;
 
-    right: 14px;
+    right:
+        14px;
 
-    top: 50%;
+    top:
+        50%;
 
     transform:
         translateY(-50%);
 
-    color: #69768b;
+    color:
+        #69768d;
 
-    pointer-events: none;
+    pointer-events:
+        none;
 
 }
 
 
 /* =====================================================
-   HOURS
+   HOURS SUMMARY
 ===================================================== */
 
 .hours-summary {
 
-    display: grid;
+    display:
+        grid;
 
     grid-template-columns:
         repeat(3, 1fr);
 
-    gap: 15px;
+    gap:
+        15px;
 
-    margin-top: 20px;
+    margin-top:
+        20px;
 
 }
 
 
 .hours-card {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    gap: 13px;
+    gap:
+        13px;
 
-    min-height: 76px;
-
-    padding: 16px;
+    padding:
+        17px;
 
     border:
         1px solid
         rgba(255,255,255,.07);
 
-    border-radius: 15px;
+    border-radius:
+        14px;
 
     background:
         rgba(255,255,255,.035);
@@ -508,19 +496,26 @@
 
 .hours-icon {
 
-    width: 44px;
+    width:
+        42px;
 
-    height: 44px;
+    height:
+        42px;
 
-    flex-shrink: 0;
+    min-width:
+        42px;
 
-    display: flex;
+    border-radius:
+        11px;
 
-    align-items: center;
+    display:
+        flex;
 
-    justify-content: center;
+    align-items:
+        center;
 
-    border-radius: 12px;
+    justify-content:
+        center;
 
     background:
         rgba(212,175,55,.10);
@@ -533,350 +528,269 @@
 
 .hours-card small {
 
-    display: block;
+    display:
+        block;
 
-    margin-bottom: 4px;
+    margin-bottom:
+        4px;
 
-    color: #7f8ba0;
+    color:
+        #7e8ba2;
 
-    font-size: 11px;
+    font-size:
+        11px;
 
 }
 
 
 .hours-card strong {
 
-    display: block;
+    display:
+        block;
 
-    color: #ffffff;
+    color:
+        #ffffff;
 
-    font-size: 18px;
-
-    font-weight: 850;
+    font-size:
+        17px;
 
 }
 
 
 /* =====================================================
-   TASK SECTION
+   TOTAL TASK
 ===================================================== */
 
 .task-section {
 
-    margin-top: 24px;
+    margin-top:
+        28px;
 
 }
 
 
+/* =====================================================
+   TASK HEADER
+===================================================== */
+
+.task-section .section-heading {
+
+    margin-bottom:
+        22px;
+
+}
+
+
+.task-section .section-heading-left {
+
+    gap:
+        15px;
+
+}
+
+
+.task-section .heading-icon {
+
+    width:
+        50px;
+
+    height:
+        50px;
+
+    min-width:
+        50px;
+
+    border-radius:
+        14px;
+
+}
+
+
+.task-section .section-heading h2 {
+
+    font-size:
+        25px;
+
+    font-weight:
+        850;
+
+}
+
+
+.task-section .section-heading p {
+
+    font-size:
+        14px;
+
+}
+
+
+/* =====================================================
+   TASK COUNT
+===================================================== */
+
 .task-count {
 
     padding:
-        7px 12px;
+        11px 17px;
 
-    border-radius: 9px;
+    border:
+        1px solid
+        rgba(212,175,55,.10);
+
+    border-radius:
+        12px;
 
     background:
         rgba(212,175,55,.10);
 
     color:
-        #e2bd49;
-
-    font-size: 12px;
-
-    font-weight: 800;
-
-}
-
-
-/* =====================================================
-   TASK CONTAINER
-===================================================== */
-
-.task-container {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 12px;
-
-}
-
-
-/* =====================================================
-   TASK CARD
-===================================================== */
-
-.task-card {
-
-    padding: 15px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.08);
-
-    border-radius: 14px;
-
-    background:
-        rgba(6,14,28,.60);
-
-    transition:
-        border-color .2s ease,
-        background .2s ease,
-        transform .2s ease;
-
-}
-
-
-.task-card:hover {
-
-    border-color:
-        rgba(212,175,55,.25);
-
-    background:
-        rgba(9,18,33,.82);
-
-}
-
-
-.task-card-top {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    margin-bottom: 12px;
-
-}
-
-
-.task-title {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 9px;
-
-}
-
-
-.task-title strong {
-
-    color: #dfe5ef;
-
-    font-size: 13px;
-
-}
-
-
-.task-number {
-
-    width: 25px;
-
-    height: 25px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 7px;
-
-    background:
-        rgba(212,175,55,.12);
-
-    color:
         #d4af37;
 
-    font-size: 11px;
+    font-size:
+        13px;
 
-    font-weight: 850;
+    font-weight:
+        850;
 
-}
-
-
-.remove-task-btn {
-
-    width: 32px;
-
-    height: 32px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border: none;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-    background:
-        rgba(255,70,70,.10);
-
-    color:
-        #ff7373;
-
-    transition:
-        .2s ease;
-
-}
-
-
-.remove-task-btn:hover {
-
-    background:
-        rgba(255,70,70,.18);
-
-    transform:
-        translateY(-1px);
+    white-space:
+        nowrap;
 
 }
 
 
 /* =====================================================
-   TASK INPUT
+   SINGLE TASK TEXTAREA
 ===================================================== */
 
-.task-input-row {
+.task-input-wrap {
 
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
+    width:
+        100%;
 
 }
 
 
-.task-bullet {
+#taskInput {
 
-    width: 20px;
+    display:
+        block;
 
-    text-align: center;
+    width:
+        100%;
 
-    color:
-        #d4af37;
+    min-height:
+        275px;
 
-    font-size: 6px;
-
-}
-
-
-.task-input {
-
-    flex: 1;
-
-    height: 46px;
+    box-sizing:
+        border-box;
 
     padding:
-        0 13px;
-
-    box-sizing: border-box;
+        24px;
 
     border:
         1px solid
-        rgba(255,255,255,.10);
+        rgba(255,255,255,.12);
 
-    border-radius: 10px;
+    border-radius:
+        17px;
 
     background:
-        #101a2c;
+        #111b2c;
 
     color:
         #ffffff;
 
-    outline: none;
+    outline:
+        none;
 
-    font-family: inherit;
+    resize:
+        vertical;
 
-    font-size: 13px;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size:
+        16px;
+
+    line-height:
+        1.8;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
 
 }
 
 
-.task-input:focus {
+#taskInput:hover {
 
     border-color:
-        rgba(212,175,55,.70);
+        rgba(255,255,255,.18);
+
+}
+
+
+#taskInput:focus {
+
+    border-color:
+        #d4af37;
+
+    background:
+        #121e31;
 
     box-shadow:
         0 0 0 3px
-        rgba(212,175,55,.07);
+        rgba(212,175,55,.09);
 
 }
 
 
-.task-input::placeholder {
+#taskInput::placeholder {
 
-    color: #667389;
+    color:
+        #71809b;
+
+    opacity:
+        1;
 
 }
 
 
 /* =====================================================
-   ADD TASK BUTTON
+   TASK HELP
 ===================================================== */
 
-.add-task-btn {
+.task-bottom {
 
-    margin-top: 14px;
+    display:
+        flex;
 
-    height: 42px;
+    align-items:
+        center;
 
-    padding:
-        0 17px;
+    gap:
+        8px;
 
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 8px;
-
-    border:
-        1px dashed
-        rgba(212,175,55,.40);
-
-    border-radius: 10px;
-
-    background:
-        rgba(212,175,55,.06);
+    margin-top:
+        13px;
 
     color:
-        #d9b943;
+        #7d8ca6;
 
-    cursor: pointer;
-
-    font-family: inherit;
-
-    font-size: 12px;
-
-    font-weight: 800;
-
-    transition:
-        .2s ease;
+    font-size:
+        13px;
 
 }
 
 
-.add-task-btn:hover {
+.task-bottom i {
 
-    background:
-        rgba(212,175,55,.12);
-
-    border-color:
-        rgba(212,175,55,.65);
-
-    transform:
-        translateY(-1px);
+    color:
+        #d4af37;
 
 }
 
@@ -885,28 +799,51 @@
    COMMENTS
 ===================================================== */
 
-.comments-section {
+.comments-group {
 
-    padding-bottom: 22px;
+    margin-top:
+        25px;
+
+}
+
+
+.comments-group textarea {
+
+    height:
+        auto;
+
+    min-height:
+        105px;
+
+    padding:
+        14px;
+
+    resize:
+        vertical;
+
+    line-height:
+        1.6;
 
 }
 
 
 /* =====================================================
-   ACTIONS
+   FORM ACTIONS
 ===================================================== */
 
 .form-actions {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    justify-content:
+        flex-end;
 
-    justify-content: flex-end;
+    gap:
+        12px;
 
-    gap: 11px;
-
-    margin-top: 25px;
+    margin-top:
+        25px;
 
 }
 
@@ -914,28 +851,41 @@
 .primary-btn,
 .secondary-btn {
 
-    min-height: 45px;
+    min-width:
+        115px;
+
+    height:
+        46px;
 
     padding:
-        0 19px;
+        0 20px;
 
-    border-radius: 11px;
+    border-radius:
+        11px;
 
-    cursor: pointer;
+    cursor:
+        pointer;
 
-    display: inline-flex;
+    display:
+        inline-flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    justify-content: center;
+    justify-content:
+        center;
 
-    gap: 8px;
+    gap:
+        8px;
 
-    font-family: inherit;
+    font-family:
+        inherit;
 
-    font-size: 13px;
+    font-size:
+        14px;
 
-    font-weight: 800;
+    font-weight:
+        800;
 
     transition:
         .2s ease;
@@ -945,20 +895,18 @@
 
 .primary-btn {
 
-    border: none;
+    border:
+        none;
 
     background:
         linear-gradient(
             135deg,
-            #e4c35a,
-            #a87b13
+            #d4af37,
+            #b88713
         );
 
-    color: #101522;
-
-    box-shadow:
-        0 8px 25px
-        rgba(212,175,55,.13);
+    color:
+        #101522;
 
 }
 
@@ -969,7 +917,7 @@
         translateY(-1px);
 
     box-shadow:
-        0 12px 30px
+        0 8px 22px
         rgba(212,175,55,.20);
 
 }
@@ -982,10 +930,10 @@
         rgba(255,255,255,.10);
 
     background:
-        rgba(255,255,255,.055);
+        rgba(255,255,255,.06);
 
     color:
-        #cfd6e3;
+        #d9dfeb;
 
 }
 
@@ -993,22 +941,22 @@
 .secondary-btn:hover {
 
     background:
-        rgba(255,255,255,.09);
+        rgba(255,255,255,.10);
 
 }
 
 
 /* =====================================================
-   RECORDS CARD
+   RECORDS
 ===================================================== */
 
 .records-card {
 
-    margin-top: 25px;
+    margin-top:
+        25px;
 
-    border-radius: 22px;
-
-    overflow: hidden;
+    overflow:
+        hidden;
 
 }
 
@@ -1016,7 +964,7 @@
 .records-header {
 
     padding:
-        24px 28px;
+        25px 28px;
 
     border-bottom:
         1px solid
@@ -1027,20 +975,22 @@
 
 .records-header h2 {
 
-    margin: 0;
+    margin:
+        0;
 
-    color: #ffffff;
+    color:
+        #ffffff;
 
-    font-size: 21px;
-
-    font-weight: 850;
+    font-size:
+        21px;
 
 }
 
 
 .records-header h2 i {
 
-    margin-right: 8px;
+    margin-right:
+        7px;
 
     color:
         #d4af37;
@@ -1050,12 +1000,14 @@
 
 .records-header p {
 
-    margin: 6px 0 0;
+    margin:
+        6px 0 0;
 
     color:
-        #758198;
+        #7f899d;
 
-    font-size: 12px;
+    font-size:
+        13px;
 
 }
 
@@ -1066,24 +1018,25 @@
 
 .table-wrapper {
 
-    width: 100%;
+    width:
+        100%;
 
-    overflow-x: auto;
+    overflow-x:
+        auto;
 
 }
 
 
-/* =====================================================
-   TABLE
-===================================================== */
-
 table {
 
-    width: 100%;
+    width:
+        100%;
 
-    min-width: 1050px;
+    min-width:
+        1050px;
 
-    border-collapse: collapse;
+    border-collapse:
+        collapse;
 
 }
 
@@ -1093,8 +1046,8 @@ thead {
     background:
         linear-gradient(
             135deg,
-            #233b7d,
-            #192d61
+            #243e87,
+            #1d3679
         );
 
 }
@@ -1103,18 +1056,22 @@ thead {
 th {
 
     padding:
-        16px 15px;
+        17px 14px;
 
-    text-align: left;
+    text-align:
+        left;
 
     color:
         #ffffff;
 
-    font-size: 12px;
+    font-size:
+        13px;
 
-    font-weight: 800;
+    font-weight:
+        800;
 
-    white-space: nowrap;
+    white-space:
+        nowrap;
 
 }
 
@@ -1122,18 +1079,20 @@ th {
 td {
 
     padding:
-        15px;
+        18px 14px;
 
     border-bottom:
         1px solid
-        rgba(255,255,255,.055);
+        rgba(255,255,255,.06);
 
     color:
-        #dfe5ef;
+        #dfe5f0;
 
-    font-size: 12px;
+    font-size:
+        13px;
 
-    vertical-align: middle;
+    vertical-align:
+        top;
 
 }
 
@@ -1155,214 +1114,107 @@ tbody tr:hover {
 
 
 /* =====================================================
-   EMPLOYEE CELL
-===================================================== */
-
-.employee-cell {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-}
-
-
-.employee-avatar {
-
-    width: 34px;
-
-    height: 34px;
-
-    flex-shrink: 0;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 10px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #d4af37,
-            #8d6812
-        );
-
-    color:
-        #111827;
-
-    font-size: 12px;
-
-    font-weight: 900;
-
-}
-
-
-.employee-cell strong {
-
-    color:
-        #e8edf5;
-
-    font-size: 12px;
-
-}
-
-
-/* =====================================================
-   DATE
-===================================================== */
-
-.date-badge {
-
-    display: inline-flex;
-
-    padding:
-        6px 9px;
-
-    border-radius: 7px;
-
-    background:
-        rgba(255,255,255,.055);
-
-    color:
-        #cdd5e2;
-
-    white-space: nowrap;
-
-}
-
-
-/* =====================================================
-   TASK RECORDS
+   RECORD TASKS
 ===================================================== */
 
 .record-tasks {
 
-    min-width: 260px;
+    min-width:
+        300px;
 
-    max-width: 430px;
+    max-width:
+        450px;
 
 }
 
 
 .record-task {
 
-    margin-bottom: 5px;
+    display:
+        block;
 
-    color:
-        #cdd5e1;
+    margin-bottom:
+        5px;
 
-    line-height: 1.5;
+    line-height:
+        1.5;
 
 }
 
 
 .record-task:last-child {
 
-    margin-bottom: 0;
-
-}
-
-
-.record-task span {
-
-    color:
-        #d4af37;
-
-    font-weight: 800;
-
-    margin-right: 4px;
+    margin-bottom:
+        0;
 
 }
 
 
 /* =====================================================
-   HOURS BADGES
-===================================================== */
-
-.hours-badge {
-
-    display: inline-flex;
-
-    min-width: 65px;
-
-    justify-content: center;
-
-    padding:
-        7px 9px;
-
-    border-radius: 8px;
-
-    background:
-        rgba(255,255,255,.055);
-
-    color:
-        #dce3ee;
-
-    font-weight: 750;
-
-}
-
-
-.hours-badge.working {
-
-    background:
-        rgba(60,190,130,.10);
-
-    color:
-        #69d9a7;
-
-}
-
-
-.hours-badge.lunch {
-
-    background:
-        rgba(255,181,70,.10);
-
-    color:
-        #f2bd69;
-
-}
-
-
-/* =====================================================
-   ACTIONS
+   RECORD ACTIONS
 ===================================================== */
 
 .record-actions {
 
-    display: flex;
+    display:
+        flex;
 
-    gap: 7px;
+    gap:
+        7px;
 
 }
 
 
 .record-action {
 
-    width: 34px;
+    width:
+        35px;
 
-    height: 34px;
+    height:
+        35px;
 
-    border: none;
+    border:
+        none;
 
-    border-radius: 8px;
+    border-radius:
+        8px;
 
-    display: flex;
+    cursor:
+        pointer;
 
-    align-items: center;
+    display:
+        flex;
 
-    justify-content: center;
+    align-items:
+        center;
 
-    cursor: pointer;
+    justify-content:
+        center;
 
     transition:
         .2s ease;
+
+}
+
+
+.edit-action {
+
+    background:
+        rgba(56,132,255,.15);
+
+    color:
+        #69a5ff;
+
+}
+
+
+.delete-action {
+
+    background:
+        rgba(255,74,74,.14);
+
+    color:
+        #ff6b6b;
 
 }
 
@@ -1375,126 +1227,30 @@ tbody tr:hover {
 }
 
 
-.edit-action {
-
-    background:
-        rgba(70,135,255,.12);
-
-    color:
-        #72a9ff;
-
-}
-
-
-.edit-action:hover {
-
-    background:
-        rgba(70,135,255,.20);
-
-}
-
-
-.delete-action {
-
-    background:
-        rgba(255,70,70,.11);
-
-    color:
-        #ff7373;
-
-}
-
-
-.delete-action:hover {
-
-    background:
-        rgba(255,70,70,.19);
-
-}
-
-
 /* =====================================================
-   EMPTY STATE
+   EMPTY TABLE
 ===================================================== */
 
-.empty-state {
-
-    padding:
-        55px 20px !important;
-
-    text-align: center !important;
-
-}
-
-
-.empty-state i {
-
-    display: block;
-
-    margin-bottom: 10px;
-
-    color:
-        #56647c;
-
-    font-size: 32px;
-
-}
-
-
-.empty-state strong {
-
-    display: block;
-
-    margin-bottom: 5px;
-
-    color:
-        #d7deea;
-
-    font-size: 14px;
-
-}
-
-
-.empty-state span {
-
-    display: block;
-
-    color:
-        #6e7b91;
-
-    font-size: 12px;
-
-}
-
-
-/* =====================================================
-   ERROR
-===================================================== */
-
+.empty-table,
 .table-error {
 
-    padding: 30px !important;
+    padding:
+        35px !important;
 
-    text-align: center !important;
+    text-align:
+        center;
 
     color:
-        #ff7a7a !important;
-
-}
-
-
-.table-error i {
-
-    margin-right: 7px;
+        #7e8ca5;
 
 }
 
 
 /* =====================================================
-   RESPONSIVE
+   MOBILE
 ===================================================== */
 
-@media (max-width: 1100px) {
+@media (max-width: 1000px) {
 
     .attendance-grid {
 
@@ -1506,7 +1262,7 @@ tbody tr:hover {
 }
 
 
-@media (max-width: 800px) {
+@media (max-width: 700px) {
 
     .timesheet-page {
 
@@ -1514,14 +1270,15 @@ tbody tr:hover {
             calc(100% - 24px);
 
         margin:
-            20px auto 50px;
+            18px auto 40px;
 
     }
 
 
     .timesheet-card {
 
-        padding: 18px;
+        padding:
+            17px;
 
     }
 
@@ -1536,70 +1293,8 @@ tbody tr:hover {
 
     .section-block {
 
-        padding: 17px;
-
-    }
-
-
-    .hours-summary {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-
-    .form-actions {
-
-        flex-direction: column-reverse;
-
-        align-items: stretch;
-
-    }
-
-
-    .primary-btn,
-    .secondary-btn {
-
-        width: 100%;
-
-    }
-
-}
-
-
-@media (max-width: 600px) {
-
-    .page-title-row {
-
-        align-items: flex-start;
-
-    }
-
-
-    .title-icon {
-
-        width: 48px;
-
-        height: 48px;
-
-        border-radius: 14px;
-
-        font-size: 19px;
-
-    }
-
-
-    .page-header h1 {
-
-        font-size: 25px;
-
-    }
-
-
-    .page-header p {
-
-        font-size: 12px;
+        padding:
+            17px;
 
     }
 
@@ -1612,24 +1307,106 @@ tbody tr:hover {
     }
 
 
+    .hours-summary {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
     .section-heading {
 
-        align-items: flex-start;
+        align-items:
+            flex-start;
 
     }
 
 
-    .task-card {
+    .task-section .section-heading {
 
-        padding: 12px;
+        align-items:
+            flex-start;
 
     }
 
 
-    .records-header {
+    .task-section .section-heading-left {
+
+        gap:
+            10px;
+
+    }
+
+
+    .task-section .heading-icon {
+
+        width:
+            43px;
+
+        height:
+            43px;
+
+        min-width:
+            43px;
+
+    }
+
+
+    .task-section .section-heading h2 {
+
+        font-size:
+            19px;
+
+    }
+
+
+    .task-count {
 
         padding:
-            20px;
+            8px 11px;
+
+        font-size:
+            11px;
+
+    }
+
+
+    #taskInput {
+
+        min-height:
+            220px;
+
+        padding:
+            17px;
+
+        font-size:
+            14px;
+
+    }
+
+
+    .form-actions {
+
+        flex-direction:
+            column;
+
+    }
+
+
+    .primary-btn,
+    .secondary-btn {
+
+        width:
+            100%;
+
+    }
+
+
+    .page-header h1 {
+
+        font-size:
+            25px;
 
     }
 

@@ -1,76 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Timesheet | THE D CUTS</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/timesheet.css">
+    <title>
+        Timesheet | THE D CUTS
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/timesheet.css"
+    >
 
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     >
+
 </head>
+
 
 <body>
 
+
+<!-- AUTH -->
 <script src="../js/auth.js"></script>
 
+
+<!-- NAVBAR -->
 <div id="navbar-container"></div>
 
-<main class="timesheet-page">
-
-    <!-- ================= HEADER ================= -->
-
-    <section class="page-header">
-
-        <div class="page-title-row">
-
-            <div class="title-icon">
-                <i class="fa-solid fa-clock"></i>
-            </div>
-
-            <div>
-                <h1>Daily Timesheet</h1>
-                <p>Manage daily employee attendance and work</p>
-            </div>
-
-        </div>
-
-    </section>
 
 
-    <!-- ================= FORM CARD ================= -->
+<div class="timesheet-page">
 
-    <section class="timesheet-card">
 
-        <!-- TOP FIELDS -->
+    <!-- ==========================================
+         PAGE HEADER
+    =========================================== -->
+
+    <div class="page-header">
+
+        <h1>
+            Daily Timesheet
+        </h1>
+
+        <p>
+            Manage Daily Employee Work
+        </p>
+
+    </div>
+
+
+
+    <!-- ==========================================
+         MAIN FORM CARD
+    =========================================== -->
+
+    <div class="timesheet-card">
+
+
+        <!-- ======================================
+             EMPLOYEE + DATE
+        ======================================= -->
 
         <div class="top-fields">
+
+
+            <!-- EMPLOYEE -->
 
             <div class="field-group">
 
                 <label for="employeeName">
+
                     Employee
-                    <span>*</span>
+
+                    <span>
+                        *
+                    </span>
+
                 </label>
 
-                <select id="employeeName" required>
-                    <option value="">Select Employee</option>
+
+                <select
+                    id="employeeName"
+                    required
+                >
+
+                    <option value="">
+                        Select Employee
+                    </option>
+
                 </select>
 
             </div>
 
 
+
+            <!-- DATE -->
+
             <div class="field-group">
 
                 <label for="date">
+
                     Date
-                    <span>*</span>
+
+                    <span>
+                        *
+                    </span>
+
                 </label>
+
 
                 <input
                     type="date"
@@ -80,41 +132,68 @@
 
             </div>
 
+
         </div>
 
 
-        <!-- ================= ATTENDANCE ================= -->
 
-        <section class="section-block">
+        <!-- ======================================
+             ATTENDANCE SECTION
+        ======================================= -->
+
+        <div class="section-block">
+
 
             <div class="section-heading">
 
                 <div class="section-heading-left">
 
+
                     <div class="heading-icon">
-                        <i class="fa-solid fa-business-time"></i>
+
+                        <i class="fa-solid fa-clock"></i>
+
                     </div>
 
+
                     <div>
-                        <h2>Attendance Time</h2>
-                        <p>Enter employee attendance timings</p>
+
+                        <h2>
+                            Attendance Time
+                        </h2>
+
+                        <p>
+                            Enter employee attendance timings
+                        </p>
+
                     </div>
+
 
                 </div>
 
             </div>
 
 
+
+            <!-- TIME GRID -->
+
             <div class="attendance-grid">
+
 
                 <!-- CHECK IN -->
 
                 <div class="field-group">
 
                     <label for="checkIn">
+
                         Check-in
-                        <span>*</span>
+
+                        <span>
+                            *
+                        </span>
+
                     </label>
+
 
                     <div class="time-input-wrap">
 
@@ -122,7 +201,7 @@
                             type="text"
                             id="checkIn"
                             class="flexible-time"
-                            placeholder="9:00 AM"
+                            placeholder="9:00 AM / 9.00 / 09:00"
                             autocomplete="off"
                             required
                         >
@@ -131,6 +210,7 @@
 
                     </div>
 
+
                     <small>
                         Example: 9:00 AM, 9.30, 0930
                     </small>
@@ -138,14 +218,21 @@
                 </div>
 
 
+
                 <!-- LUNCH START -->
 
                 <div class="field-group">
 
                     <label for="lunchStart">
+
                         Lunch Start
-                        <span>*</span>
+
+                        <span>
+                            *
+                        </span>
+
                     </label>
+
 
                     <div class="time-input-wrap">
 
@@ -153,14 +240,15 @@
                             type="text"
                             id="lunchStart"
                             class="flexible-time"
-                            placeholder="1:00 PM"
+                            placeholder="1:00 PM / 1.00"
                             autocomplete="off"
                             required
                         >
 
-                        <i class="fa-solid fa-utensils"></i>
+                        <i class="fa-regular fa-clock"></i>
 
                     </div>
+
 
                     <small>
                         Example: 1:00 PM, 1.00
@@ -169,14 +257,21 @@
                 </div>
 
 
+
                 <!-- LUNCH END -->
 
                 <div class="field-group">
 
                     <label for="lunchEnd">
+
                         Lunch End
-                        <span>*</span>
+
+                        <span>
+                            *
+                        </span>
+
                     </label>
+
 
                     <div class="time-input-wrap">
 
@@ -184,14 +279,15 @@
                             type="text"
                             id="lunchEnd"
                             class="flexible-time"
-                            placeholder="2:00 PM"
+                            placeholder="2:00 PM / 2.00"
                             autocomplete="off"
                             required
                         >
 
-                        <i class="fa-solid fa-utensils"></i>
+                        <i class="fa-regular fa-clock"></i>
 
                     </div>
+
 
                     <small>
                         Example: 2:00 PM, 2.00
@@ -200,14 +296,21 @@
                 </div>
 
 
+
                 <!-- CHECK OUT -->
 
                 <div class="field-group">
 
                     <label for="checkOut">
+
                         Check-out
-                        <span>*</span>
+
+                        <span>
+                            *
+                        </span>
+
                     </label>
+
 
                     <div class="time-input-wrap">
 
@@ -215,14 +318,15 @@
                             type="text"
                             id="checkOut"
                             class="flexible-time"
-                            placeholder="6:00 PM"
+                            placeholder="6:00 PM / 18:00"
                             autocomplete="off"
                             required
                         >
 
-                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <i class="fa-regular fa-clock"></i>
 
                     </div>
+
 
                     <small>
                         Example: 6:00 PM, 18:00, 1830
@@ -230,146 +334,244 @@
 
                 </div>
 
+
             </div>
 
 
-            <!-- HOURS SUMMARY -->
+
+            <!-- ==================================
+                 HOURS SUMMARY
+            =================================== -->
 
             <div class="hours-summary">
 
+
+                <!-- OFFICE -->
+
                 <div class="hours-card">
 
                     <div class="hours-icon">
+
                         <i class="fa-solid fa-building"></i>
+
                     </div>
 
                     <div>
-                        <small>Office Hours</small>
-                        <strong id="officeHours">0h 0m</strong>
+
+                        <small>
+                            Office Hours
+                        </small>
+
+                        <strong id="officeHours">
+                            0h 0m
+                        </strong>
+
                     </div>
 
                 </div>
 
+
+
+                <!-- LUNCH -->
 
                 <div class="hours-card">
 
                     <div class="hours-icon">
-                        <i class="fa-solid fa-mug-hot"></i>
+
+                        <i class="fa-solid fa-utensils"></i>
+
                     </div>
 
                     <div>
-                        <small>Lunch Break</small>
-                        <strong id="lunchHours">0h 0m</strong>
+
+                        <small>
+                            Lunch Break
+                        </small>
+
+                        <strong id="lunchHours">
+                            0h 0m
+                        </strong>
+
                     </div>
 
                 </div>
 
 
-                <div class="hours-card working-hours-card">
+
+                <!-- WORKING -->
+
+                <div class="hours-card">
 
                     <div class="hours-icon">
-                        <i class="fa-solid fa-hourglass-half"></i>
+
+                        <i class="fa-solid fa-business-time"></i>
+
                     </div>
 
                     <div>
-                        <small>Working Hours</small>
-                        <strong id="workingHours">0h 0m</strong>
+
+                        <small>
+                            Working Hours
+                        </small>
+
+                        <strong id="workingHours">
+                            0h 0m
+                        </strong>
+
                     </div>
 
                 </div>
+
 
             </div>
 
-        </section>
+
+        </div>
 
 
-        <!-- ================= TASKS ================= -->
 
-        <section class="section-block task-section">
+        <!-- ======================================
+             TOTAL TASK
+        ======================================= -->
+
+        <div class="task-section">
+
 
             <div class="section-heading">
 
+
                 <div class="section-heading-left">
 
+
                     <div class="heading-icon">
+
                         <i class="fa-solid fa-list-check"></i>
+
                     </div>
 
+
                     <div>
-                        <h2>Total Task</h2>
-                        <p>Enter all tasks completed by the employee</p>
+
+                        <h2>
+
+                            TOTAL TASK
+
+                            <span class="required-star">
+                                *
+                            </span>
+
+                        </h2>
+
+
+                        <p>
+                            Enter all tasks completed by the employee
+                        </p>
+
                     </div>
+
 
                 </div>
 
 
-                <div class="task-count" id="taskCount">
+
+                <!-- TASK COUNT -->
+
+                <div
+                    class="task-count"
+                    id="taskCount"
+                >
                     0 Tasks
                 </div>
 
+
             </div>
 
 
-            <div class="task-container" id="projectContainer"></div>
 
+            <!-- ==================================
+                 SINGLE TASK TEXTAREA
+            =================================== -->
 
-            <button
-                type="button"
-                class="add-task-btn"
-                onclick="addProjectCard()"
-            >
-                <i class="fa-solid fa-plus"></i>
-                Add Task
-            </button>
+            <div class="task-input-wrap">
 
-        </section>
-
-
-        <!-- ================= COMMENTS ================= -->
-
-        <section class="section-block comments-section">
-
-            <div class="field-group">
-
-                <label for="comments">
-                    Comments
-                </label>
 
                 <textarea
-                    id="comments"
-                    rows="4"
-                    placeholder="Add additional comments..."
+                    id="taskInput"
+                    rows="8"
+                    placeholder="Enter task..."
+                    autocomplete="off"
                 ></textarea>
+
 
             </div>
 
-        </section>
 
 
-        <!-- ================= ACTIONS ================= -->
+            <!-- HELP -->
+
+            <div class="task-bottom">
+
+                <i class="fa-solid fa-circle-info"></i>
+
+                Press Enter to move to the next task
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ======================================
+             COMMENTS
+        ======================================= -->
+
+        <div class="field-group comments-group">
+
+
+            <label for="comments">
+
+                Comments
+
+            </label>
+
+
+            <textarea
+                id="comments"
+                rows="4"
+                placeholder="Additional comments..."
+            ></textarea>
+
+
+        </div>
+
+
+
+        <!-- ======================================
+             FORM ACTIONS
+        ======================================= -->
 
         <div class="form-actions">
 
-            <button
-                type="button"
-                class="secondary-btn"
-                onclick="resetForm()"
-            >
-                <i class="fa-solid fa-rotate-left"></i>
-                Clear
-            </button>
 
+            <!-- SAVE -->
 
             <button
                 type="button"
-                class="primary-btn"
+                class="primary-btn save-btn"
                 id="saveBtn"
                 onclick="saveTimesheet()"
             >
+
                 <i class="fa-solid fa-floppy-disk"></i>
-                Save Timesheet
+
+                Save
+
             </button>
 
+
+
+            <!-- UPDATE -->
 
             <button
                 type="button"
@@ -378,30 +580,58 @@
                 onclick="updateTimesheet()"
                 style="display:none;"
             >
+
                 <i class="fa-solid fa-pen"></i>
-                Update Timesheet
+
+                Update
+
             </button>
+
+
+
+            <!-- CLEAR -->
+
+            <button
+                type="button"
+                class="secondary-btn"
+                onclick="resetForm()"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+                Clear
+
+            </button>
+
 
         </div>
 
-    </section>
+
+    </div>
 
 
-    <!-- ================= RECORDS ================= -->
 
-    <section class="records-card">
+    <!-- ==========================================
+         RECORDS
+    =========================================== -->
+
+    <div class="records-card">
+
 
         <div class="records-header">
 
             <div>
 
                 <h2>
+
                     <i class="fa-solid fa-table-list"></i>
+
                     Timesheet Records
+
                 </h2>
 
                 <p>
-                    Employee daily attendance and completed tasks
+                    Employee daily attendance and tasks
                 </p>
 
             </div>
@@ -409,38 +639,84 @@
         </div>
 
 
+
         <div class="table-wrapper">
 
+
             <table>
+
 
                 <thead>
 
                     <tr>
-                        <th>Employee</th>
-                        <th>Date</th>
-                        <th>Total Task</th>
-                        <th>Office Hours</th>
-                        <th>Working Hours</th>
-                        <th>Lunch Break</th>
-                        <th>Actions</th>
+
+                        <th>
+                            Employee
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Total Task
+                        </th>
+
+                        <th>
+                            Office Hours
+                        </th>
+
+                        <th>
+                            Working Hours
+                        </th>
+
+                        <th>
+                            Lunch Break
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
                     </tr>
 
                 </thead>
 
-                <tbody id="timesheetTable"></tbody>
+
+
+                <tbody id="timesheetTable">
+
+                </tbody>
+
 
             </table>
 
+
         </div>
 
-    </section>
 
-</main>
+    </div>
 
+
+</div>
+
+
+
+<!-- NAVBAR -->
 
 <script src="../js/navbar.js"></script>
+
+
+<!-- SIDEBAR -->
+
 <script src="../js/sidebar.js"></script>
+
+
+<!-- TIMESHEET -->
+
 <script src="../js/timesheet.js"></script>
 
+
 </body>
+
 </html>
