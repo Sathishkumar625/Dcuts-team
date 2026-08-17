@@ -1,6 +1,7 @@
 /* =====================================================
    THE D CUTS
    DAILY TIMESHEET
+   PREMIUM DARK GLASS UI
 ===================================================== */
 
 
@@ -15,7 +16,7 @@
         calc(100% - 40px)
     );
 
-    margin: 30px auto 60px;
+    margin: 35px auto 70px;
 
     color: #ffffff;
 
@@ -23,7 +24,7 @@
 
 
 /* =====================================================
-   PAGE HEADER
+   HEADER
 ===================================================== */
 
 .page-header {
@@ -39,18 +40,18 @@
 
     align-items: center;
 
-    gap: 15px;
+    gap: 16px;
 
 }
 
 
 .title-icon {
 
-    width: 54px;
+    width: 58px;
 
-    height: 54px;
+    height: 58px;
 
-    border-radius: 15px;
+    flex-shrink: 0;
 
     display: flex;
 
@@ -58,20 +59,22 @@
 
     justify-content: center;
 
+    border-radius: 17px;
+
     background:
         linear-gradient(
             135deg,
-            #d4af37,
-            #a77c13
+            #e4c35a,
+            #a87b13
         );
 
     color: #101522;
 
-    font-size: 23px;
+    font-size: 24px;
 
     box-shadow:
-        0 8px 25px
-        rgba(212,175,55,.18);
+        0 12px 35px
+        rgba(212,175,55,.20);
 
 }
 
@@ -80,9 +83,11 @@
 
     margin: 0;
 
-    font-size: 30px;
+    font-size: 32px;
 
-    font-weight: 800;
+    font-weight: 850;
+
+    letter-spacing: -.5px;
 
 }
 
@@ -91,7 +96,7 @@
 
     margin: 5px 0 0;
 
-    color: #8e99ad;
+    color: #8995ab;
 
     font-size: 14px;
 
@@ -105,29 +110,38 @@
 .timesheet-card,
 .records-card {
 
-    background:
-        linear-gradient(
-            145deg,
-            rgba(19,28,47,.97),
-            rgba(8,16,31,.97)
-        );
-
     border:
+
         1px solid
         rgba(255,255,255,.09);
 
-    border-radius: 22px;
+    background:
+
+        linear-gradient(
+            145deg,
+            rgba(19,29,49,.96),
+            rgba(7,15,29,.98)
+        );
 
     box-shadow:
-        0 20px 50px
+
+        0 25px 70px
         rgba(0,0,0,.28);
+
+    backdrop-filter:
+        blur(20px);
+
+    -webkit-backdrop-filter:
+        blur(20px);
 
 }
 
 
 .timesheet-card {
 
-    padding: 28px;
+    padding: 30px;
+
+    border-radius: 24px;
 
 }
 
@@ -141,12 +155,11 @@
     display: grid;
 
     grid-template-columns:
-        1fr
-        1fr;
+        1fr 1fr;
 
     gap: 22px;
 
-    margin-bottom: 28px;
+    margin-bottom: 26px;
 
 }
 
@@ -168,18 +181,50 @@
 
     margin-bottom: 8px;
 
+    color: #e9edf6;
+
     font-size: 13px;
 
-    font-weight: 700;
-
-    color: #e9edf5;
+    font-weight: 750;
 
 }
 
 
 .field-group label span {
 
-    color: #ff5353;
+    color: #ff5c63;
+
+}
+
+
+.field-group input,
+.field-group select,
+.field-group textarea {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    border:
+        1px solid
+        rgba(255,255,255,.11);
+
+    border-radius: 12px;
+
+    outline: none;
+
+    background:
+        rgba(9,17,31,.88);
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease,
+        transform .2s ease;
 
 }
 
@@ -187,47 +232,81 @@
 .field-group input,
 .field-group select {
 
-    width: 100%;
-
     height: 48px;
 
     padding:
         0 14px;
 
-    box-sizing: border-box;
+}
 
-    border-radius: 11px;
 
-    border:
-        1px solid
-        rgba(255,255,255,.12);
+.field-group textarea {
 
-    background:
-        #151e2f;
+    min-height: 120px;
 
-    color: #ffffff;
+    padding: 14px;
 
-    outline: none;
+    resize: vertical;
 
-    font-family: inherit;
+    line-height: 1.6;
 
-    font-size: 14px;
+}
 
-    transition:
-        .2s ease;
+
+.field-group input::placeholder,
+.field-group textarea::placeholder {
+
+    color: #5f6c82;
 
 }
 
 
 .field-group input:focus,
-.field-group select:focus {
+.field-group select:focus,
+.field-group textarea:focus {
 
     border-color:
-        #d4af37;
+        rgba(212,175,55,.75);
+
+    background:
+        rgba(15,26,45,.98);
 
     box-shadow:
-        0 0 0 3px
-        rgba(212,175,55,.10);
+        0 0 0 4px
+        rgba(212,175,55,.08);
+
+}
+
+
+.field-group small {
+
+    display: block;
+
+    margin-top: 7px;
+
+    color: #69768d;
+
+    font-size: 11px;
+
+}
+
+
+/* =====================================================
+   SELECT
+===================================================== */
+
+.field-group select {
+
+    cursor: pointer;
+
+}
+
+
+.field-group select option {
+
+    background: #111b2c;
+
+    color: #ffffff;
 
 }
 
@@ -238,11 +317,11 @@
 
 .section-block {
 
-    margin-top: 25px;
+    margin-top: 24px;
 
     padding: 24px;
 
-    border-radius: 17px;
+    border-radius: 18px;
 
     border:
         1px solid
@@ -286,11 +365,11 @@
 
 .heading-icon {
 
-    width: 40px;
+    width: 42px;
 
-    height: 40px;
+    height: 42px;
 
-    border-radius: 11px;
+    flex-shrink: 0;
 
     display: flex;
 
@@ -298,8 +377,10 @@
 
     justify-content: center;
 
+    border-radius: 12px;
+
     background:
-        rgba(212,175,55,.12);
+        rgba(212,175,55,.11);
 
     color:
         #d4af37;
@@ -311,9 +392,11 @@
 
     margin: 0;
 
-    font-size: 20px;
+    color: #ffffff;
 
-    font-weight: 800;
+    font-size: 19px;
+
+    font-weight: 850;
 
 }
 
@@ -322,22 +405,15 @@
 
     margin: 4px 0 0;
 
-    color: #7f899d;
+    color: #758198;
 
     font-size: 12px;
 
 }
 
 
-.required-star {
-
-    color: #ff4f4f;
-
-}
-
-
 /* =====================================================
-   ATTENDANCE GRID
+   ATTENDANCE
 ===================================================== */
 
 .attendance-grid {
@@ -365,7 +441,7 @@
 
 .time-input-wrap input {
 
-    padding-right: 42px;
+    padding-right: 44px;
 
 }
 
@@ -381,7 +457,7 @@
     transform:
         translateY(-50%);
 
-    color: #707b90;
+    color: #69768b;
 
     pointer-events: none;
 
@@ -389,7 +465,7 @@
 
 
 /* =====================================================
-   HOURS SUMMARY
+   HOURS
 ===================================================== */
 
 .hours-summary {
@@ -414,25 +490,27 @@
 
     gap: 13px;
 
-    padding: 17px;
+    min-height: 76px;
 
-    border-radius: 14px;
-
-    background:
-        rgba(255,255,255,.035);
+    padding: 16px;
 
     border:
         1px solid
         rgba(255,255,255,.07);
+
+    border-radius: 15px;
+
+    background:
+        rgba(255,255,255,.035);
 
 }
 
 
 .hours-icon {
 
-    width: 42px;
+    width: 44px;
 
-    height: 42px;
+    height: 44px;
 
     flex-shrink: 0;
 
@@ -442,7 +520,7 @@
 
     justify-content: center;
 
-    border-radius: 11px;
+    border-radius: 12px;
 
     background:
         rgba(212,175,55,.10);
@@ -457,11 +535,11 @@
 
     display: block;
 
-    color: #8490a4;
+    margin-bottom: 4px;
+
+    color: #7f8ba0;
 
     font-size: 11px;
-
-    margin-bottom: 4px;
 
 }
 
@@ -472,18 +550,20 @@
 
     color: #ffffff;
 
-    font-size: 17px;
+    font-size: 18px;
+
+    font-weight: 850;
 
 }
 
 
 /* =====================================================
-   TOTAL TASK
+   TASK SECTION
 ===================================================== */
 
 .task-section {
 
-    margin-top: 25px;
+    margin-top: 24px;
 
 }
 
@@ -499,7 +579,7 @@
         rgba(212,175,55,.10);
 
     color:
-        #d4af37;
+        #e2bd49;
 
     font-size: 12px;
 
@@ -509,144 +589,249 @@
 
 
 /* =====================================================
-   TASK TEXTAREA
+   TASK CONTAINER
 ===================================================== */
 
-.task-input-wrap {
-
-    position: relative;
-
-}
-
-
-#taskInput {
-
-    display: block;
-
-    width: 100%;
-
-    min-height: 170px;
-
-    box-sizing: border-box;
-
-    padding: 16px 18px;
-
-    border-radius: 14px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.13);
-
-    background:
-        #121b2b;
-
-    color: #ffffff;
-
-    outline: none;
-
-    resize: vertical;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    font-size: 15px;
-
-    line-height: 1.8;
-
-    transition:
-        border-color .2s ease,
-        box-shadow .2s ease,
-        background .2s ease;
-
-}
-
-
-#taskInput:focus {
-
-    border-color:
-        #d4af37;
-
-    background:
-        #162033;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(212,175,55,.10);
-
-}
-
-
-#taskInput::placeholder {
-
-    color: #6f7a8f;
-
-}
-
-
-/* =====================================================
-   TASK BOTTOM
-===================================================== */
-
-.task-bottom {
-
-    margin-top: 10px;
-
-    color: #778399;
-
-    font-size: 12px;
-
-}
-
-
-.task-bottom i {
-
-    margin-right: 5px;
-
-    color: #d4af37;
-
-}
-
-
-/* =====================================================
-   FORM ACTIONS
-===================================================== */
-
-.form-actions {
+.task-container {
 
     display: flex;
 
-    justify-content: flex-end;
+    flex-direction: column;
 
     gap: 12px;
-
-    margin-top: 25px;
 
 }
 
 
-.primary-btn,
-.secondary-btn {
+/* =====================================================
+   TASK CARD
+===================================================== */
 
-    min-width: 115px;
+.task-card {
 
-    height: 45px;
+    padding: 15px;
 
-    padding:
-        0 20px;
+    border:
+        1px solid
+        rgba(255,255,255,.08);
 
-    border-radius: 11px;
+    border-radius: 14px;
+
+    background:
+        rgba(6,14,28,.60);
+
+    transition:
+        border-color .2s ease,
+        background .2s ease,
+        transform .2s ease;
+
+}
+
+
+.task-card:hover {
+
+    border-color:
+        rgba(212,175,55,.25);
+
+    background:
+        rgba(9,18,33,.82);
+
+}
+
+
+.task-card-top {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+
+}
+
+
+.task-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+}
+
+
+.task-title strong {
+
+    color: #dfe5ef;
+
+    font-size: 13px;
+
+}
+
+
+.task-number {
+
+    width: 25px;
+
+    height: 25px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background:
+        rgba(212,175,55,.12);
+
+    color:
+        #d4af37;
+
+    font-size: 11px;
+
+    font-weight: 850;
+
+}
+
+
+.remove-task-btn {
+
+    width: 32px;
+
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
 
     border: none;
 
+    border-radius: 8px;
+
     cursor: pointer;
+
+    background:
+        rgba(255,70,70,.10);
+
+    color:
+        #ff7373;
+
+    transition:
+        .2s ease;
+
+}
+
+
+.remove-task-btn:hover {
+
+    background:
+        rgba(255,70,70,.18);
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+/* =====================================================
+   TASK INPUT
+===================================================== */
+
+.task-input-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.task-bullet {
+
+    width: 20px;
+
+    text-align: center;
+
+    color:
+        #d4af37;
+
+    font-size: 6px;
+
+}
+
+
+.task-input {
+
+    flex: 1;
+
+    height: 46px;
+
+    padding:
+        0 13px;
+
+    box-sizing: border-box;
+
+    border:
+        1px solid
+        rgba(255,255,255,.10);
+
+    border-radius: 10px;
+
+    background:
+        #101a2c;
+
+    color:
+        #ffffff;
+
+    outline: none;
 
     font-family: inherit;
 
-    font-size: 14px;
+    font-size: 13px;
 
-    font-weight: 800;
+}
+
+
+.task-input:focus {
+
+    border-color:
+        rgba(212,175,55,.70);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(212,175,55,.07);
+
+}
+
+
+.task-input::placeholder {
+
+    color: #667389;
+
+}
+
+
+/* =====================================================
+   ADD TASK BUTTON
+===================================================== */
+
+.add-task-btn {
+
+    margin-top: 14px;
+
+    height: 42px;
+
+    padding:
+        0 17px;
 
     display: inline-flex;
 
@@ -656,6 +841,102 @@
 
     gap: 8px;
 
+    border:
+        1px dashed
+        rgba(212,175,55,.40);
+
+    border-radius: 10px;
+
+    background:
+        rgba(212,175,55,.06);
+
+    color:
+        #d9b943;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    transition:
+        .2s ease;
+
+}
+
+
+.add-task-btn:hover {
+
+    background:
+        rgba(212,175,55,.12);
+
+    border-color:
+        rgba(212,175,55,.65);
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+/* =====================================================
+   COMMENTS
+===================================================== */
+
+.comments-section {
+
+    padding-bottom: 22px;
+
+}
+
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.form-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 11px;
+
+    margin-top: 25px;
+
+}
+
+
+.primary-btn,
+.secondary-btn {
+
+    min-height: 45px;
+
+    padding:
+        0 19px;
+
+    border-radius: 11px;
+
+    cursor: pointer;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
     transition:
         .2s ease;
 
@@ -664,14 +945,20 @@
 
 .primary-btn {
 
+    border: none;
+
     background:
         linear-gradient(
             135deg,
-            #d4af37,
-            #a77b12
+            #e4c35a,
+            #a87b13
         );
 
     color: #101522;
+
+    box-shadow:
+        0 8px 25px
+        rgba(212,175,55,.13);
 
 }
 
@@ -682,7 +969,7 @@
         translateY(-1px);
 
     box-shadow:
-        0 8px 22px
+        0 12px 30px
         rgba(212,175,55,.20);
 
 }
@@ -690,14 +977,15 @@
 
 .secondary-btn {
 
-    background:
-        rgba(255,255,255,.07);
-
     border:
         1px solid
         rgba(255,255,255,.10);
 
-    color: #d8deea;
+    background:
+        rgba(255,255,255,.055);
+
+    color:
+        #cfd6e3;
 
 }
 
@@ -705,18 +993,20 @@
 .secondary-btn:hover {
 
     background:
-        rgba(255,255,255,.11);
+        rgba(255,255,255,.09);
 
 }
 
 
 /* =====================================================
-   RECORDS
+   RECORDS CARD
 ===================================================== */
 
 .records-card {
 
     margin-top: 25px;
+
+    border-radius: 22px;
 
     overflow: hidden;
 
@@ -725,7 +1015,8 @@
 
 .records-header {
 
-    padding: 25px 28px;
+    padding:
+        24px 28px;
 
     border-bottom:
         1px solid
@@ -738,16 +1029,21 @@
 
     margin: 0;
 
+    color: #ffffff;
+
     font-size: 21px;
+
+    font-weight: 850;
 
 }
 
 
 .records-header h2 i {
 
-    color: #d4af37;
+    margin-right: 8px;
 
-    margin-right: 7px;
+    color:
+        #d4af37;
 
 }
 
@@ -756,15 +1052,16 @@
 
     margin: 6px 0 0;
 
-    color: #7f899d;
+    color:
+        #758198;
 
-    font-size: 13px;
+    font-size: 12px;
 
 }
 
 
 /* =====================================================
-   TABLE
+   TABLE WRAPPER
 ===================================================== */
 
 .table-wrapper {
@@ -775,6 +1072,10 @@
 
 }
 
+
+/* =====================================================
+   TABLE
+===================================================== */
 
 table {
 
@@ -792,8 +1093,8 @@ thead {
     background:
         linear-gradient(
             135deg,
-            #243e87,
-            #1d3679
+            #233b7d,
+            #192d61
         );
 
 }
@@ -801,13 +1102,15 @@ thead {
 
 th {
 
-    padding: 17px 14px;
+    padding:
+        16px 15px;
 
     text-align: left;
 
-    color: #ffffff;
+    color:
+        #ffffff;
 
-    font-size: 13px;
+    font-size: 12px;
 
     font-weight: 800;
 
@@ -818,17 +1121,19 @@ th {
 
 td {
 
-    padding: 18px 14px;
+    padding:
+        15px;
 
     border-bottom:
         1px solid
-        rgba(255,255,255,.06);
+        rgba(255,255,255,.055);
 
-    color: #dfe5f0;
+    color:
+        #dfe5ef;
 
-    font-size: 13px;
+    font-size: 12px;
 
-    vertical-align: top;
+    vertical-align: middle;
 
 }
 
@@ -850,23 +1155,106 @@ tbody tr:hover {
 
 
 /* =====================================================
-   TASKS IN TABLE
+   EMPLOYEE CELL
+===================================================== */
+
+.employee-cell {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.employee-avatar {
+
+    width: 34px;
+
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #d4af37,
+            #8d6812
+        );
+
+    color:
+        #111827;
+
+    font-size: 12px;
+
+    font-weight: 900;
+
+}
+
+
+.employee-cell strong {
+
+    color:
+        #e8edf5;
+
+    font-size: 12px;
+
+}
+
+
+/* =====================================================
+   DATE
+===================================================== */
+
+.date-badge {
+
+    display: inline-flex;
+
+    padding:
+        6px 9px;
+
+    border-radius: 7px;
+
+    background:
+        rgba(255,255,255,.055);
+
+    color:
+        #cdd5e2;
+
+    white-space: nowrap;
+
+}
+
+
+/* =====================================================
+   TASK RECORDS
 ===================================================== */
 
 .record-tasks {
 
-    min-width: 300px;
+    min-width: 260px;
 
-    max-width: 450px;
+    max-width: 430px;
 
 }
 
 
 .record-task {
 
-    display: block;
-
     margin-bottom: 5px;
+
+    color:
+        #cdd5e1;
 
     line-height: 1.5;
 
@@ -880,40 +1268,70 @@ tbody tr:hover {
 }
 
 
-/* =====================================================
-   BADGE
-===================================================== */
-
-.total-task-badge {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    min-width: 34px;
-
-    height: 30px;
-
-    padding:
-        0 8px;
-
-    border-radius: 8px;
-
-    background:
-        rgba(212,175,55,.12);
+.record-task span {
 
     color:
         #d4af37;
 
     font-weight: 800;
 
+    margin-right: 4px;
+
 }
 
 
 /* =====================================================
-   ACTION BUTTONS
+   HOURS BADGES
+===================================================== */
+
+.hours-badge {
+
+    display: inline-flex;
+
+    min-width: 65px;
+
+    justify-content: center;
+
+    padding:
+        7px 9px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(255,255,255,.055);
+
+    color:
+        #dce3ee;
+
+    font-weight: 750;
+
+}
+
+
+.hours-badge.working {
+
+    background:
+        rgba(60,190,130,.10);
+
+    color:
+        #69d9a7;
+
+}
+
+
+.hours-badge.lunch {
+
+    background:
+        rgba(255,181,70,.10);
+
+    color:
+        #f2bd69;
+
+}
+
+
+/* =====================================================
+   ACTIONS
 ===================================================== */
 
 .record-actions {
@@ -935,38 +1353,16 @@ tbody tr:hover {
 
     border-radius: 8px;
 
-    cursor: pointer;
-
     display: flex;
 
     align-items: center;
 
     justify-content: center;
 
+    cursor: pointer;
+
     transition:
         .2s ease;
-
-}
-
-
-.edit-action {
-
-    background:
-        rgba(56,132,255,.15);
-
-    color:
-        #69a5ff;
-
-}
-
-
-.delete-action {
-
-    background:
-        rgba(255,74,74,.14);
-
-    color:
-        #ff6b6b;
 
 }
 
@@ -979,55 +1375,126 @@ tbody tr:hover {
 }
 
 
+.edit-action {
+
+    background:
+        rgba(70,135,255,.12);
+
+    color:
+        #72a9ff;
+
+}
+
+
+.edit-action:hover {
+
+    background:
+        rgba(70,135,255,.20);
+
+}
+
+
+.delete-action {
+
+    background:
+        rgba(255,70,70,.11);
+
+    color:
+        #ff7373;
+
+}
+
+
+.delete-action:hover {
+
+    background:
+        rgba(255,70,70,.19);
+
+}
+
+
 /* =====================================================
    EMPTY STATE
 ===================================================== */
 
 .empty-state {
 
-    padding: 55px 20px;
+    padding:
+        55px 20px !important;
 
-    text-align: center;
-
-    color: #7f899d;
+    text-align: center !important;
 
 }
 
 
 .empty-state i {
 
-    font-size: 38px;
+    display: block;
 
-    color: #59667d;
+    margin-bottom: 10px;
 
-    margin-bottom: 12px;
+    color:
+        #56647c;
 
-}
-
-
-.empty-state h3 {
-
-    margin: 0 0 5px;
-
-    color: #d7dce6;
+    font-size: 32px;
 
 }
 
 
-.empty-state p {
+.empty-state strong {
 
-    margin: 0;
+    display: block;
 
-    font-size: 13px;
+    margin-bottom: 5px;
+
+    color:
+        #d7deea;
+
+    font-size: 14px;
+
+}
+
+
+.empty-state span {
+
+    display: block;
+
+    color:
+        #6e7b91;
+
+    font-size: 12px;
 
 }
 
 
 /* =====================================================
-   MOBILE
+   ERROR
 ===================================================== */
 
-@media (max-width: 900px) {
+.table-error {
+
+    padding: 30px !important;
+
+    text-align: center !important;
+
+    color:
+        #ff7a7a !important;
+
+}
+
+
+.table-error i {
+
+    margin-right: 7px;
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1100px) {
 
     .attendance-grid {
 
@@ -1039,42 +1506,30 @@ tbody tr:hover {
 }
 
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
 
     .timesheet-page {
 
         width:
             calc(100% - 24px);
 
-        margin-top: 18px;
+        margin:
+            20px auto 50px;
 
     }
 
 
     .timesheet-card {
 
-        padding: 17px;
+        padding: 18px;
 
     }
 
 
     .top-fields {
 
-        grid-template-columns: 1fr;
-
-    }
-
-
-    .attendance-grid {
-
-        grid-template-columns: 1fr;
-
-    }
-
-
-    .hours-summary {
-
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            1fr;
 
     }
 
@@ -1086,16 +1541,19 @@ tbody tr:hover {
     }
 
 
-    .section-heading {
+    .hours-summary {
 
-        align-items: flex-start;
+        grid-template-columns:
+            1fr;
 
     }
 
 
     .form-actions {
 
-        flex-direction: column;
+        flex-direction: column-reverse;
+
+        align-items: stretch;
 
     }
 
@@ -1107,10 +1565,71 @@ tbody tr:hover {
 
     }
 
+}
+
+
+@media (max-width: 600px) {
+
+    .page-title-row {
+
+        align-items: flex-start;
+
+    }
+
+
+    .title-icon {
+
+        width: 48px;
+
+        height: 48px;
+
+        border-radius: 14px;
+
+        font-size: 19px;
+
+    }
+
 
     .page-header h1 {
 
-        font-size: 24px;
+        font-size: 25px;
+
+    }
+
+
+    .page-header p {
+
+        font-size: 12px;
+
+    }
+
+
+    .attendance-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .section-heading {
+
+        align-items: flex-start;
+
+    }
+
+
+    .task-card {
+
+        padding: 12px;
+
+    }
+
+
+    .records-header {
+
+        padding:
+            20px;
 
     }
 

@@ -1,8 +1,7 @@
 /* =====================================================
-   THE D CUTS - TIMESHEET JS
-   FLEXIBLE TIME VERSION
+   THE D CUTS
+   DAILY TIMESHEET
 ===================================================== */
-
 
 const API_BASE =
     window.API_BASE ||
@@ -10,26 +9,18 @@ const API_BASE =
 
 
 let editingId = null;
-
 let employees = [];
-
-let taskList = [];
-
 
 
 /* =====================================================
    DOM READY
 ===================================================== */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+document.addEventListener("DOMContentLoaded", () => {
 
-        initializeTimesheet();
+    initializeTimesheet();
 
-    }
-);
-
+});
 
 
 /* =====================================================
@@ -50,8 +41,26 @@ async function initializeTimesheet() {
 
     toggleUpdateButton();
 
+    calculateWorkingHours();
+
 }
 
+
+/* =====================================================
+   TOKEN
+===================================================== */
+
+function getAuthToken() {
+
+    return (
+        localStorage.getItem("token") ||
+        localStorage.getItem("authToken") ||
+        localStorage.getItem("jwt") ||
+        sessionStorage.getItem("token") ||
+        ""
+    );
+
+}
 
 
 /* =====================================================
@@ -61,85 +70,27 @@ async function initializeTimesheet() {
 function setTodayDate() {
 
     const input =
-        document.getElementById(
-            "date"
-        );
-
+        document.getElementById("date");
 
     if (!input) return;
 
-
-    const today =
-        new Date();
-
+    const today = new Date();
 
     const year =
         today.getFullYear();
 
-
     const month =
-        String(
-            today.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
-
+        String(today.getMonth() + 1)
+            .padStart(2, "0");
 
     const day =
-        String(
-            today.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
-
+        String(today.getDate())
+            .padStart(2, "0");
 
     input.value =
         `${year}-${month}-${day}`;
 
 }
-
-
-
-/* =====================================================
-   AUTH TOKEN
-===================================================== */
-
-function getAuthToken() {
-
-    return (
-
-        localStorage.getItem(
-            "token"
-        )
-
-        ||
-
-        localStorage.getItem(
-            "authToken"
-        )
-
-        ||
-
-        localStorage.getItem(
-            "jwt"
-        )
-
-        ||
-
-        sessionStorage.getItem(
-            "token"
-        )
-
-        ||
-
-        ""
-
-    );
-
-}
-
 
 
 /* =====================================================
@@ -149,10 +100,7 @@ function getAuthToken() {
 async function loadEmployees() {
 
     const select =
-        document.getElementById(
-            "employeeName"
-        );
-
+        document.getElementById("employeeName");
 
     if (!select) return;
 
@@ -174,11 +122,9 @@ async function loadEmployees() {
             await fetch(
                 `${API_BASE}/employees`,
                 {
-
                     method: "GET",
 
                     headers: {
-
                         "Content-Type":
                             "application/json",
 
@@ -188,29 +134,29 @@ async function loadEmployees() {
                                     `Bearer ${token}`
                               }
                             : {})
-
                     }
-
                 }
             );
+
+
+        const result =
+            await response.json();
 
 
         if (!response.ok) {
 
             throw new Error(
+                result.message ||
                 "Failed to load employees."
             );
 
         }
 
 
-        const data =
-            await response.json();
-
-
         employees =
-            data.employees ||
-            data.data ||
+            result.employees ||
+            result.data ||
+            result.users ||
             [];
 
 
@@ -224,40 +170,38 @@ async function loadEmployees() {
         employees.forEach(
             (employee, index) => {
 
-                const number =
-                    employee.employeeId ||
-                    String(
-                        index + 1
-                    ).padStart(
-                        2,
-                        "0"
-                    );
-
-
                 const option =
-                    document.createElement(
-                        "option"
-                    );
+                    document.createElement("option");
 
 
                 option.value =
-                    employee._id;
+                    employee._id ||
+                    employee.id ||
+                    "";
+
+
+                const employeeId =
+                    employee.employeeId ||
+                    employee.empId ||
+                    String(index + 1)
+                        .padStart(2, "0");
 
 
                 option.textContent =
-                    `${number}-${employee.name || "Unknown"}`;
+                    `${employeeId} - ${
+                        employee.name ||
+                        employee.fullName ||
+                        "Unknown Employee"
+                    }`;
 
 
-                select.appendChild(
-                    option
-                );
+                select.appendChild(option);
 
             }
         );
 
+
     }
-
-
     catch (error) {
 
         console.error(
@@ -277,36 +221,17 @@ async function loadEmployees() {
 }
 
 
-
 /* =====================================================
    FLEXIBLE TIME PARSER
-=====================================================
-
-   ACCEPTS:
-
-   9
-   9.30
-   9:30
-   9 30
-   9:30 AM
-   9.30 AM
-   9 AM
-   6 PM
-   18:30
-   1830
 ===================================================== */
 
-function parseFlexibleTime(
-    value
-) {
+function parseFlexibleTime(value) {
 
     if (
         value === null ||
         value === undefined
     ) {
-
         return null;
-
     }
 
 
@@ -317,40 +242,22 @@ function parseFlexibleTime(
 
 
     if (!time) {
-
         return null;
-
     }
 
 
-    /* -----------------------------------------------
-       NORMALIZE
-    ----------------------------------------------- */
-
     time =
         time
-            .replace(
-                /\s+/g,
-                " "
-            )
+            .replace(/\s+/g, " ")
             .trim();
 
-
-    /* -----------------------------------------------
-       AM / PM
-    ----------------------------------------------- */
 
     let period = null;
 
 
-    if (
-        /\b(am|a\.m\.)\b/i.test(
-            time
-        )
-    ) {
+    if (/\b(am|a\.m\.)\b/i.test(time)) {
 
         period = "AM";
-
 
         time =
             time.replace(
@@ -359,16 +266,9 @@ function parseFlexibleTime(
             );
 
     }
-
-
-    else if (
-        /\b(pm|p\.m\.)\b/i.test(
-            time
-        )
-    ) {
+    else if (/\b(pm|p\.m\.)\b/i.test(time)) {
 
         period = "PM";
-
 
         time =
             time.replace(
@@ -379,85 +279,36 @@ function parseFlexibleTime(
     }
 
 
-    time =
-        time.trim();
+    time = time.trim();
 
 
-    /* -----------------------------------------------
-       0930 -> 09:30
-    ----------------------------------------------- */
-
-    if (
-        /^\d{4}$/.test(
-            time
-        )
-    ) {
+    if (/^\d{4}$/.test(time)) {
 
         time =
-            time.substring(
-                0,
-                2
-            )
-            +
-            ":"
-            +
-            time.substring(
-                2
-            );
+            time.substring(0, 2) +
+            ":" +
+            time.substring(2);
 
     }
-
-
-    /* -----------------------------------------------
-       930 -> 9:30
-    ----------------------------------------------- */
-
-    else if (
-        /^\d{3}$/.test(
-            time
-        )
-    ) {
+    else if (/^\d{3}$/.test(time)) {
 
         time =
             "0" +
             time;
 
         time =
-            time.substring(
-                0,
-                2
-            )
-            +
-            ":"
-            +
-            time.substring(
-                2
-            );
+            time.substring(0, 2) +
+            ":" +
+            time.substring(2);
 
     }
 
 
-    /* -----------------------------------------------
-       9.30 / 9 30 -> 9:30
-    ----------------------------------------------- */
-
     time =
-        time.replace(
-            /[.\s]+/g,
-            ":"
-        );
+        time.replace(/[.\s]+/g, ":");
 
 
-    /* -----------------------------------------------
-       ONLY HOUR
-       9 -> 9:00
-    ----------------------------------------------- */
-
-    if (
-        /^\d{1,2}$/.test(
-            time
-        )
-    ) {
+    if (/^\d{1,2}$/.test(time)) {
 
         time =
             `${time}:00`;
@@ -469,9 +320,7 @@ function parseFlexibleTime(
         time.split(":");
 
 
-    if (
-        parts.length !== 2
-    ) {
+    if (parts.length !== 2) {
 
         return null;
 
@@ -479,25 +328,15 @@ function parseFlexibleTime(
 
 
     let hours =
-        Number(
-            parts[0]
-        );
-
+        Number(parts[0]);
 
     let minutes =
-        Number(
-            parts[1]
-        );
+        Number(parts[1]);
 
 
     if (
-        !Number.isInteger(
-            hours
-        )
-        ||
-        !Number.isInteger(
-            minutes
-        )
+        !Number.isInteger(hours) ||
+        !Number.isInteger(minutes)
     ) {
 
         return null;
@@ -515,10 +354,6 @@ function parseFlexibleTime(
     }
 
 
-    /* -----------------------------------------------
-       12 HOUR
-    ----------------------------------------------- */
-
     if (period) {
 
         if (
@@ -531,40 +366,22 @@ function parseFlexibleTime(
         }
 
 
-        if (
-            period === "AM"
-        ) {
+        if (period === "AM") {
 
-            if (
-                hours === 12
-            ) {
-
+            if (hours === 12) {
                 hours = 0;
-
             }
 
         }
-
-
         else {
 
-            if (
-                hours !== 12
-            ) {
-
+            if (hours !== 12) {
                 hours += 12;
-
             }
 
         }
 
     }
-
-
-    /* -----------------------------------------------
-       24 HOUR
-    ----------------------------------------------- */
-
     else {
 
         if (
@@ -587,35 +404,15 @@ function parseFlexibleTime(
 }
 
 
-
-/* =====================================================
-   ALIAS
-===================================================== */
-
-function timeToMinutes(
-    value
-) {
-
-    return parseFlexibleTime(
-        value
-    );
-
-}
-
-
-
 /* =====================================================
    FORMAT DURATION
 ===================================================== */
 
-function formatDuration(
-    totalMinutes
-) {
+function formatDuration(totalMinutes) {
 
     if (
-        !Number.isFinite(
-            totalMinutes
-        )
+        !Number.isFinite(totalMinutes) ||
+        totalMinutes < 0
     ) {
 
         return "0h 0m";
@@ -624,76 +421,56 @@ function formatDuration(
 
 
     const hours =
-        Math.floor(
-            totalMinutes / 60
-        );
-
+        Math.floor(totalMinutes / 60);
 
     const minutes =
         totalMinutes % 60;
 
 
-    return (
-        `${hours}h ${minutes}m`
-    );
+    return `${hours}h ${minutes}m`;
 
 }
 
 
-
 /* =====================================================
-   TIME EVENTS
+   TIME CALCULATION SETUP
 ===================================================== */
 
 function setupTimeCalculation() {
 
-    const fields = [
-
+    [
         "checkIn",
-
         "lunchStart",
-
         "lunchEnd",
-
         "checkOut"
+    ].forEach(id => {
 
-    ];
+        const input =
+            document.getElementById(id);
 
-
-    fields.forEach(
-        (id) => {
-
-            const input =
-                document.getElementById(
-                    id
-                );
+        if (!input) return;
 
 
-            if (!input) return;
+        input.addEventListener(
+            "input",
+            calculateWorkingHours
+        );
 
 
-            input.addEventListener(
-                "input",
-                calculateWorkingHours
-            );
+        input.addEventListener(
+            "change",
+            calculateWorkingHours
+        );
 
 
-            input.addEventListener(
-                "change",
-                calculateWorkingHours
-            );
+        input.addEventListener(
+            "blur",
+            calculateWorkingHours
+        );
 
-
-            input.addEventListener(
-                "blur",
-                calculateWorkingHours
-            );
-
-        }
-    );
+    });
 
 }
-
 
 
 /* =====================================================
@@ -703,45 +480,26 @@ function setupTimeCalculation() {
 function calculateWorkingHours() {
 
     const checkIn =
-        document.getElementById(
-            "checkIn"
-        )?.value;
-
+        document.getElementById("checkIn")?.value;
 
     const lunchStart =
-        document.getElementById(
-            "lunchStart"
-        )?.value;
-
+        document.getElementById("lunchStart")?.value;
 
     const lunchEnd =
-        document.getElementById(
-            "lunchEnd"
-        )?.value;
-
+        document.getElementById("lunchEnd")?.value;
 
     const checkOut =
-        document.getElementById(
-            "checkOut"
-        )?.value;
+        document.getElementById("checkOut")?.value;
 
 
     const officeElement =
-        document.getElementById(
-            "officeHours"
-        );
-
+        document.getElementById("officeHours");
 
     const lunchElement =
-        document.getElementById(
-            "lunchHours"
-        );
-
+        document.getElementById("lunchHours");
 
     const workingElement =
-        document.getElementById(
-            "workingHours"
-        );
+        document.getElementById("workingHours");
 
 
     if (
@@ -752,19 +510,13 @@ function calculateWorkingHours() {
     ) {
 
         if (officeElement)
-            officeElement.textContent =
-                "0h 0m";
-
+            officeElement.textContent = "0h 0m";
 
         if (lunchElement)
-            lunchElement.textContent =
-                "0h 0m";
-
+            lunchElement.textContent = "0h 0m";
 
         if (workingElement)
-            workingElement.textContent =
-                "0h 0m";
-
+            workingElement.textContent = "0h 0m";
 
         return;
 
@@ -772,27 +524,16 @@ function calculateWorkingHours() {
 
 
     const inTime =
-        parseFlexibleTime(
-            checkIn
-        );
-
+        parseFlexibleTime(checkIn);
 
     const lunchStartTime =
-        parseFlexibleTime(
-            lunchStart
-        );
-
+        parseFlexibleTime(lunchStart);
 
     const lunchEndTime =
-        parseFlexibleTime(
-            lunchEnd
-        );
-
+        parseFlexibleTime(lunchEnd);
 
     const outTime =
-        parseFlexibleTime(
-            checkOut
-        );
+        parseFlexibleTime(checkOut);
 
 
     if (
@@ -811,13 +552,10 @@ function calculateWorkingHours() {
     }
 
 
-    if (
-        lunchStartTime <=
-        inTime
-    ) {
+    if (lunchStartTime <= inTime) {
 
         showTimeError(
-            "Lunch start must be after check-in."
+            "Lunch start must be after check-in"
         );
 
         return;
@@ -825,13 +563,10 @@ function calculateWorkingHours() {
     }
 
 
-    if (
-        lunchEndTime <=
-        lunchStartTime
-    ) {
+    if (lunchEndTime <= lunchStartTime) {
 
         showTimeError(
-            "Lunch end must be after lunch start."
+            "Lunch end must be after lunch start"
         );
 
         return;
@@ -839,13 +574,10 @@ function calculateWorkingHours() {
     }
 
 
-    if (
-        outTime <=
-        lunchEndTime
-    ) {
+    if (outTime <= lunchEndTime) {
 
         showTimeError(
-            "Check-out must be after lunch end."
+            "Check-out must be after lunch end"
         );
 
         return;
@@ -854,76 +586,45 @@ function calculateWorkingHours() {
 
 
     const officeMinutes =
-        outTime -
-        inTime;
+        outTime - inTime;
 
 
     const lunchMinutes =
-        lunchEndTime -
-        lunchStartTime;
+        lunchEndTime - lunchStartTime;
 
 
     const workingMinutes =
-        officeMinutes -
-        lunchMinutes;
+        officeMinutes - lunchMinutes;
 
 
-    if (officeElement) {
-
-        officeElement.textContent =
-            formatDuration(
-                officeMinutes
-            );
-
-    }
+    officeElement.textContent =
+        formatDuration(officeMinutes);
 
 
-    if (lunchElement) {
-
-        lunchElement.textContent =
-            formatDuration(
-                lunchMinutes
-            );
-
-    }
+    lunchElement.textContent =
+        formatDuration(lunchMinutes);
 
 
-    if (workingElement) {
-
-        workingElement.textContent =
-            formatDuration(
-                workingMinutes
-            );
-
-    }
+    workingElement.textContent =
+        formatDuration(workingMinutes);
 
 }
-
 
 
 /* =====================================================
    TIME ERROR
 ===================================================== */
 
-function showTimeError(
-    message
-) {
+function showTimeError(message) {
 
     const element =
-        document.getElementById(
-            "workingHours"
-        );
+        document.getElementById("workingHours");
 
+    if (!element) return;
 
-    if (element) {
-
-        element.textContent =
-            message;
-
-    }
+    element.textContent = message;
 
 }
-
 
 
 /* =====================================================
@@ -933,40 +634,25 @@ function showTimeError(
 function setupDefaultTask() {
 
     const container =
-        document.getElementById(
-            "projectContainer"
-        );
-
+        document.getElementById("projectContainer");
 
     if (!container) return;
 
-
-    container.innerHTML =
-        "";
-
-
-    taskList = [];
-
+    container.innerHTML = "";
 
     addProjectCard();
 
 }
 
 
-
 /* =====================================================
    ADD TASK
 ===================================================== */
 
-function addProjectCard(
-    taskValue = ""
-) {
+function addProjectCard(taskValue = "") {
 
     const container =
-        document.getElementById(
-            "projectContainer"
-        );
-
+        document.getElementById("projectContainer");
 
     if (!container) return;
 
@@ -979,9 +665,7 @@ function addProjectCard(
 
 
     const wrapper =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     wrapper.className =
@@ -994,20 +678,26 @@ function addProjectCard(
 
     wrapper.innerHTML = `
 
-        <div class="task-header">
+        <div class="task-card-top">
 
-            <strong>
-                Task
-            </strong>
+            <div class="task-title">
+
+                <span class="task-number">
+                    1
+                </span>
+
+                <strong>
+                    Task
+                </strong>
+
+            </div>
 
             <button
                 type="button"
                 class="remove-task-btn"
-                onclick="removeTask('${taskId}')"
+                title="Remove task"
             >
-
                 <i class="fa-solid fa-xmark"></i>
-
             </button>
 
         </div>
@@ -1015,16 +705,15 @@ function addProjectCard(
 
         <div class="task-input-row">
 
-            <span class="task-bullet">
-                •
-            </span>
+            <div class="task-bullet">
+                <i class="fa-solid fa-circle"></i>
+            </div>
 
             <input
                 type="text"
                 class="task-input"
-                placeholder="Enter task"
+                placeholder="Enter completed task..."
                 value="${escapeHtml(taskValue)}"
-                required
             >
 
         </div>
@@ -1032,114 +721,72 @@ function addProjectCard(
     `;
 
 
-    container.appendChild(
-        wrapper
+    container.appendChild(wrapper);
+
+
+    const removeButton =
+        wrapper.querySelector(
+            ".remove-task-btn"
+        );
+
+
+    removeButton.addEventListener(
+        "click",
+        () => {
+
+            wrapper.remove();
+
+            updateTaskNumbers();
+
+            if (
+                !container.querySelector(".task-card")
+            ) {
+
+                addProjectCard();
+
+            }
+
+        }
+    );
+
+
+    const input =
+        wrapper.querySelector(".task-input");
+
+
+    input.addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                addProjectCard();
+
+                const cards =
+                    document.querySelectorAll(
+                        ".task-card"
+                    );
+
+                const last =
+                    cards[cards.length - 1];
+
+                last
+                    ?.querySelector(".task-input")
+                    ?.focus();
+
+            }
+
+        }
     );
 
 
     updateTaskNumbers();
 
-
-    const input =
-        wrapper.querySelector(
-            ".task-input"
-        );
-
-
-    if (input) {
-
-        input.addEventListener(
-            "keydown",
-            (event) => {
-
-                if (
-                    event.key === "Enter"
-                ) {
-
-                    event.preventDefault();
-
-                    addProjectCard();
-
-                    const cards =
-                        document.querySelectorAll(
-                            ".task-card"
-                        );
-
-
-                    const last =
-                        cards[
-                            cards.length - 1
-                        ];
-
-
-                    const nextInput =
-                        last?.querySelector(
-                            ".task-input"
-                        );
-
-
-                    if (nextInput) {
-
-                        nextInput.focus();
-
-                    }
-
-                }
-
-            }
-        );
-
-    }
+    updateTaskCount();
 
 }
-
-
-
-/* =====================================================
-   REMOVE TASK
-===================================================== */
-
-function removeTask(
-    taskId
-) {
-
-    const container =
-        document.getElementById(
-            "projectContainer"
-        );
-
-
-    const card =
-        container?.querySelector(
-            `[data-task-id="${taskId}"]`
-        );
-
-
-    if (!card) return;
-
-
-    card.remove();
-
-
-    updateTaskNumbers();
-
-
-    const remaining =
-        container.querySelectorAll(
-            ".task-card"
-        );
-
-
-    if (
-        remaining.length === 0
-    ) {
-
-        addProjectCard();
-
-    }
-
-}
-
 
 
 /* =====================================================
@@ -1157,24 +804,74 @@ function updateTaskNumbers() {
     cards.forEach(
         (card, index) => {
 
+            const number =
+                card.querySelector(
+                    ".task-number"
+                );
+
             const title =
                 card.querySelector(
-                    ".task-header strong"
+                    ".task-title strong"
                 );
 
 
-            if (title) {
+            if (number)
+                number.textContent =
+                    index + 1;
 
+
+            if (title)
                 title.textContent =
                     `Task ${index + 1}`;
-
-            }
 
         }
     );
 
+
+    updateTaskCount();
+
 }
 
+
+/* =====================================================
+   TASK COUNT
+===================================================== */
+
+function updateTaskCount() {
+
+    const countElement =
+        document.getElementById("taskCount");
+
+
+    if (!countElement) return;
+
+
+    const cards =
+        document.querySelectorAll(
+            ".task-card"
+        );
+
+
+    const count =
+        Array.from(cards)
+            .filter(card => {
+
+                const input =
+                    card.querySelector(
+                        ".task-input"
+                    );
+
+                return input &&
+                    input.value.trim();
+
+            })
+            .length;
+
+
+    countElement.textContent =
+        `${count} ${count === 1 ? "Task" : "Tasks"}`;
+
+}
 
 
 /* =====================================================
@@ -1192,26 +889,21 @@ function getTasks() {
     const tasks = [];
 
 
-    inputs.forEach(
-        (input) => {
+    inputs.forEach(input => {
 
-            const value =
-                input.value.trim();
+        const value =
+            input.value.trim();
 
 
-            if (value) {
+        if (value) {
 
-                tasks.push({
-
-                    taskName:
-                        value
-
-                });
-
-            }
+            tasks.push({
+                taskName: value
+            });
 
         }
-    );
+
+    });
 
 
     return tasks;
@@ -1219,27 +911,17 @@ function getTasks() {
 }
 
 
-
 /* =====================================================
-   VALIDATE TIME FIELD
+   VALIDATE TIME
 ===================================================== */
 
-function validateTimeInput(
-    id,
-    label
-) {
+function validateTimeInput(id, label) {
 
     const input =
-        document.getElementById(
-            id
-        );
+        document.getElementById(id);
 
 
-    if (!input) {
-
-        return null;
-
-    }
+    if (!input) return null;
 
 
     const value =
@@ -1252,9 +934,7 @@ function validateTimeInput(
             `${label} time is mandatory.`
         );
 
-
         input.focus();
-
 
         return null;
 
@@ -1262,22 +942,24 @@ function validateTimeInput(
 
 
     const parsed =
-        parseFlexibleTime(
-            value
-        );
+        parseFlexibleTime(value);
 
 
-    if (
-        parsed === null
-    ) {
+    if (parsed === null) {
 
         alert(
-            `${label} time is invalid.\n\nAccepted examples:\n9\n9.30\n9:30\n9:30 AM\n9 PM\n18:30\n1830`
+            `${label} time is invalid.\n\n` +
+            `Accepted examples:\n` +
+            `9\n` +
+            `9.30\n` +
+            `9:30\n` +
+            `9:30 AM\n` +
+            `9 PM\n` +
+            `18:30\n` +
+            `1830`
         );
 
-
         input.focus();
-
 
         return null;
 
@@ -1287,7 +969,6 @@ function validateTimeInput(
     return parsed;
 
 }
-
 
 
 /* =====================================================
@@ -1308,15 +989,9 @@ function validateForm() {
         )?.value;
 
 
-    const tasks =
-        getTasks();
-
-
     if (!employee) {
 
-        alert(
-            "Please select employee."
-        );
+        alert("Please select employee.");
 
         return false;
 
@@ -1325,9 +1000,7 @@ function validateForm() {
 
     if (!date) {
 
-        alert(
-            "Please select date."
-        );
+        alert("Please select date.");
 
         return false;
 
@@ -1340,7 +1013,6 @@ function validateForm() {
             "Check-in"
         );
 
-
     if (inTime === null)
         return false;
 
@@ -1351,10 +1023,7 @@ function validateForm() {
             "Lunch Start"
         );
 
-
-    if (
-        lunchStartTime === null
-    )
+    if (lunchStartTime === null)
         return false;
 
 
@@ -1364,10 +1033,7 @@ function validateForm() {
             "Lunch End"
         );
 
-
-    if (
-        lunchEndTime === null
-    )
+    if (lunchEndTime === null)
         return false;
 
 
@@ -1377,16 +1043,15 @@ function validateForm() {
             "Check-out"
         );
 
-
-    if (
-        outTime === null
-    )
+    if (outTime === null)
         return false;
 
 
-    if (
-        tasks.length === 0
-    ) {
+    const tasks =
+        getTasks();
+
+
+    if (tasks.length === 0) {
 
         alert(
             "Please enter at least one task."
@@ -1397,10 +1062,7 @@ function validateForm() {
     }
 
 
-    if (
-        lunchStartTime <=
-        inTime
-    ) {
+    if (lunchStartTime <= inTime) {
 
         alert(
             "Lunch start must be after check-in."
@@ -1411,10 +1073,7 @@ function validateForm() {
     }
 
 
-    if (
-        lunchEndTime <=
-        lunchStartTime
-    ) {
+    if (lunchEndTime <= lunchStartTime) {
 
         alert(
             "Lunch end must be after lunch start."
@@ -1425,10 +1084,7 @@ function validateForm() {
     }
 
 
-    if (
-        outTime <=
-        lunchEndTime
-    ) {
+    if (outTime <= lunchEndTime) {
 
         alert(
             "Check-out must be after lunch end."
@@ -1444,9 +1100,8 @@ function validateForm() {
 }
 
 
-
 /* =====================================================
-   COLLECT FORM DATA
+   COLLECT DATA
 ===================================================== */
 
 function collectFormData() {
@@ -1490,7 +1145,7 @@ function collectFormData() {
     const comments =
         document.getElementById(
             "comments"
-        )?.value || "";
+        )?.value.trim() || "";
 
 
     const tasks =
@@ -1498,32 +1153,23 @@ function collectFormData() {
 
 
     const inTime =
-        parseFlexibleTime(
-            checkIn
-        );
+        parseFlexibleTime(checkIn);
 
 
     const lunchStartTime =
-        parseFlexibleTime(
-            lunchStart
-        );
+        parseFlexibleTime(lunchStart);
 
 
     const lunchEndTime =
-        parseFlexibleTime(
-            lunchEnd
-        );
+        parseFlexibleTime(lunchEnd);
 
 
     const outTime =
-        parseFlexibleTime(
-            checkOut
-        );
+        parseFlexibleTime(checkOut);
 
 
     const officeMinutes =
-        outTime -
-        inTime;
+        outTime - inTime;
 
 
     const lunchMinutes =
@@ -1580,20 +1226,14 @@ function collectFormData() {
 }
 
 
-
 /* =====================================================
    SAVE
 ===================================================== */
 
 async function saveTimesheet() {
 
-    if (
-        !validateForm()
-    ) {
-
+    if (!validateForm())
         return;
-
-    }
 
 
     const data =
@@ -1611,8 +1251,7 @@ async function saveTimesheet() {
                 `${API_BASE}/timesheets`,
                 {
 
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
 
@@ -1629,9 +1268,7 @@ async function saveTimesheet() {
                     },
 
                     body:
-                        JSON.stringify(
-                            data
-                        )
+                        JSON.stringify(data)
 
                 }
             );
@@ -1641,9 +1278,7 @@ async function saveTimesheet() {
             await response.json();
 
 
-        if (
-            !response.ok
-        ) {
+        if (!response.ok) {
 
             throw new Error(
                 result.message ||
@@ -1660,12 +1295,9 @@ async function saveTimesheet() {
 
         resetForm();
 
-
         await loadTimesheets();
 
     }
-
-
     catch (error) {
 
         console.error(
@@ -1674,18 +1306,15 @@ async function saveTimesheet() {
         );
 
 
-        alert(
-            error.message
-        );
+        alert(error.message);
 
     }
 
 }
 
 
-
 /* =====================================================
-   LOAD
+   LOAD TIMESHEETS
 ===================================================== */
 
 async function loadTimesheets() {
@@ -1710,8 +1339,7 @@ async function loadTimesheets() {
                 `${API_BASE}/timesheets`,
                 {
 
-                    method:
-                        "GET",
+                    method: "GET",
 
                     headers: {
 
@@ -1735,9 +1363,7 @@ async function loadTimesheets() {
             await response.json();
 
 
-        if (
-            !response.ok
-        ) {
+        if (!response.ok) {
 
             throw new Error(
                 result.message ||
@@ -1749,12 +1375,11 @@ async function loadTimesheets() {
 
         renderTimesheets(
             result.timesheets ||
+            result.data ||
             []
         );
 
     }
-
-
     catch (error) {
 
         console.error(
@@ -1767,10 +1392,12 @@ async function loadTimesheets() {
 
             <tr>
 
-                <td colspan="7">
-
+                <td
+                    colspan="7"
+                    class="table-error"
+                >
+                    <i class="fa-solid fa-triangle-exclamation"></i>
                     Failed to load timesheets.
-
                 </td>
 
             </tr>
@@ -1782,14 +1409,11 @@ async function loadTimesheets() {
 }
 
 
-
 /* =====================================================
    RENDER
 ===================================================== */
 
-function renderTimesheets(
-    records
-) {
+function renderTimesheets(records) {
 
     const table =
         document.getElementById(
@@ -1800,21 +1424,29 @@ function renderTimesheets(
     if (!table) return;
 
 
-    table.innerHTML =
-        "";
+    table.innerHTML = "";
 
 
-    if (
-        records.length === 0
-    ) {
+    if (!records.length) {
 
         table.innerHTML = `
 
             <tr>
 
-                <td colspan="7">
+                <td
+                    colspan="7"
+                    class="empty-state"
+                >
 
-                    No timesheet records found.
+                    <i class="fa-regular fa-calendar-xmark"></i>
+
+                    <strong>
+                        No timesheet records
+                    </strong>
+
+                    <span>
+                        Saved employee timesheets will appear here.
+                    </span>
 
                 </td>
 
@@ -1827,175 +1459,187 @@ function renderTimesheets(
     }
 
 
-    records.forEach(
-        (record) => {
+    records.forEach(record => {
 
-            const row =
-                document.createElement(
-                    "tr"
-                );
+        const row =
+            document.createElement("tr");
 
 
-            const employee =
-                record.employee ||
-                {};
+        const employee =
+            record.employee || {};
 
 
-            const employeeId =
-                employee.employeeId ||
-                "";
+        const employeeId =
+            employee.employeeId ||
+            employee.empId ||
+            "";
 
 
-            const employeeName =
-                employee.name ||
-                "Unknown";
+        const employeeName =
+            employee.name ||
+            employee.fullName ||
+            "Unknown";
 
 
-            const employeeDisplay =
-                employeeId
-                    ? `${employeeId}-${employeeName}`
-                    : employeeName;
+        const employeeDisplay =
+            employeeId
+                ? `${employeeId} - ${employeeName}`
+                : employeeName;
 
 
-            const tasks =
-                Array.isArray(
-                    record.tasks
-                )
-                    ? record.tasks
-                    : [];
+        const tasks =
+            Array.isArray(record.tasks)
+                ? record.tasks
+                : [];
 
 
-            const taskHtml =
-                tasks.length
-                    ? tasks
-                        .map(
-                            (
-                                task,
-                                index
-                            ) =>
-                                `
-                                <div class="report-task">
-                                    ${index + 1}.
-                                    ${escapeHtml(
-                                        task.taskName ||
-                                        ""
-                                    )}
-                                </div>
-                                `
-                        )
-                        .join("")
-                    : "-";
+        const taskHtml =
+            tasks.length
+                ? tasks.map(
+                    (task, index) => `
+                        <div class="record-task">
+                            <span>${index + 1}.</span>
+                            ${escapeHtml(
+                                task.taskName || ""
+                            )}
+                        </div>
+                    `
+                ).join("")
+                : "-";
 
 
-            const officeHours =
-                record.officeHours ||
-                "0h 0m";
+        const officeHours =
+            record.officeHours ||
+            formatDuration(
+                record.officeMinutes || 0
+            );
 
 
-            const workingHours =
-                record.workingHours ||
-                "0h 0m";
+        const workingHours =
+            record.workingHours ||
+            formatDuration(
+                record.workingMinutes || 0
+            );
 
 
-            const lunchHours =
-                record.lunchHours ||
-                "0h 0m";
+        const lunchHours =
+            record.lunchHours ||
+            formatDuration(
+                record.lunchMinutes || 0
+            );
 
 
-            row.innerHTML = `
+        row.innerHTML = `
 
-                <td>
-                    ${escapeHtml(
-                        employeeDisplay
-                    )}
-                </td>
+            <td>
 
+                <div class="employee-cell">
 
-                <td>
-                    ${formatDate(
-                        record.date
-                    )}
-                </td>
+                    <div class="employee-avatar">
+                        ${escapeHtml(
+                            employeeName
+                                .charAt(0)
+                                .toUpperCase()
+                        )}
+                    </div>
 
-
-                <td>
-
-                    <div class="task-list">
-
-                        ${taskHtml}
+                    <div>
+                        <strong>
+                            ${escapeHtml(
+                                employeeDisplay
+                            )}
+                        </strong>
 
                     </div>
 
-                </td>
+                </div>
+
+            </td>
 
 
-                <td>
-                    ${escapeHtml(
-                        officeHours
-                    )}
-                </td>
+            <td>
+
+                <span class="date-badge">
+                    ${formatDate(record.date)}
+                </span>
+
+            </td>
 
 
-                <td>
-                    ${escapeHtml(
-                        workingHours
-                    )}
-                </td>
+            <td>
+
+                <div class="record-tasks">
+
+                    ${taskHtml}
+
+                </div>
+
+            </td>
 
 
-                <td>
-                    ${escapeHtml(
-                        lunchHours
-                    )}
-                </td>
+            <td>
+                <span class="hours-badge">
+                    ${escapeHtml(officeHours)}
+                </span>
+            </td>
 
 
-                <td>
+            <td>
+                <span class="hours-badge working">
+                    ${escapeHtml(workingHours)}
+                </span>
+            </td>
+
+
+            <td>
+                <span class="hours-badge lunch">
+                    ${escapeHtml(lunchHours)}
+                </span>
+            </td>
+
+
+            <td>
+
+                <div class="record-actions">
 
                     <button
                         type="button"
-                        class="edit-btn"
+                        class="record-action edit-action"
                         onclick="editTimesheet('${record._id}')"
+                        title="Edit"
                     >
-
                         <i class="fa-solid fa-pen"></i>
-
                     </button>
 
 
                     <button
                         type="button"
-                        class="delete-btn"
+                        class="record-action delete-action"
                         onclick="deleteTimesheet('${record._id}')"
+                        title="Delete"
                     >
-
                         <i class="fa-solid fa-trash"></i>
-
                     </button>
 
-                </td>
+                </div>
 
-            `;
+            </td>
+
+        `;
 
 
-            table.appendChild(
-                row
-            );
+        table.appendChild(row);
 
-        }
-    );
+    });
 
 }
-
 
 
 /* =====================================================
    EDIT
 ===================================================== */
 
-async function editTimesheet(
-    id
-) {
+async function editTimesheet(id) {
 
     try {
 
@@ -2008,8 +1652,7 @@ async function editTimesheet(
                 `${API_BASE}/timesheets/${id}`,
                 {
 
-                    method:
-                        "GET",
+                    method: "GET",
 
                     headers: {
 
@@ -2033,9 +1676,7 @@ async function editTimesheet(
             await response.json();
 
 
-        if (
-            !response.ok
-        ) {
+        if (!response.ok) {
 
             throw new Error(
                 result.message ||
@@ -2046,19 +1687,33 @@ async function editTimesheet(
 
 
         const record =
-            result.timesheet;
+            result.timesheet ||
+            result.data;
+
+
+        if (!record) {
+
+            throw new Error(
+                "Timesheet record not found."
+            );
+
+        }
 
 
         editingId =
             record._id;
 
 
-        document.getElementById(
-            "employeeName"
-        ).value =
+        const employeeValue =
             record.employee?._id ||
             record.employee ||
             "";
+
+
+        document.getElementById(
+            "employeeName"
+        ).value =
+            employeeValue;
 
 
         document.getElementById(
@@ -2072,44 +1727,31 @@ async function editTimesheet(
         document.getElementById(
             "checkIn"
         ).value =
-            record.checkIn ||
-            "";
+            record.checkIn || "";
 
 
         document.getElementById(
             "lunchStart"
         ).value =
-            record.lunchStart ||
-            "";
+            record.lunchStart || "";
 
 
         document.getElementById(
             "lunchEnd"
         ).value =
-            record.lunchEnd ||
-            "";
+            record.lunchEnd || "";
 
 
         document.getElementById(
             "checkOut"
         ).value =
-            record.checkOut ||
-            "";
+            record.checkOut || "";
 
 
-        const comments =
-            document.getElementById(
-                "comments"
-            );
-
-
-        if (comments) {
-
-            comments.value =
-                record.comments ||
-                "";
-
-        }
+        document.getElementById(
+            "comments"
+        ).value =
+            record.comments || "";
 
 
         const container =
@@ -2118,60 +1760,44 @@ async function editTimesheet(
             );
 
 
-        container.innerHTML =
-            "";
+        container.innerHTML = "";
 
 
         const tasks =
-            Array.isArray(
-                record.tasks
-            )
+            Array.isArray(record.tasks)
                 ? record.tasks
                 : [];
 
 
-        if (
-            tasks.length === 0
-        ) {
+        if (!tasks.length) {
 
             addProjectCard();
 
         }
-
-
         else {
 
-            tasks.forEach(
-                (task) => {
+            tasks.forEach(task => {
 
-                    addProjectCard(
-                        task.taskName ||
-                        ""
-                    );
+                addProjectCard(
+                    task.taskName || ""
+                );
 
-                }
-            );
+            });
 
         }
 
 
         calculateWorkingHours();
 
-
         toggleUpdateButton();
 
 
         window.scrollTo({
-
             top: 0,
-
             behavior: "smooth"
-
         });
 
     }
-
-
     catch (error) {
 
         console.error(
@@ -2180,14 +1806,11 @@ async function editTimesheet(
         );
 
 
-        alert(
-            error.message
-        );
+        alert(error.message);
 
     }
 
 }
-
 
 
 /* =====================================================
@@ -2196,20 +1819,12 @@ async function editTimesheet(
 
 async function updateTimesheet() {
 
-    if (!editingId) {
-
+    if (!editingId)
         return;
 
-    }
 
-
-    if (
-        !validateForm()
-    ) {
-
+    if (!validateForm())
         return;
-
-    }
 
 
     const data =
@@ -2227,8 +1842,7 @@ async function updateTimesheet() {
                 `${API_BASE}/timesheets/${editingId}`,
                 {
 
-                    method:
-                        "PUT",
+                    method: "PUT",
 
                     headers: {
 
@@ -2245,9 +1859,7 @@ async function updateTimesheet() {
                     },
 
                     body:
-                        JSON.stringify(
-                            data
-                        )
+                        JSON.stringify(data)
 
                 }
             );
@@ -2257,9 +1869,7 @@ async function updateTimesheet() {
             await response.json();
 
 
-        if (
-            !response.ok
-        ) {
+        if (!response.ok) {
 
             throw new Error(
                 result.message ||
@@ -2274,18 +1884,13 @@ async function updateTimesheet() {
         );
 
 
-        editingId =
-            null;
-
+        editingId = null;
 
         resetForm();
-
 
         await loadTimesheets();
 
     }
-
-
     catch (error) {
 
         console.error(
@@ -2294,23 +1899,18 @@ async function updateTimesheet() {
         );
 
 
-        alert(
-            error.message
-        );
+        alert(error.message);
 
     }
 
 }
 
 
-
 /* =====================================================
    DELETE
 ===================================================== */
 
-async function deleteTimesheet(
-    id
-) {
+async function deleteTimesheet(id) {
 
     if (
         !confirm(
@@ -2334,8 +1934,7 @@ async function deleteTimesheet(
                 `${API_BASE}/timesheets/${id}`,
                 {
 
-                    method:
-                        "DELETE",
+                    method: "DELETE",
 
                     headers: {
 
@@ -2359,9 +1958,7 @@ async function deleteTimesheet(
             await response.json();
 
 
-        if (
-            !response.ok
-        ) {
+        if (!response.ok) {
 
             throw new Error(
                 result.message ||
@@ -2379,8 +1976,6 @@ async function deleteTimesheet(
         await loadTimesheets();
 
     }
-
-
     catch (error) {
 
         console.error(
@@ -2389,14 +1984,11 @@ async function deleteTimesheet(
         );
 
 
-        alert(
-            error.message
-        );
+        alert(error.message);
 
     }
 
 }
-
 
 
 /* =====================================================
@@ -2405,8 +1997,7 @@ async function deleteTimesheet(
 
 function resetForm() {
 
-    editingId =
-        null;
+    editingId = null;
 
 
     [
@@ -2415,40 +2006,37 @@ function resetForm() {
         "lunchEnd",
         "checkOut",
         "comments"
-    ]
-    .forEach(
-        (id) => {
+    ].forEach(id => {
 
-            const element =
-                document.getElementById(
-                    id
-                );
+        const element =
+            document.getElementById(id);
 
+        if (element)
+            element.value = "";
 
-            if (element) {
-
-                element.value =
-                    "";
-
-            }
-
-        }
-    );
+    });
 
 
     setTodayDate();
 
 
+    const employee =
+        document.getElementById(
+            "employeeName"
+        );
+
+
+    if (employee)
+        employee.value = "";
+
+
     setupDefaultTask();
 
-
     calculateWorkingHours();
-
 
     toggleUpdateButton();
 
 }
-
 
 
 /* =====================================================
@@ -2458,15 +2046,11 @@ function resetForm() {
 function toggleUpdateButton() {
 
     const saveBtn =
-        document.getElementById(
-            "saveBtn"
-        );
+        document.getElementById("saveBtn");
 
 
     const updateBtn =
-        document.getElementById(
-            "updateBtn"
-        );
+        document.getElementById("updateBtn");
 
 
     if (editingId) {
@@ -2481,8 +2065,6 @@ function toggleUpdateButton() {
                 "inline-flex";
 
     }
-
-
     else {
 
         if (saveBtn)
@@ -2499,20 +2081,14 @@ function toggleUpdateButton() {
 }
 
 
-
 /* =====================================================
    DATE FORMAT
 ===================================================== */
 
-function formatDate(
-    value
-) {
+function formatDate(value) {
 
-    if (!value) {
-
+    if (!value)
         return "-";
-
-    }
 
 
     const date =
@@ -2533,33 +2109,23 @@ function formatDate(
     return date.toLocaleDateString(
         "en-IN",
         {
-
             day: "2-digit",
-
-            month: "2-digit",
-
+            month: "short",
             year: "numeric"
-
         }
     );
 
 }
 
 
-
 /* =====================================================
    INPUT DATE
 ===================================================== */
 
-function formatInputDate(
-    value
-) {
+function formatInputDate(value) {
 
-    if (!value) {
-
+    if (!value)
         return "";
-
-    }
 
 
     const date =
@@ -2582,70 +2148,39 @@ function formatInputDate(
 
 
     const month =
-        String(
-            date.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
+        String(date.getMonth() + 1)
+            .padStart(2, "0");
 
 
     const day =
-        String(
-            date.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
+        String(date.getDate())
+            .padStart(2, "0");
 
 
-    return (
-        `${year}-${month}-${day}`
-    );
+    return `${year}-${month}-${day}`;
 
 }
-
 
 
 /* =====================================================
    ESCAPE HTML
 ===================================================== */
 
-function escapeHtml(
-    value
-) {
+function escapeHtml(value) {
 
-    return String(
-        value ?? ""
-    )
+    return String(value ?? "")
 
-    .replace(
-        /&/g,
-        "&amp;"
-    )
+        .replace(/&/g, "&amp;")
 
-    .replace(
-        /</g,
-        "&lt;"
-    )
+        .replace(/</g, "&lt;")
 
-    .replace(
-        />/g,
-        "&gt;"
-    )
+        .replace(/>/g, "&gt;")
 
-    .replace(
-        /"/g,
-        "&quot;"
-    )
+        .replace(/"/g, "&quot;")
 
-    .replace(
-        /'/g,
-        "&#039;"
-    );
+        .replace(/'/g, "&#039;");
 
 }
-
 
 
 /* =====================================================
@@ -2655,30 +2190,20 @@ function escapeHtml(
 window.addProjectCard =
     addProjectCard;
 
-
-window.removeTask =
-    removeTask;
-
-
 window.saveTimesheet =
     saveTimesheet;
-
 
 window.updateTimesheet =
     updateTimesheet;
 
-
 window.editTimesheet =
     editTimesheet;
-
 
 window.deleteTimesheet =
     deleteTimesheet;
 
-
 window.resetForm =
     resetForm;
-
 
 window.calculateWorkingHours =
     calculateWorkingHours;
