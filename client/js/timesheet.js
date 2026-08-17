@@ -1,7 +1,7 @@
 /* =====================================================
    THE D CUTS - DAILY TIMESHEET JS
    SINGLE TASK TEXTAREA VERSION
-   EMPLOYEE AUTO-SELECT VERSION
+   TIME ORDER VALIDATION REMOVED
 ===================================================== */
 
 
@@ -56,7 +56,6 @@ async function initializeTimesheet() {
     await loadTimesheets();
 
     toggleUpdateButton();
-
 }
 
 
@@ -86,7 +85,6 @@ function setTodayDate() {
 
     input.value =
         `${year}-${month}-${day}`;
-
 }
 
 
@@ -103,352 +101,6 @@ function getAuthToken() {
         sessionStorage.getItem("token") ||
         ""
     );
-
-}
-
-
-/* =====================================================
-   GET LOGGED-IN USER
-===================================================== */
-
-function getLoggedInUser() {
-
-    let user = null;
-
-
-    /*
-       Try loggedUser first
-    */
-
-    const loggedUserRaw =
-        localStorage.getItem("loggedUser") ||
-        sessionStorage.getItem("loggedUser");
-
-
-    if (loggedUserRaw) {
-
-        try {
-
-            user =
-                JSON.parse(loggedUserRaw);
-
-        }
-
-        catch {
-
-            user = {
-                name: loggedUserRaw
-            };
-
-        }
-
-    }
-
-
-    /*
-       Try currentUser
-    */
-
-    if (!user) {
-
-        const currentUserRaw =
-            localStorage.getItem("currentUser") ||
-            sessionStorage.getItem("currentUser");
-
-        if (currentUserRaw) {
-
-            try {
-
-                user =
-                    JSON.parse(currentUserRaw);
-
-            }
-
-            catch {
-
-                user = {
-                    name: currentUserRaw
-                };
-
-            }
-
-        }
-
-    }
-
-
-    /*
-       Try user
-    */
-
-    if (!user) {
-
-        const userRaw =
-            localStorage.getItem("user") ||
-            sessionStorage.getItem("user");
-
-        if (userRaw) {
-
-            try {
-
-                user =
-                    JSON.parse(userRaw);
-
-            }
-
-            catch {
-
-                user = {
-                    name: userRaw
-                };
-
-            }
-
-        }
-
-    }
-
-
-    /*
-       Individual localStorage values
-    */
-
-    if (!user) {
-
-        const name =
-            localStorage.getItem("userName") ||
-            localStorage.getItem("employeeName") ||
-            sessionStorage.getItem("userName") ||
-            sessionStorage.getItem("employeeName");
-
-
-        const email =
-            localStorage.getItem("email") ||
-            sessionStorage.getItem("email");
-
-
-        if (name || email) {
-
-            user = {
-                name: name || "",
-                email: email || ""
-            };
-
-        }
-
-    }
-
-
-    /*
-       Normalize string
-    */
-
-    if (typeof user === "string") {
-
-        user = {
-            name: user
-        };
-
-    }
-
-
-    return user || {};
-
-}
-
-
-/* =====================================================
-   GET LOGGED-IN EMPLOYEE NAME
-===================================================== */
-
-function getLoggedEmployeeName() {
-
-    const user =
-        getLoggedInUser();
-
-
-    return (
-        user.name ||
-        user.userName ||
-        user.employeeName ||
-        user.fullName ||
-        user.displayName ||
-        ""
-    ).trim();
-
-}
-
-
-/* =====================================================
-   GET LOGGED-IN EMPLOYEE EMAIL
-===================================================== */
-
-function getLoggedEmployeeEmail() {
-
-    const user =
-        getLoggedInUser();
-
-
-    return (
-        user.email ||
-        user.emailAddress ||
-        ""
-    ).trim();
-
-}
-
-
-/* =====================================================
-   FIND LOGGED-IN EMPLOYEE
-===================================================== */
-
-function findLoggedInEmployee(list) {
-
-    if (!Array.isArray(list)) {
-
-        return null;
-
-    }
-
-
-    const loggedName =
-        getLoggedEmployeeName()
-            .toLowerCase()
-            .trim();
-
-
-    const loggedEmail =
-        getLoggedEmployeeEmail()
-            .toLowerCase()
-            .trim();
-
-
-    if (!loggedName && !loggedEmail) {
-
-        return null;
-
-    }
-
-
-    /*
-       Match by email first
-    */
-
-    if (loggedEmail) {
-
-        const emailMatch =
-            list.find(
-                employee => {
-
-                    const employeeEmail =
-                        String(
-                            employee.email ||
-                            employee.emailAddress ||
-                            ""
-                        )
-                        .toLowerCase()
-                        .trim();
-
-                    return (
-                        employeeEmail &&
-                        employeeEmail === loggedEmail
-                    );
-
-                }
-            );
-
-
-        if (emailMatch) {
-
-            return emailMatch;
-
-        }
-
-    }
-
-
-    /*
-       Match by employee name
-    */
-
-    if (loggedName) {
-
-        const nameMatch =
-            list.find(
-                employee => {
-
-                    const employeeName =
-                        String(
-                            employee.name ||
-                            employee.fullName ||
-                            employee.userName ||
-                            ""
-                        )
-                        .toLowerCase()
-                        .trim();
-
-                    return (
-                        employeeName ===
-                        loggedName
-                    );
-
-                }
-            );
-
-
-        if (nameMatch) {
-
-            return nameMatch;
-
-        }
-
-    }
-
-
-    /*
-       Partial name match
-    */
-
-    if (loggedName) {
-
-        const partialMatch =
-            list.find(
-                employee => {
-
-                    const employeeName =
-                        String(
-                            employee.name ||
-                            employee.fullName ||
-                            employee.userName ||
-                            ""
-                        )
-                        .toLowerCase()
-                        .trim();
-
-                    return (
-                        employeeName.includes(
-                            loggedName
-                        ) ||
-                        loggedName.includes(
-                            employeeName
-                        )
-                    );
-
-                }
-            );
-
-
-        if (partialMatch) {
-
-            return partialMatch;
-
-        }
-
-    }
-
-
-    return null;
-
 }
 
 
@@ -459,49 +111,28 @@ function findLoggedInEmployee(list) {
 async function loadEmployees() {
 
     const select =
-        document.getElementById(
-            "employeeName"
-        );
-
+        document.getElementById("employeeName");
 
     if (!select) return;
 
-
-    const loggedName =
-        getLoggedEmployeeName();
-
-
-    const loggedEmail =
-        getLoggedEmployeeEmail();
-
-
-    /*
-       Always start with neutral option.
-       NEVER show "Unable to load employees".
-    */
-
-    select.innerHTML = `
-        <option value="">
-            Select Employee
-        </option>
-    `;
-
-
     try {
+
+        select.innerHTML = `
+            <option value="">
+                Loading employees...
+            </option>
+        `;
 
         const token =
             getAuthToken();
-
 
         const response =
             await fetch(
                 `${API_BASE}/employees`,
                 {
-
                     method: "GET",
 
                     headers: {
-
                         "Content-Type":
                             "application/json",
 
@@ -511,42 +142,24 @@ async function loadEmployees() {
                                     `Bearer ${token}`
                             }
                             : {})
-
                     }
-
                 }
             );
-
 
         if (!response.ok) {
 
             throw new Error(
-                `Employee API error: ${response.status}`
+                "Failed to load employees."
             );
-
         }
-
 
         const data =
             await response.json();
-
 
         employees =
             data.employees ||
             data.data ||
             [];
-
-
-        if (!Array.isArray(employees)) {
-
-            employees = [];
-
-        }
-
-
-        /*
-           Clear dropdown
-        */
 
         select.innerHTML = `
             <option value="">
@@ -554,161 +167,106 @@ async function loadEmployees() {
             </option>
         `;
 
-
-        /*
-           Add employees
-        */
-
         employees.forEach(
             (employee, index) => {
-
-                if (!employee) return;
-
 
                 const number =
                     employee.employeeId ||
                     String(index + 1)
                         .padStart(2, "0");
 
-
                 const option =
                     document.createElement(
                         "option"
                     );
 
-
                 option.value =
-                    employee._id ||
-                    employee.id ||
-                    "";
-
-
-                const employeeName =
-                    employee.name ||
-                    employee.fullName ||
-                    employee.userName ||
-                    "Unknown";
-
+                    employee._id;
 
                 option.textContent =
-                    `${number}-${employeeName}`;
-
-
-                option.dataset.name =
-                    employeeName;
-
-
-                option.dataset.email =
-                    employee.email ||
-                    "";
-
+                    `${number}-${employee.name || "Unknown"}`;
 
                 select.appendChild(
                     option
                 );
-
             }
         );
 
-
         /*
-           Find logged-in employee
-        */
+         * Employee login default selection
+         */
 
-        const loggedEmployee =
-            findLoggedInEmployee(
-                employees
-            );
+        const loggedUser =
+            localStorage.getItem("loggedUser");
 
+        const userName =
+            localStorage.getItem("userName");
 
-        if (loggedEmployee) {
+        let currentUser =
+            loggedUser ||
+            userName ||
+            "";
 
-            const loggedId =
-                loggedEmployee._id ||
-                loggedEmployee.id ||
-                "";
+        try {
 
+            if (
+                loggedUser &&
+                (
+                    loggedUser.startsWith("{") ||
+                    loggedUser.startsWith("[")
+                )
+            ) {
 
-            if (loggedId) {
+                const parsed =
+                    JSON.parse(loggedUser);
 
-                select.value =
-                    loggedId;
+                currentUser =
+                    parsed.name ||
+                    parsed.displayName ||
+                    parsed.email ||
+                    "";
 
             }
 
         }
+        catch (error) {
 
+            console.warn(
+                "Unable to parse loggedUser:",
+                error
+            );
 
-        /*
-           If API employee exists but
-           name matching fails, try direct
-           option name/email matching.
-        */
+        }
 
-        if (
-            !select.value &&
-            (loggedName || loggedEmail)
-        ) {
+        if (currentUser) {
 
-            const options =
-                Array.from(
-                    select.options
+            const normalizedUser =
+                String(currentUser)
+                    .trim()
+                    .toLowerCase();
+
+            const matchedEmployee =
+                employees.find(
+                    employee =>
+                        String(
+                            employee.name || ""
+                        )
+                        .trim()
+                        .toLowerCase()
+                        ===
+                        normalizedUser
                 );
 
-
-            const matchingOption =
-                options.find(
-                    option => {
-
-                        const optionName =
-                            String(
-                                option.dataset.name ||
-                                option.textContent ||
-                                ""
-                            )
-                            .toLowerCase()
-                            .trim();
-
-
-                        const optionEmail =
-                            String(
-                                option.dataset.email ||
-                                ""
-                            )
-                            .toLowerCase()
-                            .trim();
-
-
-                        return (
-                            (
-                                loggedName &&
-                                optionName.includes(
-                                    loggedName
-                                )
-                            )
-                            ||
-                            (
-                                loggedEmail &&
-                                optionEmail ===
-                                loggedEmail
-                            )
-                        );
-
-                    }
-                );
-
-
-            if (matchingOption) {
+            if (matchedEmployee) {
 
                 select.value =
-                    matchingOption.value;
+                    matchedEmployee._id;
 
             }
 
         }
 
     }
-
 
     catch (error) {
 
@@ -717,83 +275,37 @@ async function loadEmployees() {
             error
         );
 
-
         /*
-           IMPORTANT:
-           Do NOT show:
-           "Unable to load employees"
-        */
+         * Do NOT show
+         * "Unable to load employees"
+         * as an employee option.
+         */
 
-
-        select.innerHTML = "";
-
-
-        /*
-           If logged-in employee name
-           is available, show that employee
-           as fallback.
-        */
-
-        if (loggedName) {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                loggedName;
-
-
-            option.textContent =
-                loggedName;
-
-
-            option.selected =
-                true;
-
-
-            select.appendChild(
-                option
-            );
-
-        }
-
-
-        else {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                "";
-
-
-            option.textContent =
-                "Select Employee";
-
-
-            option.selected =
-                true;
-
-
-            select.appendChild(
-                option
-            );
-
-        }
-
+        select.innerHTML = `
+            <option value="">
+                Select Employee
+            </option>
+        `;
     }
-
 }
 
 
 /* =====================================================
    FLEXIBLE TIME PARSER
+=====================================================
+
+   ACCEPTS:
+
+   9
+   9.30
+   9:30
+   9 30
+   9:30 AM
+   9.30 AM
+   9 AM
+   6 PM
+   18:30
+   1830
 ===================================================== */
 
 function parseFlexibleTime(value) {
@@ -802,36 +314,24 @@ function parseFlexibleTime(value) {
         value === null ||
         value === undefined
     ) {
-
         return null;
-
     }
-
 
     let time =
         String(value)
             .trim()
             .toLowerCase();
 
-
     if (!time) {
-
         return null;
-
     }
-
 
     time =
         time
-            .replace(
-                /\s+/g,
-                " "
-            )
+            .replace(/\s+/g, " ")
             .trim();
 
-
     let period = null;
-
 
     if (
         /\b(am|a\.m\.)\b/i.test(time)
@@ -839,15 +339,12 @@ function parseFlexibleTime(value) {
 
         period = "AM";
 
-
         time =
             time.replace(
                 /\s*(a\.m\.|am)\s*/i,
                 ""
             );
-
     }
-
 
     else if (
         /\b(pm|p\.m\.)\b/i.test(time)
@@ -855,31 +352,33 @@ function parseFlexibleTime(value) {
 
         period = "PM";
 
-
         time =
             time.replace(
                 /\s*(p\.m\.|pm)\s*/i,
                 ""
             );
-
     }
-
 
     time =
         time.trim();
 
+
+    /* 0930 -> 09:30 */
 
     if (
         /^\d{4}$/.test(time)
     ) {
 
         time =
-            time.substring(0, 2) +
-            ":" +
+            time.substring(0, 2)
+            +
+            ":"
+            +
             time.substring(2);
-
     }
 
+
+    /* 930 -> 09:30 */
 
     else if (
         /^\d{3}$/.test(time)
@@ -888,14 +387,16 @@ function parseFlexibleTime(value) {
         time =
             "0" + time;
 
-
         time =
-            time.substring(0, 2) +
-            ":" +
+            time.substring(0, 2)
+            +
+            ":"
+            +
             time.substring(2);
-
     }
 
+
+    /* 9.30 / 9 30 */
 
     time =
         time.replace(
@@ -904,32 +405,29 @@ function parseFlexibleTime(value) {
         );
 
 
+    /* ONLY HOUR */
+
     if (
         /^\d{1,2}$/.test(time)
     ) {
 
         time =
             `${time}:00`;
-
     }
 
 
     const parts =
         time.split(":");
 
-
     if (
         parts.length !== 2
     ) {
-
         return null;
-
     }
 
 
     let hours =
         Number(parts[0]);
-
 
     let minutes =
         Number(parts[1]);
@@ -941,7 +439,6 @@ function parseFlexibleTime(value) {
     ) {
 
         return null;
-
     }
 
 
@@ -951,9 +448,10 @@ function parseFlexibleTime(value) {
     ) {
 
         return null;
-
     }
 
+
+    /* 12 HOUR */
 
     if (period) {
 
@@ -963,32 +461,33 @@ function parseFlexibleTime(value) {
         ) {
 
             return null;
-
         }
 
+        if (
+            period === "AM"
+        ) {
 
-        if (period === "AM") {
-
-            if (hours === 12) {
+            if (
+                hours === 12
+            ) {
 
                 hours = 0;
-
             }
-
         }
 
         else {
 
-            if (hours !== 12) {
+            if (
+                hours !== 12
+            ) {
 
                 hours += 12;
-
             }
-
         }
-
     }
 
+
+    /* 24 HOUR */
 
     else {
 
@@ -998,9 +497,7 @@ function parseFlexibleTime(value) {
         ) {
 
             return null;
-
         }
-
     }
 
 
@@ -1008,7 +505,6 @@ function parseFlexibleTime(value) {
         hours * 60 +
         minutes
     );
-
 }
 
 
@@ -1019,7 +515,6 @@ function parseFlexibleTime(value) {
 function timeToMinutes(value) {
 
     return parseFlexibleTime(value);
-
 }
 
 
@@ -1034,22 +529,25 @@ function formatDuration(totalMinutes) {
     ) {
 
         return "0h 0m";
-
     }
 
+    /*
+     * Keep calculation positive.
+     * Time order is NOT validated.
+     */
+
+    totalMinutes =
+        Math.abs(totalMinutes);
 
     const hours =
         Math.floor(
             totalMinutes / 60
         );
 
-
     const minutes =
         totalMinutes % 60;
 
-
     return `${hours}h ${minutes}m`;
-
 }
 
 
@@ -1066,37 +564,30 @@ function setupTimeCalculation() {
         "checkOut"
     ];
 
-
     fields.forEach(
-        id => {
+        (id) => {
 
             const input =
                 document.getElementById(id);
 
-
             if (!input) return;
-
 
             input.addEventListener(
                 "input",
                 calculateWorkingHours
             );
 
-
             input.addEventListener(
                 "change",
                 calculateWorkingHours
             );
 
-
             input.addEventListener(
                 "blur",
                 calculateWorkingHours
             );
-
         }
     );
-
 }
 
 
@@ -1111,18 +602,15 @@ function calculateWorkingHours() {
             "checkIn"
         )?.value;
 
-
     const lunchStart =
         document.getElementById(
             "lunchStart"
         )?.value;
 
-
     const lunchEnd =
         document.getElementById(
             "lunchEnd"
         )?.value;
-
 
     const checkOut =
         document.getElementById(
@@ -1135,18 +623,21 @@ function calculateWorkingHours() {
             "officeHours"
         );
 
-
     const lunchElement =
         document.getElementById(
             "lunchHours"
         );
-
 
     const workingElement =
         document.getElementById(
             "workingHours"
         );
 
+
+    /*
+     * If all fields are not entered yet,
+     * simply show zero.
+     */
 
     if (
         !checkIn ||
@@ -1155,38 +646,45 @@ function calculateWorkingHours() {
         !checkOut
     ) {
 
-        if (officeElement)
-            officeElement.textContent = "0h 0m";
+        if (officeElement) {
 
+            officeElement.textContent =
+                "0h 0m";
+        }
 
-        if (lunchElement)
-            lunchElement.textContent = "0h 0m";
+        if (lunchElement) {
 
+            lunchElement.textContent =
+                "0h 0m";
+        }
 
-        if (workingElement)
-            workingElement.textContent = "0h 0m";
+        if (workingElement) {
 
+            workingElement.textContent =
+                "0h 0m";
+        }
 
         return;
-
     }
 
 
     const inTime =
         parseFlexibleTime(checkIn);
 
-
     const lunchStartTime =
         parseFlexibleTime(lunchStart);
-
 
     const lunchEndTime =
         parseFlexibleTime(lunchEnd);
 
-
     const outTime =
         parseFlexibleTime(checkOut);
 
+
+    /*
+     * Invalid individual time format only.
+     * No time-order validation.
+     */
 
     if (
         inTime === null ||
@@ -1199,65 +697,38 @@ function calculateWorkingHours() {
 
             workingElement.textContent =
                 "Invalid time";
-
         }
 
         return;
-
     }
 
 
-    if (
-        lunchStartTime <= inTime
-    ) {
-
-        showTimeError(
-            "Lunch start must be after check-in."
-        );
-
-        return;
-
-    }
-
-
-    if (
-        lunchEndTime <= lunchStartTime
-    ) {
-
-        showTimeError(
-            "Lunch end must be after lunch start."
-        );
-
-        return;
-
-    }
-
-
-    if (
-        outTime <= lunchEndTime
-    ) {
-
-        showTimeError(
-            "Check-out must be after lunch end."
-        );
-
-        return;
-
-    }
-
+    /*
+     * Calculate directly.
+     *
+     * Check-in -> Check-out
+     * Lunch start -> Lunch end
+     *
+     * NO ORDER VALIDATION
+     */
 
     const officeMinutes =
-        outTime - inTime;
-
+        Math.abs(
+            outTime - inTime
+        );
 
     const lunchMinutes =
-        lunchEndTime -
-        lunchStartTime;
-
+        Math.abs(
+            lunchEndTime -
+            lunchStartTime
+        );
 
     const workingMinutes =
-        officeMinutes -
-        lunchMinutes;
+        Math.max(
+            0,
+            officeMinutes -
+            lunchMinutes
+        );
 
 
     if (officeElement) {
@@ -1266,9 +737,7 @@ function calculateWorkingHours() {
             formatDuration(
                 officeMinutes
             );
-
     }
-
 
     if (lunchElement) {
 
@@ -1276,9 +745,7 @@ function calculateWorkingHours() {
             formatDuration(
                 lunchMinutes
             );
-
     }
-
 
     if (workingElement) {
 
@@ -1286,9 +753,7 @@ function calculateWorkingHours() {
             formatDuration(
                 workingMinutes
             );
-
     }
-
 }
 
 
@@ -1303,14 +768,11 @@ function showTimeError(message) {
             "workingHours"
         );
 
-
     if (element) {
 
         element.textContent =
             message;
-
     }
-
 }
 
 
@@ -1325,37 +787,30 @@ function setupTaskInputEvents() {
             "taskInput"
         );
 
-
     if (
         !taskInput ||
         taskEventsReady
     ) {
 
         return;
-
     }
 
-
     taskEventsReady = true;
-
 
     taskInput.addEventListener(
         "input",
         updateTaskCount
     );
 
-
     taskInput.addEventListener(
         "keyup",
         updateTaskCount
     );
 
-
     taskInput.addEventListener(
         "change",
         updateTaskCount
     );
-
 }
 
 
@@ -1370,12 +825,10 @@ function updateTaskCount() {
             "taskInput"
         );
 
-
     const taskCount =
         document.getElementById(
             "taskCount"
         );
-
 
     if (
         !taskInput ||
@@ -1383,28 +836,25 @@ function updateTaskCount() {
     ) {
 
         return;
-
     }
-
 
     const tasks =
         taskInput.value
             .split(/\r?\n/)
             .map(
-                task => task.trim()
+                task =>
+                    task.trim()
             )
             .filter(
-                task => task.length > 0
+                task =>
+                    task.length > 0
             );
-
 
     const count =
         tasks.length;
 
-
     taskCount.textContent =
         `${count} ${count === 1 ? "Task" : "Tasks"}`;
-
 }
 
 
@@ -1419,31 +869,28 @@ function getTasks() {
             "taskInput"
         );
 
-
     if (!taskInput) {
 
         return [];
-
     }
-
 
     const lines =
         taskInput.value
             .split(/\r?\n/)
             .map(
-                task => task.trim()
+                task =>
+                    task.trim()
             )
             .filter(
-                task => task.length > 0
+                task =>
+                    task.length > 0
             );
-
 
     return lines.map(
         task => ({
             taskName: task
         })
     );
-
 }
 
 
@@ -1458,26 +905,22 @@ function setTasks(tasks) {
             "taskInput"
         );
 
-
     if (!taskInput) {
 
         return;
-
     }
-
 
     if (
         !Array.isArray(tasks)
     ) {
 
-        taskInput.value = "";
+        taskInput.value =
+            "";
 
         updateTaskCount();
 
         return;
-
     }
-
 
     taskInput.value =
         tasks
@@ -1489,9 +932,7 @@ function setTasks(tasks) {
                     ) {
 
                         return task;
-
                     }
-
 
                     return (
                         task.taskName ||
@@ -1499,7 +940,6 @@ function setTasks(tasks) {
                         task.title ||
                         ""
                     );
-
                 }
             )
             .filter(
@@ -1508,9 +948,7 @@ function setTasks(tasks) {
             )
             .join("\n");
 
-
     updateTaskCount();
-
 }
 
 
@@ -1526,17 +964,13 @@ function validateTimeInput(
     const input =
         document.getElementById(id);
 
-
     if (!input) {
 
         return null;
-
     }
-
 
     const value =
         input.value.trim();
-
 
     if (!value) {
 
@@ -1544,18 +978,13 @@ function validateTimeInput(
             `${label} time is mandatory.`
         );
 
-
         input.focus();
 
-
         return null;
-
     }
-
 
     const parsed =
         parseFlexibleTime(value);
-
 
     if (
         parsed === null
@@ -1565,17 +994,12 @@ function validateTimeInput(
             `${label} time is invalid.\n\nAccepted examples:\n9\n9.30\n9:30\n9:30 AM\n9 PM\n18:30\n1830`
         );
 
-
         input.focus();
 
-
         return null;
-
     }
 
-
     return parsed;
-
 }
 
 
@@ -1590,12 +1014,10 @@ function validateForm() {
             "employeeName"
         )?.value;
 
-
     const date =
         document.getElementById(
             "date"
         )?.value;
-
 
     const tasks =
         getTasks();
@@ -1608,7 +1030,6 @@ function validateForm() {
         );
 
         return false;
-
     }
 
 
@@ -1619,9 +1040,15 @@ function validateForm() {
         );
 
         return false;
-
     }
 
+
+    /*
+     * Only check whether each time is valid.
+     *
+     * IMPORTANT:
+     * No comparison between times.
+     */
 
     const inTime =
         validateTimeInput(
@@ -1629,13 +1056,11 @@ function validateForm() {
             "Check-in"
         );
 
-
     if (
         inTime === null
     ) {
 
         return false;
-
     }
 
 
@@ -1645,13 +1070,11 @@ function validateForm() {
             "Lunch Start"
         );
 
-
     if (
         lunchStartTime === null
     ) {
 
         return false;
-
     }
 
 
@@ -1661,13 +1084,11 @@ function validateForm() {
             "Lunch End"
         );
 
-
     if (
         lunchEndTime === null
     ) {
 
         return false;
-
     }
 
 
@@ -1677,13 +1098,11 @@ function validateForm() {
             "Check-out"
         );
 
-
     if (
         outTime === null
     ) {
 
         return false;
-
     }
 
 
@@ -1695,60 +1114,28 @@ function validateForm() {
             "Please enter at least one task."
         );
 
-
-        document
-            .getElementById(
+        const taskInput =
+            document.getElementById(
                 "taskInput"
-            )
-            ?.focus();
+            );
 
+        taskInput?.focus();
 
         return false;
-
     }
 
 
-    if (
-        lunchStartTime <= inTime
-    ) {
-
-        alert(
-            "Lunch start must be after check-in."
-        );
-
-        return false;
-
-    }
-
-
-    if (
-        lunchEndTime <= lunchStartTime
-    ) {
-
-        alert(
-            "Lunch end must be after lunch start."
-        );
-
-        return false;
-
-    }
-
-
-    if (
-        outTime <= lunchEndTime
-    ) {
-
-        alert(
-            "Check-out must be after lunch end."
-        );
-
-        return false;
-
-    }
-
+    /*
+     * NO TIME ORDER VALIDATION HERE.
+     *
+     * Removed:
+     *
+     * lunchStartTime <= inTime
+     * lunchEndTime <= lunchStartTime
+     * outTime <= lunchEndTime
+     */
 
     return true;
-
 }
 
 
@@ -1763,42 +1150,35 @@ function collectFormData() {
             "employeeName"
         ).value;
 
-
     const date =
         document.getElementById(
             "date"
         ).value;
-
 
     const checkIn =
         document.getElementById(
             "checkIn"
         ).value.trim();
 
-
     const lunchStart =
         document.getElementById(
             "lunchStart"
         ).value.trim();
-
 
     const lunchEnd =
         document.getElementById(
             "lunchEnd"
         ).value.trim();
 
-
     const checkOut =
         document.getElementById(
             "checkOut"
         ).value.trim();
 
-
     const comments =
         document.getElementById(
             "comments"
         )?.value || "";
-
 
     const tasks =
         getTasks();
@@ -1807,31 +1187,38 @@ function collectFormData() {
     const inTime =
         parseFlexibleTime(checkIn);
 
-
     const lunchStartTime =
         parseFlexibleTime(lunchStart);
 
-
     const lunchEndTime =
         parseFlexibleTime(lunchEnd);
-
 
     const outTime =
         parseFlexibleTime(checkOut);
 
 
-    const officeMinutes =
-        outTime - inTime;
+    /*
+     * Calculate without checking order.
+     */
 
+    const officeMinutes =
+        Math.abs(
+            outTime -
+            inTime
+        );
 
     const lunchMinutes =
-        lunchEndTime -
-        lunchStartTime;
-
+        Math.abs(
+            lunchEndTime -
+            lunchStartTime
+        );
 
     const workingMinutes =
-        officeMinutes -
-        lunchMinutes;
+        Math.max(
+            0,
+            officeMinutes -
+            lunchMinutes
+        );
 
 
     return {
@@ -1872,9 +1259,7 @@ function collectFormData() {
         tasks,
 
         comments
-
     };
-
 }
 
 
@@ -1889,26 +1274,23 @@ async function saveTimesheet() {
     ) {
 
         return;
-
     }
-
 
     const data =
         collectFormData();
-
 
     try {
 
         const token =
             getAuthToken();
 
-
         const response =
             await fetch(
                 `${API_BASE}/timesheets`,
                 {
 
-                    method: "POST",
+                    method:
+                        "POST",
 
                     headers: {
 
@@ -1921,19 +1303,17 @@ async function saveTimesheet() {
                                     `Bearer ${token}`
                             }
                             : {})
-
                     },
 
                     body:
-                        JSON.stringify(data)
-
+                        JSON.stringify(
+                            data
+                        )
                 }
             );
 
-
         const result =
             await response.json();
-
 
         if (
             !response.ok
@@ -1943,21 +1323,17 @@ async function saveTimesheet() {
                 result.message ||
                 "Failed to save timesheet."
             );
-
         }
-
 
         alert(
             "Timesheet saved successfully."
         );
-
 
         resetForm();
 
         await loadTimesheets();
 
     }
-
 
     catch (error) {
 
@@ -1966,13 +1342,10 @@ async function saveTimesheet() {
             error
         );
 
-
         alert(
             error.message
         );
-
     }
-
 }
 
 
@@ -1987,22 +1360,20 @@ async function loadTimesheets() {
             "timesheetTable"
         );
 
-
     if (!table) return;
-
 
     try {
 
         const token =
             getAuthToken();
 
-
         const response =
             await fetch(
                 `${API_BASE}/timesheets`,
                 {
 
-                    method: "GET",
+                    method:
+                        "GET",
 
                     headers: {
 
@@ -2015,16 +1386,12 @@ async function loadTimesheets() {
                                     `Bearer ${token}`
                             }
                             : {})
-
                     }
-
                 }
             );
 
-
         const result =
             await response.json();
-
 
         if (
             !response.ok
@@ -2034,9 +1401,7 @@ async function loadTimesheets() {
                 result.message ||
                 "Failed to load timesheets."
             );
-
         }
-
 
         renderTimesheets(
             result.timesheets ||
@@ -2045,14 +1410,12 @@ async function loadTimesheets() {
 
     }
 
-
     catch (error) {
 
         console.error(
             "LOAD TIMESHEETS ERROR:",
             error
         );
-
 
         table.innerHTML = `
 
@@ -2070,9 +1433,7 @@ async function loadTimesheets() {
             </tr>
 
         `;
-
     }
-
 }
 
 
@@ -2087,12 +1448,9 @@ function renderTimesheets(records) {
             "timesheetTable"
         );
 
-
     if (!table) return;
 
-
     table.innerHTML = "";
-
 
     if (
         records.length === 0
@@ -2116,33 +1474,28 @@ function renderTimesheets(records) {
         `;
 
         return;
-
     }
 
 
     records.forEach(
-        record => {
+        (record) => {
 
             const row =
                 document.createElement(
                     "tr"
                 );
 
-
             const employee =
                 record.employee ||
                 {};
-
 
             const employeeId =
                 employee.employeeId ||
                 "";
 
-
             const employeeName =
                 employee.name ||
                 "Unknown";
-
 
             const employeeDisplay =
                 employeeId
@@ -2160,6 +1513,7 @@ function renderTimesheets(records) {
 
             const taskHtml =
                 tasks.length
+
                     ? tasks
                         .map(
                             (
@@ -2180,6 +1534,7 @@ function renderTimesheets(records) {
                             `
                         )
                         .join("")
+
                     : "-";
 
 
@@ -2187,11 +1542,9 @@ function renderTimesheets(records) {
                 record.officeHours ||
                 "0h 0m";
 
-
             const workingHours =
                 record.workingHours ||
                 "0h 0m";
-
 
             const lunchHours =
                 record.lunchHours ||
@@ -2201,16 +1554,22 @@ function renderTimesheets(records) {
             row.innerHTML = `
 
                 <td>
+
                     ${escapeHtml(
                         employeeDisplay
                     )}
+
                 </td>
 
+
                 <td>
+
                     ${formatDate(
                         record.date
                     )}
+
                 </td>
+
 
                 <td>
 
@@ -2222,23 +1581,33 @@ function renderTimesheets(records) {
 
                 </td>
 
+
                 <td>
+
                     ${escapeHtml(
                         officeHours
                     )}
+
                 </td>
 
+
                 <td>
+
                     ${escapeHtml(
                         workingHours
                     )}
+
                 </td>
 
+
                 <td>
+
                     ${escapeHtml(
                         lunchHours
                     )}
+
                 </td>
+
 
                 <td>
 
@@ -2273,12 +1642,10 @@ function renderTimesheets(records) {
 
             `;
 
-
             table.appendChild(row);
 
         }
     );
-
 }
 
 
@@ -2293,13 +1660,13 @@ async function editTimesheet(id) {
         const token =
             getAuthToken();
 
-
         const response =
             await fetch(
                 `${API_BASE}/timesheets/${id}`,
                 {
 
-                    method: "GET",
+                    method:
+                        "GET",
 
                     headers: {
 
@@ -2312,16 +1679,12 @@ async function editTimesheet(id) {
                                     `Bearer ${token}`
                             }
                             : {})
-
                     }
-
                 }
             );
 
-
         const result =
             await response.json();
-
 
         if (
             !response.ok
@@ -2331,33 +1694,26 @@ async function editTimesheet(id) {
                 result.message ||
                 "Failed to load timesheet."
             );
-
         }
-
 
         const record =
             result.timesheet;
-
 
         editingId =
             record._id;
 
 
-        const employeeSelect =
-            document.getElementById(
-                "employeeName"
-            );
+        /* EMPLOYEE */
+
+        document.getElementById(
+            "employeeName"
+        ).value =
+            record.employee?._id ||
+            record.employee ||
+            "";
 
 
-        if (employeeSelect) {
-
-            employeeSelect.value =
-                record.employee?._id ||
-                record.employee ||
-                "";
-
-        }
-
+        /* DATE */
 
         document.getElementById(
             "date"
@@ -2367,43 +1723,58 @@ async function editTimesheet(id) {
             );
 
 
+        /* CHECK IN */
+
         document.getElementById(
             "checkIn"
         ).value =
-            record.checkIn || "";
+            record.checkIn ||
+            "";
 
+
+        /* LUNCH START */
 
         document.getElementById(
             "lunchStart"
         ).value =
-            record.lunchStart || "";
+            record.lunchStart ||
+            "";
 
+
+        /* LUNCH END */
 
         document.getElementById(
             "lunchEnd"
         ).value =
-            record.lunchEnd || "";
+            record.lunchEnd ||
+            "";
 
+
+        /* CHECK OUT */
 
         document.getElementById(
             "checkOut"
         ).value =
-            record.checkOut || "";
+            record.checkOut ||
+            "";
 
+
+        /* COMMENTS */
 
         const comments =
             document.getElementById(
                 "comments"
             );
 
-
         if (comments) {
 
             comments.value =
-                record.comments || "";
-
+                record.comments ||
+                "";
         }
 
+
+        /* TASKS */
 
         const tasks =
             Array.isArray(
@@ -2412,9 +1783,7 @@ async function editTimesheet(id) {
                 ? record.tasks
                 : [];
 
-
         setTasks(tasks);
-
 
         calculateWorkingHours();
 
@@ -2422,15 +1791,11 @@ async function editTimesheet(id) {
 
 
         window.scrollTo({
-
             top: 0,
-
             behavior: "smooth"
-
         });
 
     }
-
 
     catch (error) {
 
@@ -2439,13 +1804,10 @@ async function editTimesheet(id) {
             error
         );
 
-
         alert(
             error.message
         );
-
     }
-
 }
 
 
@@ -2458,35 +1820,30 @@ async function updateTimesheet() {
     if (!editingId) {
 
         return;
-
     }
-
 
     if (
         !validateForm()
     ) {
 
         return;
-
     }
-
 
     const data =
         collectFormData();
-
 
     try {
 
         const token =
             getAuthToken();
 
-
         const response =
             await fetch(
                 `${API_BASE}/timesheets/${editingId}`,
                 {
 
-                    method: "PUT",
+                    method:
+                        "PUT",
 
                     headers: {
 
@@ -2499,19 +1856,17 @@ async function updateTimesheet() {
                                     `Bearer ${token}`
                             }
                             : {})
-
                     },
 
                     body:
-                        JSON.stringify(data)
-
+                        JSON.stringify(
+                            data
+                        )
                 }
             );
 
-
         const result =
             await response.json();
-
 
         if (
             !response.ok
@@ -2521,25 +1876,20 @@ async function updateTimesheet() {
                 result.message ||
                 "Failed to update timesheet."
             );
-
         }
-
 
         alert(
             "Timesheet updated successfully."
         );
 
-
         editingId =
             null;
-
 
         resetForm();
 
         await loadTimesheets();
 
     }
-
 
     catch (error) {
 
@@ -2548,13 +1898,10 @@ async function updateTimesheet() {
             error
         );
 
-
         alert(
             error.message
         );
-
     }
-
 }
 
 
@@ -2571,22 +1918,20 @@ async function deleteTimesheet(id) {
     ) {
 
         return;
-
     }
-
 
     try {
 
         const token =
             getAuthToken();
 
-
         const response =
             await fetch(
                 `${API_BASE}/timesheets/${id}`,
                 {
 
-                    method: "DELETE",
+                    method:
+                        "DELETE",
 
                     headers: {
 
@@ -2599,16 +1944,12 @@ async function deleteTimesheet(id) {
                                     `Bearer ${token}`
                             }
                             : {})
-
                     }
-
                 }
             );
 
-
         const result =
             await response.json();
-
 
         if (
             !response.ok
@@ -2618,19 +1959,15 @@ async function deleteTimesheet(id) {
                 result.message ||
                 "Failed to delete timesheet."
             );
-
         }
-
 
         alert(
             "Timesheet deleted successfully."
         );
 
-
         await loadTimesheets();
 
     }
-
 
     catch (error) {
 
@@ -2639,13 +1976,10 @@ async function deleteTimesheet(id) {
             error
         );
 
-
         alert(
             error.message
         );
-
     }
-
 }
 
 
@@ -2658,7 +1992,6 @@ function resetForm() {
     editingId =
         null;
 
-
     [
         "checkIn",
         "lunchStart",
@@ -2667,18 +2000,16 @@ function resetForm() {
         "comments"
     ]
     .forEach(
-        id => {
+        (id) => {
 
             const element =
                 document.getElementById(id);
 
-
             if (element) {
 
-                element.value = "";
-
+                element.value =
+                    "";
             }
-
         }
     );
 
@@ -2688,11 +2019,10 @@ function resetForm() {
             "taskInput"
         );
 
-
     if (taskInput) {
 
-        taskInput.value = "";
-
+        taskInput.value =
+            "";
     }
 
 
@@ -2703,42 +2033,6 @@ function resetForm() {
     calculateWorkingHours();
 
     toggleUpdateButton();
-
-
-    /*
-       IMPORTANT:
-       After reset, keep the logged-in
-       employee selected.
-    */
-
-    const employeeSelect =
-        document.getElementById(
-            "employeeName"
-        );
-
-
-    if (
-        employeeSelect &&
-        employees.length
-    ) {
-
-        const loggedEmployee =
-            findLoggedInEmployee(
-                employees
-            );
-
-
-        if (loggedEmployee) {
-
-            employeeSelect.value =
-                loggedEmployee._id ||
-                loggedEmployee.id ||
-                "";
-
-        }
-
-    }
-
 }
 
 
@@ -2753,7 +2047,6 @@ function toggleUpdateButton() {
             "saveBtn"
         );
 
-
     const updateBtn =
         document.getElementById(
             "updateBtn"
@@ -2766,19 +2059,15 @@ function toggleUpdateButton() {
 
             saveBtn.style.display =
                 "none";
-
         }
-
 
         if (updateBtn) {
 
             updateBtn.style.display =
                 "inline-flex";
-
         }
 
     }
-
 
     else {
 
@@ -2786,19 +2075,14 @@ function toggleUpdateButton() {
 
             saveBtn.style.display =
                 "inline-flex";
-
         }
-
 
         if (updateBtn) {
 
             updateBtn.style.display =
                 "none";
-
         }
-
     }
-
 }
 
 
@@ -2811,13 +2095,10 @@ function formatDate(value) {
     if (!value) {
 
         return "-";
-
     }
-
 
     const date =
         new Date(value);
-
 
     if (
         Number.isNaN(
@@ -2826,9 +2107,7 @@ function formatDate(value) {
     ) {
 
         return "-";
-
     }
-
 
     return date.toLocaleDateString(
         "en-IN",
@@ -2842,7 +2121,6 @@ function formatDate(value) {
 
         }
     );
-
 }
 
 
@@ -2855,13 +2133,10 @@ function formatInputDate(value) {
     if (!value) {
 
         return "";
-
     }
-
 
     const date =
         new Date(value);
-
 
     if (
         Number.isNaN(
@@ -2870,36 +2145,28 @@ function formatInputDate(value) {
     ) {
 
         return "";
-
     }
-
 
     const year =
         date.getFullYear();
 
-
     const month =
         String(
             date.getMonth() + 1
-        )
-        .padStart(
+        ).padStart(
             2,
             "0"
         );
-
 
     const day =
         String(
             date.getDate()
-        )
-        .padStart(
+        ).padStart(
             2,
             "0"
         );
 
-
     return `${year}-${month}-${day}`;
-
 }
 
 
@@ -2937,7 +2204,6 @@ function escapeHtml(value) {
         /'/g,
         "&#039;"
     );
-
 }
 
 
@@ -2948,26 +2214,20 @@ function escapeHtml(value) {
 window.saveTimesheet =
     saveTimesheet;
 
-
 window.updateTimesheet =
     updateTimesheet;
-
 
 window.editTimesheet =
     editTimesheet;
 
-
 window.deleteTimesheet =
     deleteTimesheet;
-
 
 window.resetForm =
     resetForm;
 
-
 window.calculateWorkingHours =
     calculateWorkingHours;
-
 
 window.updateTaskCount =
     updateTaskCount;
