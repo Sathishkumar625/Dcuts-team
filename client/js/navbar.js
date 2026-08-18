@@ -1,25 +1,24 @@
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", function () {
+
+    const navbar =
+        document.getElementById("navbar-container");
+
+    if (!navbar)
+        return;
 
 
-const navbar = document.getElementById("navbar-container");
+    let user =
+        JSON.parse(
+            localStorage.getItem("loggedUser")
+        );
+
+    let role =
+        localStorage.getItem("role");
 
 
-if(!navbar)
-return;
-
-
-
-let user = JSON.parse(localStorage.getItem("loggedUser"));
-
-let role = localStorage.getItem("role");
-
-
-
-let adminMenu = `
-
+    let adminMenu = `
 
 <nav class="navbar">
-
 
 <div class="logo">
 
@@ -32,7 +31,6 @@ let adminMenu = `
 <h2>DCUTS.TS</h2>
 
 </div>
-
 
 
 <ul class="menu">
@@ -49,7 +47,6 @@ Home
 </a>
 
 </li>
-
 
 
 <li>
@@ -78,7 +75,6 @@ Timesheet
 </li>
 
 
-
 <li>
 
 <a href="reports.html">
@@ -90,7 +86,6 @@ Reports
 </a>
 
 </li>
-
 
 
 <li>
@@ -106,7 +101,6 @@ Calendar
 </li>
 
 
-
 <li>
 
 <a href="employees.html">
@@ -120,7 +114,6 @@ Employees
 </li>
 
 
-
 <li>
 
 <a href="clients.html">
@@ -132,7 +125,6 @@ Clients
 </a>
 
 </li>
-
 
 
 <li>
@@ -149,7 +141,6 @@ Settings
 
 
 </ul>
-
 
 
 <div class="profile">
@@ -175,18 +166,12 @@ Admin
 
 </nav>
 
-
 `;
 
 
-
-
-
-let employeeMenu = `
-
+    let employeeMenu = `
 
 <nav class="navbar">
-
 
 <div class="logo">
 
@@ -201,8 +186,6 @@ let employeeMenu = `
 
 
 </div>
-
-
 
 
 <ul class="menu">
@@ -223,7 +206,10 @@ Timesheet
 
 <li>
 
-<a href="#" onclick="logout()">
+<a
+    href="#"
+    onclick="logout(); return false;"
+>
 
 <i class="fa-solid fa-right-from-bracket"></i>
 
@@ -235,7 +221,6 @@ Logout
 
 
 </ul>
-
 
 
 <div class="profile">
@@ -260,46 +245,55 @@ Employee
 
 </nav>
 
-
-
 `;
 
 
+    if (role === "admin") {
 
+        navbar.innerHTML =
+            adminMenu;
 
+    }
 
-if(role==="admin"){
+    else {
 
-navbar.innerHTML = adminMenu;
+        navbar.innerHTML =
+            employeeMenu;
 
-
-}
-
-else{
-
-
-navbar.innerHTML = employeeMenu;
-
-
-}
-
-
+    }
 
 });
 
 
+function logout() {
+
+    localStorage.removeItem(
+        "token"
+    );
+
+    localStorage.removeItem(
+        "user"
+    );
+
+    localStorage.removeItem(
+        "loggedUser"
+    );
+
+    localStorage.removeItem(
+        "role"
+    );
+
+    localStorage.removeItem(
+        "userName"
+    );
+
+    localStorage.removeItem(
+        "userEmail"
+    );
 
 
-
-function logout(){
-
-
-localStorage.removeItem("loggedUser");
-
-localStorage.removeItem("role");
-
-
-window.location.href="login.html";
-
+    window.location.replace(
+        "/client/login.html"
+    );
 
 }
