@@ -2,6 +2,12 @@
    THE D CUTS
    TIMESHEET REPORTS
    ADMIN ONLY
+
+   TASK DISPLAY:
+   - NO 1,2,3 NUMBERING
+   - PRESERVE ORIGINAL TASK TEXT
+   - PRESERVE LINE BREAKS
+   - PRESERVE SPACING
 ===================================================== */
 
 
@@ -19,7 +25,8 @@ const API = "/api";
 function getToken() {
 
     return (
-        localStorage.getItem("token") || ""
+        localStorage.getItem("token") ||
+        ""
     );
 
 }
@@ -62,7 +69,10 @@ function checkAdmin() {
         getToken();
 
 
-    if (!token || role !== "admin") {
+    if (
+        !token ||
+        role !== "admin"
+    ) {
 
         window.location.href =
             "../login.html";
@@ -144,7 +154,7 @@ async function loadReports() {
         <tr>
 
             <td
-                colspan="8"
+                colspan="7"
                 class="loading-cell">
 
                 Loading Timesheet Records...
@@ -197,9 +207,9 @@ async function loadReports() {
         );
 
 
-        /* -----------------------------------------
+        /* =========================================
            SESSION EXPIRED
-        ----------------------------------------- */
+        ========================================== */
 
         if (
             response.status === 401
@@ -219,9 +229,9 @@ async function loadReports() {
         }
 
 
-        /* -----------------------------------------
-           ERROR
-        ----------------------------------------- */
+        /* =========================================
+           API ERROR
+        ========================================== */
 
         if (
             !response.ok ||
@@ -237,21 +247,25 @@ async function loadReports() {
 
 
         const records =
-            data.timesheets || [];
+            Array.isArray(
+                data.timesheets
+            )
+                ? data.timesheets
+                : [];
 
 
-        /* -----------------------------------------
+        /* =========================================
            SUMMARY
-        ----------------------------------------- */
+        ========================================== */
 
         updateSummary(
             records
         );
 
 
-        /* -----------------------------------------
+        /* =========================================
            EMPTY
-        ----------------------------------------- */
+        ========================================== */
 
         if (
             records.length === 0
@@ -262,7 +276,7 @@ async function loadReports() {
                 <tr>
 
                     <td
-                        colspan="8"
+                        colspan="7"
                         class="empty-cell">
 
                         <i class="fa-regular fa-file-lines"></i>
@@ -291,28 +305,33 @@ async function loadReports() {
         }
 
 
-        /* -----------------------------------------
-           TABLE
-        ----------------------------------------- */
+        /* =========================================
+           CLEAR TABLE
+        ========================================== */
 
         tableBody.innerHTML =
             "";
 
 
-        records.forEach(
-            function (
-                item,
-                index
-            ) {
+        /* =========================================
+           RENDER RECORDS
+        ========================================== */
 
+        records.forEach(
+            function (item) {
+
+
+                /* =================================
+                   EMPLOYEE
+                ================================= */
 
                 let employeeName =
                     "Unknown";
 
 
-                /* ---------------------------------
-                   POPULATED EMPLOYEE OBJECT
-                --------------------------------- */
+                let employeeId =
+                    "";
+
 
                 if (
                     item.employee &&
@@ -326,12 +345,13 @@ async function loadReports() {
                         item.employee.email ||
                         "Unknown";
 
+
+                    employeeId =
+                        item.employee.employeeId ||
+                        "";
+
                 }
 
-
-                /* ---------------------------------
-                   EMPLOYEE NAME
-                --------------------------------- */
 
                 else if (
                     item.employeeName
@@ -343,9 +363,36 @@ async function loadReports() {
                 }
 
 
-                /* ---------------------------------
+                else if (
+                    typeof item.employee ===
+                    "string"
+                ) {
+
+                    employeeName =
+                        item.employee;
+
+                }
+
+
+                /*
+                   Employee display:
+
+                   01 - Naveen
+                   02 - Sathish
+
+                   if ID exists.
+                */
+
+                const employeeDisplay =
+                    employeeId
+                        ? `${employeeId} - ${employeeName}`
+                        : employeeName;
+
+
+
+                /* =================================
                    DATE
-                --------------------------------- */
+                ================================= */
 
                 let formattedDate =
                     "-";
@@ -367,7 +414,12 @@ async function loadReports() {
 
                         formattedDate =
                             date.toLocaleDateString(
-                                "en-IN"
+                                "en-IN",
+                                {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric"
+                                }
                             );
 
                     }
@@ -375,54 +427,99 @@ async function loadReports() {
                 }
 
 
-                /* ---------------------------------
-                   PROJECT
-                --------------------------------- */
 
-                const project =
-                    item.project ||
-                    item.projectName ||
-                    "-";
+                /* =================================
+                   TASKS
+                ================================= */
 
-
-                /* ---------------------------------
-                   VIDEOS
-                --------------------------------- */
-
-                const total =
-                    Number(
-                        item.totalVideos
-                    ) || 0;
-
-
-                const completed =
-                    Number(
-                        item.completedVideos
-                    ) || 0;
-
-
-                const balance =
-                    Number(
-                        item.balanceVideos
-                    ) ||
-                    Math.max(
-                        total - completed,
-                        0
+                const taskText =
+                    getOriginalTaskText(
+                        item
                     );
 
 
-                /* ---------------------------------
+                /* =================================
+                   OFFICE HOURS
+                ================================= */
+
+                const officeHours =
+                    item.officeHours ||
+                    calculateHoursText(
+                        item.officeMinutes
+                    );
+
+
+
+                /* =================================
+                   WORKING HOURS
+                ================================= */
+
+                const workingHours =
+                    item.workingHours ||
+                    calculateHoursText(
+                        item.workingMinutes
+                    );
+
+
+
+                /* =================================
+                   LUNCH HOURS
+                ================================= */
+
+                const lunchHours =
+                    item.lunchHours ||
+                    calculateHoursText(
+                        item.lunchMinutes
+                    );
+
+
+
+                /* =================================
                    COMMENTS
-                --------------------------------- */
+                ================================= */
 
                 const comments =
                     item.comments ||
                     "-";
 
 
-                /* ---------------------------------
+
+                /* =================================
+                   TASK BOX
+                ================================= */
+
+                const taskBoxHtml =
+                    taskText
+                        ? `
+
+                            <div class="report-task-box">
+
+                                <div class="report-task-content">
+
+                                    ${escapeHtml(
+                                        taskText
+                                    )}
+
+                                </div>
+
+                            </div>
+
+                        `
+                        : `
+
+                            <div class="empty-task-box">
+
+                                No Task Entered
+
+                            </div>
+
+                        `;
+
+
+
+                /* =================================
                    ROW
-                --------------------------------- */
+                ================================= */
 
                 const row =
                     document.createElement(
@@ -432,25 +529,23 @@ async function loadReports() {
 
                 row.innerHTML = `
 
-                    <td>
-
-                        ${index + 1}
-
-                    </td>
-
+                    <!-- EMPLOYEE -->
 
                     <td>
 
-                        <strong>
+                        <strong
+                            class="employee-report-name">
 
                             ${escapeHtml(
-                                employeeName
+                                employeeDisplay
                             )}
 
                         </strong>
 
                     </td>
 
+
+                    <!-- DATE -->
 
                     <td>
 
@@ -461,50 +556,49 @@ async function loadReports() {
                     </td>
 
 
-                    <td>
+                    <!-- TOTAL TASK -->
 
-                        <span
-                            class="project-badge">
+                    <td class="task-report-cell">
 
-                            ${escapeHtml(
-                                project
-                            )}
-
-                        </span>
+                        ${taskBoxHtml}
 
                     </td>
 
 
+                    <!-- OFFICE HOURS -->
+
                     <td>
 
-                        ${total}
+                        ${escapeHtml(
+                            officeHours
+                        )}
 
                     </td>
 
 
+                    <!-- WORKING HOURS -->
+
                     <td>
 
-                        <span
-                            class="completed-badge">
-
-                            ${completed}
-
-                        </span>
+                        ${escapeHtml(
+                            workingHours
+                        )}
 
                     </td>
 
 
+                    <!-- LUNCH -->
+
                     <td>
 
-                        <span
-                            class="balance-badge">
-
-                            ${balance}
-
-                        </span>
+                        ${escapeHtml(
+                            lunchHours
+                        )}
 
                     </td>
 
+
+                    <!-- COMMENTS -->
 
                     <td>
 
@@ -533,6 +627,10 @@ async function loadReports() {
         );
 
 
+        /* =========================================
+           STATUS
+        ========================================== */
+
         if (status) {
 
             status.innerText =
@@ -556,7 +654,7 @@ async function loadReports() {
             <tr>
 
                 <td
-                    colspan="8"
+                    colspan="7"
                     class="error-cell">
 
                     <i class="fa-solid fa-triangle-exclamation"></i>
@@ -565,7 +663,7 @@ async function loadReports() {
 
                     Unable to load Timesheet Records.
 
-                    <br>
+                    <br><br>
 
                     Please try again.
 
@@ -588,6 +686,221 @@ async function loadReports() {
 }
 
 
+
+/* =====================================================
+   GET ORIGINAL TASK TEXT
+=====================================================
+
+   Timesheet stores the entire textarea as ONE TASK.
+
+   Example:
+
+   Today Task :-
+
+   > DRT 3 videos
+
+   Others Task :-
+
+   > SRG video shoot
+
+   We do NOT split it.
+   We do NOT number it.
+   We display it exactly as saved.
+===================================================== */
+
+function getOriginalTaskText(item) {
+
+    /* =========================================
+       CASE 1
+       tasks array
+    ========================================== */
+
+    if (
+        Array.isArray(
+            item.tasks
+        ) &&
+        item.tasks.length > 0
+    ) {
+
+        /*
+           IMPORTANT:
+
+           Use only the FIRST task because
+           the entire textarea is ONE task.
+        */
+
+        const firstTask =
+            item.tasks[0];
+
+
+        if (
+            typeof firstTask ===
+            "string"
+        ) {
+
+            return normalizeTaskText(
+                firstTask
+            );
+
+        }
+
+
+        if (
+            firstTask &&
+            typeof firstTask ===
+            "object"
+        ) {
+
+            return normalizeTaskText(
+
+                firstTask.taskName ||
+                firstTask.name ||
+                firstTask.title ||
+                ""
+
+            );
+
+        }
+
+    }
+
+
+
+    /* =========================================
+       CASE 2
+       direct taskName
+    ========================================== */
+
+    if (
+        item.taskName
+    ) {
+
+        return normalizeTaskText(
+            item.taskName
+        );
+
+    }
+
+
+
+    /* =========================================
+       CASE 3
+       task
+    ========================================== */
+
+    if (
+        typeof item.task ===
+        "string"
+    ) {
+
+        return normalizeTaskText(
+            item.task
+        );
+
+    }
+
+
+
+    /* =========================================
+       CASE 4
+       tasksText
+    ========================================== */
+
+    if (
+        item.tasksText
+    ) {
+
+        return normalizeTaskText(
+            item.tasksText
+        );
+
+    }
+
+
+
+    return "";
+
+}
+
+
+
+/* =====================================================
+   NORMALIZE TASK TEXT
+=====================================================
+
+   IMPORTANT:
+
+   We do NOT split lines.
+
+   We do NOT add numbers.
+
+   We keep the user's original text.
+
+===================================================== */
+
+function normalizeTaskText(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n")
+        .trim();
+
+}
+
+
+
+/* =====================================================
+   HOURS FORMAT
+===================================================== */
+
+function calculateHoursText(
+    minutes
+) {
+
+    const total =
+        Number(minutes);
+
+
+    if (
+        !Number.isFinite(total) ||
+        total < 0
+    ) {
+
+        return "0h 0m";
+
+    }
+
+
+    const rounded =
+        Math.floor(total);
+
+
+    const hours =
+        Math.floor(
+            rounded / 60
+        );
+
+
+    const mins =
+        rounded % 60;
+
+
+    return `${hours}h ${mins}m`;
+
+}
+
+
+
 /* =====================================================
    SUMMARY
 ===================================================== */
@@ -596,11 +909,16 @@ function updateSummary(
     records
 ) {
 
-    let totalVideos = 0;
+    let totalVideos =
+        0;
 
-    let completedVideos = 0;
 
-    let balanceVideos = 0;
+    let completedVideos =
+        0;
+
+
+    let balanceVideos =
+        0;
 
 
     records.forEach(
@@ -623,7 +941,8 @@ function updateSummary(
                     item.balanceVideos
                 ) ||
                 Math.max(
-                    total - completed,
+                    total -
+                    completed,
                     0
                 );
 
@@ -699,6 +1018,7 @@ function updateSummary(
     }
 
 }
+
 
 
 /* =====================================================

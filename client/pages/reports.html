@@ -23,14 +23,162 @@
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
+
+    <style>
+
+        /* =========================================
+           TASK REPORT BOX
+        ========================================= */
+
+        .report-task-box {
+
+            width: 100%;
+
+            min-height: 150px;
+
+            padding: 28px 30px;
+
+            box-sizing: border-box;
+
+            border: 1px solid rgba(255,255,255,0.16);
+
+            border-radius: 18px;
+
+            background: #101a2b;
+
+            color: #ffffff;
+
+            font-size: 17px;
+
+            line-height: 1.9;
+
+            white-space: pre-wrap;
+
+            word-break: break-word;
+
+            text-align: left;
+
+            box-shadow:
+                inset 0 0 0 1px rgba(255,255,255,0.02);
+
+        }
+
+
+        /* =========================================
+           TASK CONTENT
+        ========================================= */
+
+        .report-task-content {
+
+            margin: 0;
+
+            padding: 0;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            white-space: pre-wrap;
+
+            word-break: break-word;
+
+        }
+
+
+        /* =========================================
+           TASK COLUMN
+        ========================================= */
+
+        .task-report-cell {
+
+            min-width: 420px;
+
+            vertical-align: top;
+
+            padding: 18px !important;
+
+        }
+
+
+        /* =========================================
+           EMPTY TASK
+        ========================================= */
+
+        .empty-task-box {
+
+            width: 100%;
+
+            min-height: 100px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border: 1px solid rgba(255,255,255,0.12);
+
+            border-radius: 16px;
+
+            color: #8994a8;
+
+            background: #101a2b;
+
+        }
+
+
+        /* =========================================
+           EMPLOYEE DISPLAY
+        ========================================= */
+
+        .employee-report-name {
+
+            font-weight: 700;
+
+            color: #ffffff;
+
+            white-space: nowrap;
+
+        }
+
+
+        /* =========================================
+           MOBILE
+        ========================================= */
+
+        @media (max-width: 900px) {
+
+            .task-report-cell {
+
+                min-width: 300px;
+
+            }
+
+            .report-task-box {
+
+                padding: 22px;
+
+                font-size: 15px;
+
+            }
+
+        }
+
+    </style>
+
 </head>
 
+
 <body>
+
 
 <script src="../js/auth.js"></script>
 
 
-<!-- ================= ADMIN AUTH ================= -->
+<!-- =========================================
+     ADMIN AUTH
+========================================= -->
 
 <script>
 
@@ -60,7 +208,10 @@ if (role !== "admin") {
 </script>
 
 
-<!-- ================= NAVBAR ================= -->
+
+<!-- =========================================
+     NAVBAR
+========================================= -->
 
 <nav class="navbar">
 
@@ -203,7 +354,9 @@ if (role !== "admin") {
 
 
 
-<!-- ================= REPORT PAGE ================= -->
+<!-- =========================================
+     REPORT PAGE
+========================================= -->
 
 <main class="report-page">
 
@@ -213,16 +366,11 @@ if (role !== "admin") {
         <div>
 
             <h1>
-
                 Timesheet Reports
-
             </h1>
 
-
             <p>
-
                 All saved employee timesheet entries
-
             </p>
 
         </div>
@@ -243,7 +391,9 @@ if (role !== "admin") {
 
 
 
-    <!-- ================= SUMMARY ================= -->
+    <!-- =========================================
+         SUMMARY
+    ========================================== -->
 
     <div class="report-summary">
 
@@ -350,7 +500,9 @@ if (role !== "admin") {
 
 
 
-    <!-- ================= TABLE ================= -->
+    <!-- =========================================
+         SAVED REPORTS
+    ========================================== -->
 
     <div class="report-card">
 
@@ -358,16 +510,12 @@ if (role !== "admin") {
         <div class="table-header">
 
             <h2>
-
                 Saved Timesheet Entries
-
             </h2>
 
 
             <span id="reportStatus">
-
                 Loading...
-
             </span>
 
         </div>
@@ -384,10 +532,6 @@ if (role !== "admin") {
                     <tr>
 
                         <th>
-                            #
-                        </th>
-
-                        <th>
                             Employee
                         </th>
 
@@ -396,19 +540,19 @@ if (role !== "admin") {
                         </th>
 
                         <th>
-                            Project
+                            Total Task
                         </th>
 
                         <th>
-                            Total Videos
+                            Office Hours
                         </th>
 
                         <th>
-                            Completed
+                            Working Hours
                         </th>
 
                         <th>
-                            Balance
+                            Lunch Break
                         </th>
 
                         <th>
@@ -420,12 +564,13 @@ if (role !== "admin") {
                 </thead>
 
 
+
                 <tbody id="reportTableBody">
 
                     <tr>
 
                         <td
-                            colspan="8"
+                            colspan="7"
                             class="loading-cell">
 
                             Loading Timesheet Records...
