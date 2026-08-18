@@ -5,7 +5,6 @@ const Employee =
     require("../models/Employee");
 
 
-
 // ==================================================
 // TIME PARSER
 // Accepts:
@@ -13,10 +12,14 @@ const Employee =
 // 9
 // 9.30
 // 9:30
+// 9 30
 // 9:30 AM
 // 9.30 PM
+// 9 AM
+// 6 PM
 // 18:30
 // 1830
+// 930
 // ==================================================
 
 function parseTime(value) {
@@ -28,47 +31,50 @@ function parseTime(value) {
         return null;
     }
 
-
     let time =
         String(value)
             .trim()
             .toLowerCase();
 
-
     if (!time) {
         return null;
     }
 
-
     let period = null;
 
 
+    // ==================================================
     // AM
+    // ==================================================
+
     if (
-        /\b(am|a\.m\.)\b/.test(time)
+        /\b(am|a\.m\.)\b/i.test(time)
     ) {
 
         period = "AM";
 
         time =
             time.replace(
-                /\s*(am|a\.m\.)/g,
+                /\s*(am|a\.m\.)\s*/gi,
                 ""
             );
 
     }
 
 
+    // ==================================================
     // PM
+    // ==================================================
+
     else if (
-        /\b(pm|p\.m\.)\b/.test(time)
+        /\b(pm|p\.m\.)\b/i.test(time)
     ) {
 
         period = "PM";
 
         time =
             time.replace(
-                /\s*(pm|p\.m\.)/g,
+                /\s*(pm|p\.m\.)\s*/gi,
                 ""
             );
 
@@ -79,7 +85,10 @@ function parseTime(value) {
         time.trim();
 
 
+    // ==================================================
     // 1830
+    // ==================================================
+
     if (
         /^\d{4}$/.test(time)
     ) {
@@ -94,7 +103,10 @@ function parseTime(value) {
     }
 
 
+    // ==================================================
     // 930
+    // ==================================================
+
     else if (
         /^\d{3}$/.test(time)
     ) {
@@ -113,7 +125,10 @@ function parseTime(value) {
     }
 
 
+    // ==================================================
     // 9.30 / 9 30
+    // ==================================================
+
     time =
         time.replace(
             /[.\s]+/g,
@@ -121,7 +136,10 @@ function parseTime(value) {
         );
 
 
-    // 9
+    // ==================================================
+    // ONLY HOUR
+    // ==================================================
+
     if (
         /^\d{1,2}$/.test(time)
     ) {
@@ -170,9 +188,9 @@ function parseTime(value) {
     }
 
 
-    // ==========================================
+    // ==================================================
     // AM / PM
-    // ==========================================
+    // ==================================================
 
     if (period) {
 
@@ -196,7 +214,9 @@ function parseTime(value) {
                 hours = 0;
             }
 
-        } else {
+        }
+
+        else {
 
             if (
                 hours !== 12
@@ -204,14 +224,15 @@ function parseTime(value) {
 
                 hours += 12;
             }
+
         }
 
     }
 
 
-    // ==========================================
+    // ==================================================
     // 24 HOUR
-    // ==========================================
+    // ==================================================
 
     else {
 
@@ -222,6 +243,7 @@ function parseTime(value) {
 
             return null;
         }
+
     }
 
 
@@ -232,7 +254,6 @@ function parseTime(value) {
 }
 
 
-
 // ==================================================
 // FORMAT HOURS
 // ==================================================
@@ -240,11 +261,16 @@ function parseTime(value) {
 function formatHours(minutes) {
 
     if (
-        !Number.isFinite(minutes)
+        !Number.isFinite(minutes) ||
+        minutes < 0
     ) {
 
         return "0h 0m";
     }
+
+
+    minutes =
+        Math.floor(minutes);
 
 
     const hours =
@@ -261,9 +287,71 @@ function formatHours(minutes) {
 }
 
 
+// ==================================================
+// SAFE POSITIVE DIFFERENCE
+//
+// No negative values.
+//
+// Example:
+// 09:00 -> 18:30
+// = 570 minutes
+//
+// If result is negative:
+// = 0
+// ==================================================
+
+function safeDifference(
+    start,
+    end
+) {
+
+    if (
+        start === null ||
+        end === null
+    ) {
+
+        return 0;
+    }
+
+
+    const difference =
+        end - start;
+
+
+    if (
+        difference < 0
+    ) {
+
+        return 0;
+    }
+
+
+    return difference;
+}
+
 
 // ==================================================
 // CALCULATE ATTENDANCE
+//
+// IMPORTANT:
+//
+// NO FIXED TIME
+// NO FIXED LUNCH
+// NO TIME ORDER VALIDATION
+//
+// User can enter any valid time.
+//
+// Office Hours:
+// Check-out - Check-in
+//
+// Lunch:
+// Lunch End - Lunch Start
+//
+// Working:
+// Office Hours - Lunch
+//
+// Missing time:
+// automatically 0
 // ==================================================
 
 function calculateAttendance(
@@ -274,82 +362,150 @@ function calculateAttendance(
 ) {
 
     const inTime =
-        parseTime(checkIn);
+        checkIn
+            ? parseTime(checkIn)
+            : null;
 
 
     const lunchStartTime =
-        parseTime(lunchStart);
+        lunchStart
+            ? parseTime(lunchStart)
+            : null;
 
 
     const lunchEndTime =
-        parseTime(lunchEnd);
+        lunchEnd
+            ? parseTime(lunchEnd)
+            : null;
 
 
     const outTime =
-        parseTime(checkOut);
+        checkOut
+            ? parseTime(checkOut)
+            : null;
+
+
+    // ==================================================
+    // INVALID TIME FORMAT
+    // ==================================================
+
+    if (
+        checkIn &&
+        inTime === null
+    ) {
+
+        return {
+
+            valid: false,
+
+            message:
+                "Invalid Check-in time."
+
+        };
+    }
 
 
     if (
-        inTime === null ||
-        lunchStartTime === null ||
-        lunchEndTime === null ||
+        lunchStart &&
+        lunchStartTime === null
+    ) {
+
+        return {
+
+            valid: false,
+
+            message:
+                "Invalid Lunch Start time."
+
+        };
+    }
+
+
+    if (
+        lunchEnd &&
+        lunchEndTime === null
+    ) {
+
+        return {
+
+            valid: false,
+
+            message:
+                "Invalid Lunch End time."
+
+        };
+    }
+
+
+    if (
+        checkOut &&
         outTime === null
     ) {
 
         return {
+
             valid: false,
+
             message:
-                "Invalid attendance time."
+                "Invalid Check-out time."
+
         };
     }
+
+
+    // ==================================================
+    // OFFICE HOURS
+    //
+    // Only calculate when both check-in
+    // and check-out are available.
+    // ==================================================
+
+    let officeMinutes = 0;
 
 
     if (
-        lunchStartTime <= inTime
+        inTime !== null &&
+        outTime !== null
     ) {
 
-        return {
-            valid: false,
-            message:
-                "Lunch start must be after check-in."
-        };
+        officeMinutes =
+            safeDifference(
+                inTime,
+                outTime
+            );
+
     }
+
+
+    // ==================================================
+    // LUNCH HOURS
+    //
+    // Only calculate when both lunch
+    // start and lunch end are available.
+    // ==================================================
+
+    let lunchMinutes = 0;
 
 
     if (
-        lunchEndTime <= lunchStartTime
+        lunchStartTime !== null &&
+        lunchEndTime !== null
     ) {
 
-        return {
-            valid: false,
-            message:
-                "Lunch end must be after lunch start."
-        };
+        lunchMinutes =
+            safeDifference(
+                lunchStartTime,
+                lunchEndTime
+            );
+
     }
 
 
-    if (
-        outTime <= lunchEndTime
-    ) {
+    // ==================================================
+    // WORKING HOURS
+    // ==================================================
 
-        return {
-            valid: false,
-            message:
-                "Check-out must be after lunch end."
-        };
-    }
-
-
-    const officeMinutes =
-        outTime - inTime;
-
-
-    const lunchMinutes =
-        lunchEndTime -
-        lunchStartTime;
-
-
-    const workingMinutes =
+    let workingMinutes =
         officeMinutes -
         lunchMinutes;
 
@@ -358,11 +514,7 @@ function calculateAttendance(
         workingMinutes < 0
     ) {
 
-        return {
-            valid: false,
-            message:
-                "Working hours cannot be negative."
-        };
+        workingMinutes = 0;
     }
 
 
@@ -390,17 +542,16 @@ function calculateAttendance(
             formatHours(
                 workingMinutes
             )
+
     };
 }
-
 
 
 // ==================================================
 // GET ALL TIMESHEETS
 // ==================================================
 
-exports.getTimesheets =
-async function (
+async function getTimesheets(
     req,
     res
 ) {
@@ -414,7 +565,11 @@ async function (
         let query = {};
 
 
-        // Employee can see own records
+        // ==================================================
+        // EMPLOYEE
+        // Employee can see own records.
+        // ==================================================
+
         if (
             user &&
             user.role !== "admin"
@@ -423,6 +578,7 @@ async function (
             query.employee =
                 user.employeeId ||
                 user._id;
+
         }
 
 
@@ -454,7 +610,6 @@ async function (
 
     }
 
-
     catch (error) {
 
         console.error(
@@ -474,16 +629,14 @@ async function (
 
     }
 
-};
-
+}
 
 
 // ==================================================
 // GET ONE TIMESHEET
 // ==================================================
 
-exports.getTimesheet =
-async function (
+async function getTimesheet(
     req,
     res
 ) {
@@ -530,7 +683,6 @@ async function (
 
     }
 
-
     catch (error) {
 
         console.error(
@@ -550,16 +702,14 @@ async function (
 
     }
 
-};
-
+}
 
 
 // ==================================================
 // CREATE TIMESHEET
 // ==================================================
 
-exports.createTimesheet =
-async function (
+async function createTimesheet(
     req,
     res
 ) {
@@ -599,10 +749,9 @@ async function (
         } = req.body;
 
 
-
-        // ==========================================
-        // REQUIRED
-        // ==========================================
+        // ==================================================
+        // EMPLOYEE REQUIRED
+        // ==================================================
 
         if (!employee) {
 
@@ -618,6 +767,10 @@ async function (
         }
 
 
+        // ==================================================
+        // DATE REQUIRED
+        // ==================================================
+
         if (!date) {
 
             return res.status(400).json({
@@ -632,66 +785,30 @@ async function (
         }
 
 
-        if (!checkIn) {
+        // ==================================================
+        // TASK REQUIRED
+        // ==================================================
+
+        if (
+            !Array.isArray(tasks) ||
+            tasks.length === 0
+        ) {
 
             return res.status(400).json({
 
                 success: false,
 
                 message:
-                    "Check-in time is required."
+                    "Please enter at least one task."
 
             });
 
         }
 
 
-        if (!lunchStart) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Lunch start time is required."
-
-            });
-
-        }
-
-
-        if (!lunchEnd) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Lunch end time is required."
-
-            });
-
-        }
-
-
-        if (!checkOut) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Check-out time is required."
-
-            });
-
-        }
-
-
-
-        // ==========================================
+        // ==================================================
         // VERIFY EMPLOYEE
-        // ==========================================
+        // ==================================================
 
         const employeeExists =
             await Employee.findById(
@@ -713,10 +830,12 @@ async function (
         }
 
 
-
-        // ==========================================
+        // ==================================================
         // CALCULATE TIME
-        // ==========================================
+        //
+        // No fixed time.
+        // No fixed lunch.
+        // ==================================================
 
         const attendance =
             calculateAttendance(
@@ -743,36 +862,75 @@ async function (
         }
 
 
-
-        // ==========================================
-        // TASKS
-        // ==========================================
+        // ==================================================
+        // CLEAN TASKS
+        // ==================================================
 
         const cleanTasks =
             Array.isArray(tasks)
+
                 ? tasks
                     .map(
-                        task => ({
+                        task => {
 
-                            taskName:
-                                String(
-                                    task.taskName ||
-                                    ""
-                                ).trim()
+                            if (
+                                typeof task ===
+                                "string"
+                            ) {
 
-                        })
+                                return {
+
+                                    taskName:
+                                        String(
+                                            task
+                                        ).trim()
+
+                                };
+
+                            }
+
+
+                            return {
+
+                                taskName:
+                                    String(
+                                        task.taskName ||
+                                        task.name ||
+                                        task.title ||
+                                        ""
+                                    ).trim()
+
+                            };
+
+                        }
                     )
                     .filter(
                         task =>
                             task.taskName
                     )
+
                 : [];
 
 
+        if (
+            cleanTasks.length === 0
+        ) {
 
-        // ==========================================
-        // CREATE
-        // ==========================================
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Please enter at least one task."
+
+            });
+
+        }
+
+
+        // ==================================================
+        // CREATE RECORD
+        // ==================================================
 
         const record =
             new Timesheet({
@@ -781,14 +939,30 @@ async function (
 
                 date,
 
-                checkIn,
 
-                lunchStart,
+                // Time fields
+                //
+                // Empty values remain empty.
+                // No fixed time is inserted.
 
-                lunchEnd,
+                checkIn:
+                    checkIn ||
+                    "",
 
-                checkOut,
+                lunchStart:
+                    lunchStart ||
+                    "",
 
+                lunchEnd:
+                    lunchEnd ||
+                    "",
+
+                checkOut:
+                    checkOut ||
+                    "",
+
+
+                // Calculated values
 
                 officeMinutes:
                     attendance.officeMinutes,
@@ -810,19 +984,31 @@ async function (
                     attendance.workingHours,
 
 
+                // Tasks
+
                 tasks:
                     cleanTasks,
 
 
-                comments:
-                    comments || "",
+                // Comments
 
+                comments:
+                    comments ||
+                    "",
+
+
+                // Optional project
 
                 project:
-                    project || null,
+                    project ||
+                    null,
 
                 projectName:
-                    projectName || "",
+                    projectName ||
+                    "",
+
+
+                // Optional video information
 
                 totalVideos:
                     Number(
@@ -839,6 +1025,7 @@ async function (
                         balanceVideos || 0
                     ),
 
+
                 status:
                     status ||
                     "Pending"
@@ -846,10 +1033,12 @@ async function (
             });
 
 
-
         await record.save();
 
 
+        // ==================================================
+        // POPULATE
+        // ==================================================
 
         const populated =
             await Timesheet
@@ -866,6 +1055,9 @@ async function (
                 );
 
 
+        // ==================================================
+        // RESPONSE
+        // ==================================================
 
         res.status(201).json({
 
@@ -880,7 +1072,6 @@ async function (
         });
 
     }
-
 
     catch (error) {
 
@@ -904,16 +1095,14 @@ async function (
 
     }
 
-};
-
+}
 
 
 // ==================================================
 // UPDATE TIMESHEET
 // ==================================================
 
-exports.updateTimesheet =
-async function (
+async function updateTimesheet(
     req,
     res
 ) {
@@ -953,6 +1142,9 @@ async function (
         } = req.body;
 
 
+        // ==================================================
+        // FIND RECORD
+        // ==================================================
 
         const record =
             await Timesheet.findById(
@@ -974,10 +1166,105 @@ async function (
         }
 
 
+        // ==================================================
+        // EMPLOYEE VALIDATION
+        // ==================================================
 
-        // ==========================================
+        if (
+            employee
+        ) {
+
+            const employeeExists =
+                await Employee.findById(
+                    employee
+                );
+
+
+            if (!employeeExists) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Employee not found."
+
+                });
+
+            }
+
+        }
+
+
+        // ==================================================
+        // TASKS
+        // ==================================================
+
+        const cleanTasks =
+            Array.isArray(tasks)
+
+                ? tasks
+                    .map(
+                        task => {
+
+                            if (
+                                typeof task ===
+                                "string"
+                            ) {
+
+                                return {
+
+                                    taskName:
+                                        String(
+                                            task
+                                        ).trim()
+
+                                };
+
+                            }
+
+
+                            return {
+
+                                taskName:
+                                    String(
+                                        task.taskName ||
+                                        task.name ||
+                                        task.title ||
+                                        ""
+                                    ).trim()
+
+                            };
+
+                        }
+                    )
+                    .filter(
+                        task =>
+                            task.taskName
+                    )
+
+                : [];
+
+
+        if (
+            cleanTasks.length === 0
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Please enter at least one task."
+
+            });
+
+        }
+
+
+        // ==================================================
         // CALCULATE TIME
-        // ==========================================
+        // ==================================================
 
         const attendance =
             calculateAttendance(
@@ -1004,118 +1291,118 @@ async function (
         }
 
 
+        // ==================================================
+        // UPDATE BASIC DATA
+        // ==================================================
 
-        // ==========================================
-        // TASKS
-        // ==========================================
+        if (
+            employee
+        ) {
 
-        const cleanTasks =
-            Array.isArray(tasks)
-                ? tasks
-                    .map(
-                        task => ({
+            record.employee =
+                employee;
 
-                            taskName:
-                                String(
-                                    task.taskName ||
-                                    ""
-                                ).trim()
-
-                        })
-                    )
-                    .filter(
-                        task =>
-                            task.taskName
-                    )
-                : [];
+        }
 
 
+        if (
+            date
+        ) {
 
-        // ==========================================
-        // UPDATE
-        // ==========================================
+            record.date =
+                date;
 
-        record.employee =
-            employee ||
-            record.employee;
+        }
 
 
-        record.date =
-            date ||
-            record.date;
-
+        // ==================================================
+        // TIME VALUES
+        // ==================================================
 
         record.checkIn =
-            checkIn;
-
+            checkIn ||
+            "";
 
         record.lunchStart =
-            lunchStart;
-
+            lunchStart ||
+            "";
 
         record.lunchEnd =
-            lunchEnd;
-
+            lunchEnd ||
+            "";
 
         record.checkOut =
-            checkOut;
+            checkOut ||
+            "";
 
 
+        // ==================================================
+        // CALCULATED HOURS
+        // ==================================================
 
         record.officeMinutes =
             attendance.officeMinutes;
 
-
         record.lunchMinutes =
             attendance.lunchMinutes;
-
 
         record.workingMinutes =
             attendance.workingMinutes;
 
 
-
         record.officeHours =
             attendance.officeHours;
 
-
         record.lunchHours =
             attendance.lunchHours;
-
 
         record.workingHours =
             attendance.workingHours;
 
 
+        // ==================================================
+        // TASKS
+        // ==================================================
 
         record.tasks =
             cleanTasks;
 
 
+        // ==================================================
+        // COMMENTS
+        // ==================================================
+
         record.comments =
-            comments || "";
+            comments ||
+            "";
 
 
+        // ==================================================
+        // PROJECT
+        // ==================================================
 
         record.project =
-            project || null;
-
+            project ||
+            null;
 
         record.projectName =
-            projectName || "";
+            projectName ||
+            "";
 
+
+        // ==================================================
+        // VIDEOS
+        // ==================================================
 
         record.totalVideos =
             Number(
                 totalVideos || 0
             );
 
-
         record.completedVideos =
             Number(
                 completedVideos || 0
             );
-
 
         record.balanceVideos =
             Number(
@@ -1123,15 +1410,26 @@ async function (
             );
 
 
+        // ==================================================
+        // STATUS
+        // ==================================================
+
         record.status =
             status ||
-            record.status;
+            record.status ||
+            "Pending";
 
 
+        // ==================================================
+        // SAVE
+        // ==================================================
 
         await record.save();
 
 
+        // ==================================================
+        // POPULATE
+        // ==================================================
 
         const populated =
             await Timesheet
@@ -1148,6 +1446,9 @@ async function (
                 );
 
 
+        // ==================================================
+        // RESPONSE
+        // ==================================================
 
         res.json({
 
@@ -1162,7 +1463,6 @@ async function (
         });
 
     }
-
 
     catch (error) {
 
@@ -1186,16 +1486,14 @@ async function (
 
     }
 
-};
-
+}
 
 
 // ==================================================
 // DELETE TIMESHEET
 // ==================================================
 
-exports.deleteTimesheet =
-async function (
+async function deleteTimesheet(
     req,
     res
 ) {
@@ -1222,11 +1520,9 @@ async function (
         }
 
 
-
         await Timesheet.findByIdAndDelete(
             req.params.id
         );
-
 
 
         res.json({
@@ -1239,7 +1535,6 @@ async function (
         });
 
     }
-
 
     catch (error) {
 
@@ -1263,10 +1558,18 @@ async function (
 
     }
 
-};
-/* =====================================================
-   EXPORT CONTROLLER FUNCTIONS
-===================================================== */
+}
+
+
+// ==================================================
+// EXPORT CONTROLLER FUNCTIONS
+//
+// IMPORTANT:
+// Functions are declared above using:
+// async function functionName()
+//
+// Therefore they can safely be exported here.
+// ==================================================
 
 module.exports = {
 
@@ -1274,9 +1577,10 @@ module.exports = {
 
     getTimesheets,
 
-    // Route compatibility
     getTimesheetById:
         getTimesheet,
+
+    getTimesheet,
 
     updateTimesheet,
 
