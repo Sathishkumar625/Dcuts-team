@@ -1,5 +1,6 @@
 /* =====================================================
-   THE D CUTS - DAILY TIMESHEET
+   THE D CUTS - DAILY TIMESHEET JS
+   SINGLE TASK TEXTAREA VERSION
 ===================================================== */
 
 
@@ -9,11 +10,7 @@
 
 const API_BASE =
     window.API_BASE ||
-    (
-        window.location.hostname === "localhost"
-            ? "http://localhost:5000/api"
-            : "/api"
-    );
+    "https://dcuts-team.onrender.com/api";
 
 
 /* =====================================================
@@ -33,7 +30,9 @@ let taskEventsReady = false;
 
 document.addEventListener(
     "DOMContentLoaded",
-    initializeTimesheet
+    () => {
+        initializeTimesheet();
+    }
 );
 
 
@@ -72,26 +71,18 @@ function setTodayDate() {
 
     if (!input) return;
 
-
-    const today =
-        new Date();
-
+    const today = new Date();
 
     const year =
         today.getFullYear();
 
-
     const month =
-        String(
-            today.getMonth() + 1
-        ).padStart(2, "0");
-
+        String(today.getMonth() + 1)
+            .padStart(2, "0");
 
     const day =
-        String(
-            today.getDate()
-        ).padStart(2, "0");
-
+        String(today.getDate())
+            .padStart(2, "0");
 
     input.value =
         `${year}-${month}-${day}`;
@@ -115,321 +106,15 @@ function getAuthToken() {
 
 
 /* =====================================================
-   GET LOGGED USER
-===================================================== */
-
-function getLoggedUser() {
-
-    let user = null;
-
-
-    const possibleKeys = [
-        "loggedUser",
-        "user",
-        "currentUser"
-    ];
-
-
-    for (
-        const key
-        of possibleKeys
-    ) {
-
-        const value =
-            localStorage.getItem(key);
-
-
-        if (!value) continue;
-
-
-        try {
-
-            const parsed =
-                JSON.parse(value);
-
-
-            if (
-                parsed &&
-                typeof parsed === "object"
-            ) {
-
-                user = parsed;
-
-                break;
-            }
-
-        }
-        catch {
-
-            // Ignore invalid JSON
-        }
-
-    }
-
-
-    return user;
-}
-
-
-/* =====================================================
-   GET LOGGED USER NAME
-===================================================== */
-
-function getLoggedUserName() {
-
-    const user =
-        getLoggedUser();
-
-
-    const values = [
-
-        user?.name,
-
-        user?.userName,
-
-        user?.username,
-
-        user?.displayName,
-
-        user?.employeeName,
-
-        localStorage.getItem(
-            "userName"
-        ),
-
-        localStorage.getItem(
-            "employeeName"
-        )
-
-    ];
-
-
-    for (
-        const value
-        of values
-    ) {
-
-        if (
-            value &&
-            String(value).trim()
-        ) {
-
-            return String(
-                value
-            ).trim();
-
-        }
-
-    }
-
-
-    return "";
-}
-
-
-/* =====================================================
-   GET LOGGED USER EMAIL
-===================================================== */
-
-function getLoggedUserEmail() {
-
-    const user =
-        getLoggedUser();
-
-
-    const values = [
-
-        user?.email,
-
-        localStorage.getItem(
-            "userEmail"
-        ),
-
-        localStorage.getItem(
-            "email"
-        )
-
-    ];
-
-
-    for (
-        const value
-        of values
-    ) {
-
-        if (
-            value &&
-            String(value).trim()
-        ) {
-
-            return String(
-                value
-            ).trim()
-                .toLowerCase();
-
-        }
-
-    }
-
-
-    return "";
-}
-
-
-/* =====================================================
-   GET ROLE
-===================================================== */
-
-function getLoggedRole() {
-
-    const user =
-        getLoggedUser();
-
-
-    return (
-        user?.role ||
-        localStorage.getItem("role") ||
-        ""
-    )
-        .toString()
-        .toLowerCase();
-}
-
-
-/* =====================================================
-   EMPLOYEE MATCH
-===================================================== */
-
-function isCurrentEmployee(
-    employee
-) {
-
-    const loggedName =
-        getLoggedUserName()
-            .toLowerCase()
-            .trim();
-
-
-    const loggedEmail =
-        getLoggedUserEmail()
-            .toLowerCase()
-            .trim();
-
-
-    const employeeName =
-        String(
-            employee?.name || ""
-        )
-            .toLowerCase()
-            .trim();
-
-
-    const employeeEmail =
-        String(
-            employee?.email || ""
-        )
-            .toLowerCase()
-            .trim();
-
-
-    // ------------------------------------------
-    // EMAIL MATCH
-    // ------------------------------------------
-
-    if (
-        loggedEmail &&
-        employeeEmail &&
-        loggedEmail === employeeEmail
-    ) {
-
-        return true;
-
-    }
-
-
-    // ------------------------------------------
-    // NAME MATCH
-    // ------------------------------------------
-
-    if (
-        loggedName &&
-        employeeName
-    ) {
-
-        if (
-            loggedName === employeeName
-        ) {
-
-            return true;
-
-        }
-
-
-        if (
-            loggedName.includes(
-                employeeName
-            ) ||
-            employeeName.includes(
-                loggedName
-            )
-        ) {
-
-            return true;
-
-        }
-
-    }
-
-
-    return false;
-}
-
-
-/* =====================================================
-   EMPLOYEE DISPLAY ID
-===================================================== */
-
-function getEmployeeDisplayId(
-    employee,
-    index
-) {
-
-    // ------------------------------------------
-    // Existing sequence
-    // ------------------------------------------
-
-    if (
-        index !== undefined
-    ) {
-
-        return String(
-            index + 1
-        ).padStart(
-            2,
-            "0"
-        );
-
-    }
-
-
-    return "01";
-}
-
-
-/* =====================================================
    LOAD EMPLOYEES
 ===================================================== */
 
 async function loadEmployees() {
 
     const select =
-        document.getElementById(
-            "employeeName"
-        );
-
+        document.getElementById("employeeName");
 
     if (!select) return;
-
 
     try {
 
@@ -439,21 +124,16 @@ async function loadEmployees() {
             </option>
         `;
 
-
         const token =
             getAuthToken();
-
 
         const response =
             await fetch(
                 `${API_BASE}/employees`,
                 {
-
-                    method:
-                        "GET",
+                    method: "GET",
 
                     headers: {
-
                         "Content-Type":
                             "application/json",
 
@@ -463,143 +143,164 @@ async function loadEmployees() {
                                     `Bearer ${token}`
                             }
                             : {})
-
                     }
-
                 }
             );
 
-
-        const result =
-            await response.json()
-                .catch(
-                    () => ({})
-                );
-
-
-        if (
-            !response.ok
-        ) {
-
+        if (!response.ok) {
             throw new Error(
-                result.message ||
                 "Failed to load employees."
             );
-
         }
 
+        const data =
+            await response.json();
 
         employees =
-            result.employees ||
-            result.data ||
+            data.employees ||
+            data.data ||
             [];
 
+        select.innerHTML = `
+            <option value="">
+                Select Employee
+            </option>
+        `;
 
-        // ------------------------------------------
-        // ADMIN
-        // ------------------------------------------
+        employees.forEach(
+            (employee, index) => {
 
-        const role =
-            getLoggedRole();
+                const number =
+                    employee.employeeId ||
+                    String(index + 1)
+                        .padStart(2, "0");
 
+                const option =
+                    document.createElement(
+                        "option"
+                    );
 
-        if (
-            role === "admin"
-        ) {
+                option.value =
+                    employee._id;
 
-            renderEmployeeOptions(
-                select,
-                employees
-            );
+                option.textContent =
+                    `${number}-${employee.name || "Unknown"}`;
 
-            return;
-        }
-
-
-        // ------------------------------------------
-        // EMPLOYEE
-        // Only logged employee
-        // ------------------------------------------
-
-        const currentEmployee =
-            employees.find(
-                isCurrentEmployee
-            );
-
-
-        if (
-            !currentEmployee
-        ) {
-
-            select.innerHTML = `
-                <option value="">
-                    Employee not found
-                </option>
-            `;
-
-            console.warn(
-                "CURRENT EMPLOYEE NOT FOUND",
-                {
-                    loggedName:
-                        getLoggedUserName(),
-
-                    loggedEmail:
-                        getLoggedUserEmail(),
-
-                    employees
-                }
-            );
-
-            return;
-        }
-
-
-        const index =
-            employees.indexOf(
-                currentEmployee
-            );
-
-
-        const displayId =
-            getEmployeeDisplayId(
-                currentEmployee,
-                index
-            );
-
-
-        select.innerHTML = "";
-
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-
-        option.value =
-            currentEmployee._id;
-
-
-        option.textContent =
-            `${displayId}-${currentEmployee.name || "Employee"}`;
-
-
-        option.selected =
-            true;
-
-
-        select.appendChild(
-            option
+                select.appendChild(
+                    option
+                );
+            }
         );
 
+        /* ==========================================
+           LOGGED-IN EMPLOYEE DEFAULT SELECTION
+        ========================================== */
 
-        // Make sure employee cannot
-        // select another employee.
-        select.disabled =
-            true;
+        const loggedUser =
+            JSON.parse(
+                localStorage.getItem(
+                    "loggedUser"
+                ) ||
+                "null"
+            );
+
+        if (loggedUser) {
+
+            let matchedEmployee =
+                null;
+
+
+            if (
+                loggedUser.employeeId
+            ) {
+
+                matchedEmployee =
+                    employees.find(
+                        employee =>
+                            String(
+                                employee.employeeId
+                            ) ===
+                            String(
+                                loggedUser.employeeId
+                            )
+                    );
+            }
+
+
+            if (
+                !matchedEmployee &&
+                loggedUser.email
+            ) {
+
+                matchedEmployee =
+                    employees.find(
+                        employee =>
+                            String(
+                                employee.email || ""
+                            ).toLowerCase() ===
+                            String(
+                                loggedUser.email
+                            ).toLowerCase()
+                    );
+            }
+
+
+            if (
+                !matchedEmployee &&
+                loggedUser.name
+            ) {
+
+                matchedEmployee =
+                    employees.find(
+                        employee =>
+                            String(
+                                employee.name || ""
+                            ).toLowerCase() ===
+                            String(
+                                loggedUser.name
+                            ).toLowerCase()
+                    );
+            }
+
+
+            if (matchedEmployee) {
+
+                select.value =
+                    matchedEmployee._id;
+
+                /*
+                   Employee login:
+                   only own employee option remains.
+                */
+
+                if (
+                    loggedUser.role !== "admin"
+                ) {
+
+                    select.innerHTML = "";
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+                    option.value =
+                        matchedEmployee._id;
+
+                    option.textContent =
+                        `${matchedEmployee.employeeId || ""}-${matchedEmployee.name || "Unknown"}`;
+
+                    option.selected =
+                        true;
+
+                    select.appendChild(
+                        option
+                    );
+                }
+            }
+        }
 
     }
-
     catch (error) {
 
         console.error(
@@ -607,67 +308,12 @@ async function loadEmployees() {
             error
         );
 
-
         select.innerHTML = `
             <option value="">
                 Unable to load employees
             </option>
         `;
-
     }
-
-}
-
-
-/* =====================================================
-   RENDER EMPLOYEE OPTIONS
-===================================================== */
-
-function renderEmployeeOptions(
-    select,
-    list
-) {
-
-    select.innerHTML = `
-        <option value="">
-            Select Employee
-        </option>
-    `;
-
-
-    list.forEach(
-        (
-            employee,
-            index
-        ) => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                employee._id;
-
-
-            const displayId =
-                getEmployeeDisplayId(
-                    employee,
-                    index
-                );
-
-
-            option.textContent =
-                `${displayId}-${employee.name || "Unknown"}`;
-
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
 }
 
 
@@ -675,85 +321,71 @@ function renderEmployeeOptions(
    FLEXIBLE TIME PARSER
 ===================================================== */
 
-function parseFlexibleTime(
-    value
-) {
+function parseFlexibleTime(value) {
 
     if (
         value === null ||
         value === undefined
     ) {
-
         return null;
-
     }
-
 
     let time =
         String(value)
             .trim()
             .toLowerCase();
 
-
     if (!time) {
         return null;
     }
 
+    time =
+        time
+            .replace(/\s+/g, " ")
+            .trim();
 
-    let period =
-        null;
-
+    let period = null;
 
     if (
         /\b(am|a\.m\.)\b/i.test(time)
     ) {
 
-        period =
-            "AM";
-
+        period = "AM";
 
         time =
             time.replace(
                 /\s*(a\.m\.|am)\s*/i,
                 ""
             );
-
     }
 
     else if (
         /\b(pm|p\.m\.)\b/i.test(time)
     ) {
 
-        period =
-            "PM";
-
+        period = "PM";
 
         time =
             time.replace(
                 /\s*(p\.m\.|pm)\s*/i,
                 ""
             );
-
     }
-
 
     time =
         time.trim();
 
 
-    // 1830
     if (
         /^\d{4}$/.test(time)
     ) {
 
         time =
-            time.substring(0, 2) +
-            ":" +
+            time.substring(0, 2)
+            + ":" +
             time.substring(2);
-
     }
 
-    // 930
     else if (
         /^\d{3}$/.test(time)
     ) {
@@ -762,14 +394,12 @@ function parseFlexibleTime(
             "0" + time;
 
         time =
-            time.substring(0, 2) +
-            ":" +
+            time.substring(0, 2)
+            + ":" +
             time.substring(2);
-
     }
 
 
-    // 9.30 / 9 30
     time =
         time.replace(
             /[.\s]+/g,
@@ -777,14 +407,12 @@ function parseFlexibleTime(
         );
 
 
-    // 9
     if (
         /^\d{1,2}$/.test(time)
     ) {
 
         time =
             `${time}:00`;
-
     }
 
 
@@ -795,15 +423,12 @@ function parseFlexibleTime(
     if (
         parts.length !== 2
     ) {
-
         return null;
-
     }
 
 
     let hours =
         Number(parts[0]);
-
 
     let minutes =
         Number(parts[1]);
@@ -813,9 +438,7 @@ function parseFlexibleTime(
         !Number.isInteger(hours) ||
         !Number.isInteger(minutes)
     ) {
-
         return null;
-
     }
 
 
@@ -823,9 +446,7 @@ function parseFlexibleTime(
         minutes < 0 ||
         minutes > 59
     ) {
-
         return null;
-
     }
 
 
@@ -835,11 +456,8 @@ function parseFlexibleTime(
             hours < 1 ||
             hours > 12
         ) {
-
             return null;
-
         }
-
 
         if (
             period === "AM"
@@ -848,9 +466,7 @@ function parseFlexibleTime(
             if (
                 hours === 12
             ) {
-
                 hours = 0;
-
             }
 
         }
@@ -860,13 +476,9 @@ function parseFlexibleTime(
             if (
                 hours !== 12
             ) {
-
                 hours += 12;
-
             }
-
         }
-
     }
 
     else {
@@ -875,11 +487,8 @@ function parseFlexibleTime(
             hours < 0 ||
             hours > 23
         ) {
-
             return null;
-
         }
-
     }
 
 
@@ -887,7 +496,6 @@ function parseFlexibleTime(
         hours * 60 +
         minutes
     );
-
 }
 
 
@@ -895,99 +503,72 @@ function parseFlexibleTime(
    FORMAT DURATION
 ===================================================== */
 
-function formatDuration(
-    totalMinutes
-) {
+function formatDuration(totalMinutes) {
 
     if (
-        !Number.isFinite(
-            totalMinutes
-        ) ||
+        !Number.isFinite(totalMinutes) ||
         totalMinutes < 0
     ) {
-
         return "0h 0m";
-
     }
 
-
     totalMinutes =
-        Math.floor(
-            totalMinutes
-        );
-
+        Math.floor(totalMinutes);
 
     const hours =
         Math.floor(
             totalMinutes / 60
         );
 
-
     const minutes =
         totalMinutes % 60;
 
-
     return `${hours}h ${minutes}m`;
-
 }
 
 
 /* =====================================================
-   TIME CALCULATION EVENTS
+   TIME EVENTS
 ===================================================== */
 
 function setupTimeCalculation() {
 
     const fields = [
-
         "checkIn",
-
         "lunchStart",
-
         "lunchEnd",
-
         "checkOut"
-
     ];
-
 
     fields.forEach(
         id => {
 
             const input =
-                document.getElementById(
-                    id
-                );
-
+                document.getElementById(id);
 
             if (!input) return;
-
 
             input.addEventListener(
                 "input",
                 calculateWorkingHours
             );
 
-
             input.addEventListener(
                 "change",
                 calculateWorkingHours
             );
 
-
             input.addEventListener(
                 "blur",
                 calculateWorkingHours
             );
-
         }
     );
-
 }
 
 
 /* =====================================================
-   CALCULATE WORKING HOURS
+   CALCULATE HOURS
 ===================================================== */
 
 function calculateWorkingHours() {
@@ -995,25 +576,22 @@ function calculateWorkingHours() {
     const checkIn =
         document.getElementById(
             "checkIn"
-        )?.value?.trim() || "";
-
+        )?.value?.trim();
 
     const lunchStart =
         document.getElementById(
             "lunchStart"
-        )?.value?.trim() || "";
-
+        )?.value?.trim();
 
     const lunchEnd =
         document.getElementById(
             "lunchEnd"
-        )?.value?.trim() || "";
-
+        )?.value?.trim();
 
     const checkOut =
         document.getElementById(
             "checkOut"
-        )?.value?.trim() || "";
+        )?.value?.trim();
 
 
     const officeElement =
@@ -1021,12 +599,10 @@ function calculateWorkingHours() {
             "officeHours"
         );
 
-
     const lunchElement =
         document.getElementById(
             "lunchHours"
         );
-
 
     const workingElement =
         document.getElementById(
@@ -1038,27 +614,46 @@ function calculateWorkingHours() {
         9 * 60 + 30;
 
 
-    let officeMinutes =
-        DEFAULT_OFFICE_MINUTES;
+    if (officeElement) {
+        officeElement.textContent =
+            "9h 30m";
+    }
+
+    if (lunchElement) {
+        lunchElement.textContent =
+            "0h 0m";
+    }
+
+    if (workingElement) {
+        workingElement.textContent =
+            "9h 30m";
+    }
 
 
-    let lunchMinutes =
-        0;
+    if (
+        !checkIn &&
+        !lunchStart &&
+        !lunchEnd &&
+        !checkOut
+    ) {
+        return;
+    }
 
-
-    let workingMinutes =
-        DEFAULT_OFFICE_MINUTES;
-
-
-    // ------------------------------------------
-    // OFFICE
-    // ------------------------------------------
 
     const inTime =
         checkIn
             ? parseFlexibleTime(checkIn)
             : null;
 
+    const lunchStartTime =
+        lunchStart
+            ? parseFlexibleTime(lunchStart)
+            : null;
+
+    const lunchEndTime =
+        lunchEnd
+            ? parseFlexibleTime(lunchEnd)
+            : null;
 
     const outTime =
         checkOut
@@ -1067,43 +662,55 @@ function calculateWorkingHours() {
 
 
     if (
+        (
+            checkIn &&
+            inTime === null
+        ) ||
+        (
+            lunchStart &&
+            lunchStartTime === null
+        ) ||
+        (
+            lunchEnd &&
+            lunchEndTime === null
+        ) ||
+        (
+            checkOut &&
+            outTime === null
+        )
+    ) {
+
+        if (workingElement) {
+            workingElement.textContent =
+                "0h 0m";
+        }
+
+        return;
+    }
+
+
+    let officeMinutes =
+        DEFAULT_OFFICE_MINUTES;
+
+
+    if (
         inTime !== null &&
         outTime !== null
     ) {
 
         officeMinutes =
-            outTime - inTime;
-
+            outTime -
+            inTime;
 
         if (
             officeMinutes < 0
         ) {
-
             officeMinutes = 0;
-
         }
-
     }
 
 
-    // ------------------------------------------
-    // LUNCH
-    // ------------------------------------------
-
-    const lunchStartTime =
-        lunchStart
-            ? parseFlexibleTime(
-                lunchStart
-            )
-            : null;
-
-
-    const lunchEndTime =
-        lunchEnd
-            ? parseFlexibleTime(
-                lunchEnd
-            )
-            : null;
+    let lunchMinutes = 0;
 
 
     if (
@@ -1115,23 +722,15 @@ function calculateWorkingHours() {
             lunchEndTime -
             lunchStartTime;
 
-
         if (
             lunchMinutes < 0
         ) {
-
             lunchMinutes = 0;
-
         }
-
     }
 
 
-    // ------------------------------------------
-    // WORKING
-    // ------------------------------------------
-
-    workingMinutes =
+    let workingMinutes =
         officeMinutes -
         lunchMinutes;
 
@@ -1139,15 +738,9 @@ function calculateWorkingHours() {
     if (
         workingMinutes < 0
     ) {
-
         workingMinutes = 0;
-
     }
 
-
-    // ------------------------------------------
-    // DISPLAY
-    // ------------------------------------------
 
     if (officeElement) {
 
@@ -1155,7 +748,6 @@ function calculateWorkingHours() {
             formatDuration(
                 officeMinutes
             );
-
     }
 
 
@@ -1165,7 +757,6 @@ function calculateWorkingHours() {
             formatDuration(
                 lunchMinutes
             );
-
     }
 
 
@@ -1175,14 +766,12 @@ function calculateWorkingHours() {
             formatDuration(
                 workingMinutes
             );
-
     }
-
 }
 
 
 /* =====================================================
-   TASK EVENTS
+   TASK INPUT
 ===================================================== */
 
 function setupTaskInputEvents() {
@@ -1192,43 +781,44 @@ function setupTaskInputEvents() {
             "taskInput"
         );
 
-
     if (
         !taskInput ||
         taskEventsReady
     ) {
-
         return;
-
     }
 
-
-    taskEventsReady =
-        true;
-
+    taskEventsReady = true;
 
     taskInput.addEventListener(
         "input",
         updateTaskCount
     );
 
-
     taskInput.addEventListener(
         "keyup",
         updateTaskCount
     );
 
-
     taskInput.addEventListener(
         "change",
         updateTaskCount
     );
-
 }
 
 
 /* =====================================================
    TASK COUNT
+=====================================================
+
+   IMPORTANT:
+
+   Entire textarea = ONE TASK.
+
+   Even if multiple lines are entered,
+   it will always display:
+
+   1 Task
 ===================================================== */
 
 function updateTaskCount() {
@@ -1238,52 +828,39 @@ function updateTaskCount() {
             "taskInput"
         );
 
-
     const taskCount =
         document.getElementById(
             "taskCount"
         );
 
-
     if (
         !taskInput ||
         !taskCount
     ) {
-
         return;
-
     }
 
 
-    const tasks =
-        taskInput.value
-            .split(/\r?\n/)
-            .map(
-                task =>
-                    task.trim()
-            )
-            .filter(
-                task =>
-                    task.length > 0
-            );
-
-
-    const count =
-        tasks.length;
+    const hasTask =
+        taskInput.value.trim().length > 0;
 
 
     taskCount.textContent =
-        `${count} ${
-            count === 1
-                ? "Task"
-                : "Tasks"
-        }`;
-
+        hasTask
+            ? "1 Task"
+            : "0 Tasks";
 }
 
 
 /* =====================================================
    GET TASKS
+=====================================================
+
+   IMPORTANT:
+
+   Entire textarea is ONE TASK.
+
+   New lines are kept inside the same task.
 ===================================================== */
 
 function getTasks() {
@@ -1293,29 +870,26 @@ function getTasks() {
             "taskInput"
         );
 
-
     if (!taskInput) {
         return [];
     }
 
 
-    return taskInput.value
-        .split(/\r?\n/)
-        .map(
-            task =>
-                task.trim()
-        )
-        .filter(
-            task =>
-                task.length > 0
-        )
-        .map(
-            task => ({
-                taskName:
-                    task
-            })
-        );
+    const value =
+        taskInput.value.trim();
 
+
+    if (!value) {
+        return [];
+    }
+
+
+    return [
+        {
+            taskName:
+                value
+        }
+    ];
 }
 
 
@@ -1323,21 +897,21 @@ function getTasks() {
    SET TASKS
 ===================================================== */
 
-function setTasks(
-    tasks
-) {
+function setTasks(tasks) {
 
     const taskInput =
         document.getElementById(
             "taskInput"
         );
 
-
-    if (!taskInput) return;
+    if (!taskInput) {
+        return;
+    }
 
 
     if (
-        !Array.isArray(tasks)
+        !Array.isArray(tasks) ||
+        tasks.length === 0
     ) {
 
         taskInput.value =
@@ -1346,45 +920,39 @@ function setTasks(
         updateTaskCount();
 
         return;
-
     }
 
 
-    taskInput.value =
-        tasks
-            .map(
-                task => {
+    /*
+       Since all lines are one task,
+       preserve the complete task text.
+    */
 
-                    if (
-                        typeof task ===
-                        "string"
-                    ) {
-
-                        return task;
-
-                    }
+    const firstTask =
+        tasks[0];
 
 
-                    return (
-                        task.taskName ||
-                        task.name ||
-                        task.title ||
-                        ""
-                    );
+    if (
+        typeof firstTask ===
+        "string"
+    ) {
 
-                }
-            )
-            .filter(
-                task =>
-                    String(
-                        task
-                    ).trim()
-            )
-            .join("\n");
+        taskInput.value =
+            firstTask;
+
+    }
+
+    else {
+
+        taskInput.value =
+            firstTask.taskName ||
+            firstTask.name ||
+            firstTask.title ||
+            "";
+    }
 
 
     updateTaskCount();
-
 }
 
 
@@ -1398,13 +966,10 @@ function validateTimeInput(
 ) {
 
     const input =
-        document.getElementById(
-            id
-        );
-
+        document.getElementById(id);
 
     if (!input) {
-        return true;
+        return null;
     }
 
 
@@ -1412,16 +977,13 @@ function validateTimeInput(
         input.value.trim();
 
 
-    // Empty = allowed
     if (!value) {
-        return true;
+        return null;
     }
 
 
     const parsed =
-        parseFlexibleTime(
-            value
-        );
+        parseFlexibleTime(value);
 
 
     if (
@@ -1432,17 +994,13 @@ function validateTimeInput(
             `${label} time is invalid.\n\nAccepted examples:\n09:30\n18:30\n0930\n1830\n9.30\n9:30 AM\n6 PM`
         );
 
-
         input.focus();
 
-
-        return false;
-
+        return "INVALID";
     }
 
 
-    return true;
-
+    return parsed;
 }
 
 
@@ -1457,11 +1015,13 @@ function validateForm() {
             "employeeName"
         )?.value;
 
-
     const date =
         document.getElementById(
             "date"
         )?.value;
+
+    const tasks =
+        getTasks();
 
 
     if (!employee) {
@@ -1471,7 +1031,6 @@ function validateForm() {
         );
 
         return false;
-
     }
 
 
@@ -1482,47 +1041,35 @@ function validateForm() {
         );
 
         return false;
-
     }
 
 
     const timeFields = [
-
         ["checkIn", "Check-in"],
-
         ["lunchStart", "Lunch Start"],
-
         ["lunchEnd", "Lunch End"],
-
         ["checkOut", "Check-out"]
-
     ];
 
 
     for (
-        const [
-            id,
-            label
-        ]
+        const [id, label]
         of timeFields
     ) {
 
-        if (
-            !validateTimeInput(
+        const result =
+            validateTimeInput(
                 id,
                 label
-            )
+            );
+
+
+        if (
+            result === "INVALID"
         ) {
-
             return false;
-
         }
-
     }
-
-
-    const tasks =
-        getTasks();
 
 
     if (
@@ -1533,21 +1080,17 @@ function validateForm() {
             "Please enter at least one task."
         );
 
-
         document
             .getElementById(
                 "taskInput"
             )
             ?.focus();
 
-
         return false;
-
     }
 
 
     return true;
-
 }
 
 
@@ -1562,36 +1105,30 @@ function collectFormData() {
             "employeeName"
         ).value;
 
-
     const date =
         document.getElementById(
             "date"
         ).value;
-
 
     const checkIn =
         document.getElementById(
             "checkIn"
         ).value.trim();
 
-
     const lunchStart =
         document.getElementById(
             "lunchStart"
         ).value.trim();
-
 
     const lunchEnd =
         document.getElementById(
             "lunchEnd"
         ).value.trim();
 
-
     const checkOut =
         document.getElementById(
             "checkOut"
         ).value.trim();
-
 
     const comments =
         document.getElementById(
@@ -1608,26 +1145,19 @@ function collectFormData() {
             ? parseFlexibleTime(checkIn)
             : null;
 
+    const lunchStartTime =
+        lunchStart
+            ? parseFlexibleTime(lunchStart)
+            : null;
+
+    const lunchEndTime =
+        lunchEnd
+            ? parseFlexibleTime(lunchEnd)
+            : null;
 
     const outTime =
         checkOut
             ? parseFlexibleTime(checkOut)
-            : null;
-
-
-    const lunchStartTime =
-        lunchStart
-            ? parseFlexibleTime(
-                lunchStart
-            )
-            : null;
-
-
-    const lunchEndTime =
-        lunchEnd
-            ? parseFlexibleTime(
-                lunchEnd
-            )
             : null;
 
 
@@ -1648,20 +1178,15 @@ function collectFormData() {
             outTime -
             inTime;
 
-
         if (
             officeMinutes < 0
         ) {
-
             officeMinutes = 0;
-
         }
-
     }
 
 
-    let lunchMinutes =
-        0;
+    let lunchMinutes = 0;
 
 
     if (
@@ -1673,15 +1198,11 @@ function collectFormData() {
             lunchEndTime -
             lunchStartTime;
 
-
         if (
             lunchMinutes < 0
         ) {
-
             lunchMinutes = 0;
-
         }
-
     }
 
 
@@ -1693,9 +1214,7 @@ function collectFormData() {
     if (
         workingMinutes < 0
     ) {
-
         workingMinutes = 0;
-
     }
 
 
@@ -1713,43 +1232,36 @@ function collectFormData() {
 
         checkOut,
 
-
         officeMinutes,
 
         lunchMinutes,
 
         workingMinutes,
 
-
         officeHours:
             formatDuration(
                 officeMinutes
             ),
-
 
         lunchHours:
             formatDuration(
                 lunchMinutes
             ),
 
-
         workingHours:
             formatDuration(
                 workingMinutes
             ),
 
-
         tasks,
 
         comments
-
     };
-
 }
 
 
 /* =====================================================
-   SAVE TIMESHEET
+   SAVE
 ===================================================== */
 
 async function saveTimesheet() {
@@ -1757,9 +1269,7 @@ async function saveTimesheet() {
     if (
         !validateForm()
     ) {
-
         return;
-
     }
 
 
@@ -1792,24 +1302,18 @@ async function saveTimesheet() {
                                     `Bearer ${token}`
                             }
                             : {})
-
                     },
-
 
                     body:
                         JSON.stringify(
                             data
                         )
-
                 }
             );
 
 
         const result =
-            await response.json()
-                .catch(
-                    () => ({})
-                );
+            await response.json();
 
 
         if (
@@ -1818,10 +1322,8 @@ async function saveTimesheet() {
 
             throw new Error(
                 result.message ||
-                result.error ||
                 "Failed to save timesheet."
             );
-
         }
 
 
@@ -1844,14 +1346,10 @@ async function saveTimesheet() {
             error
         );
 
-
         alert(
-            error.message ||
-            "Failed to save timesheet."
+            error.message
         );
-
     }
-
 }
 
 
@@ -1865,7 +1363,6 @@ async function loadTimesheets() {
         document.getElementById(
             "timesheetTable"
         );
-
 
     if (!table) return;
 
@@ -1895,18 +1392,13 @@ async function loadTimesheets() {
                                     `Bearer ${token}`
                             }
                             : {})
-
                     }
-
                 }
             );
 
 
         const result =
-            await response.json()
-                .catch(
-                    () => ({})
-                );
+            await response.json();
 
 
         if (
@@ -1917,7 +1409,6 @@ async function loadTimesheets() {
                 result.message ||
                 "Failed to load timesheets."
             );
-
         }
 
 
@@ -1952,25 +1443,36 @@ async function loadTimesheets() {
             </tr>
 
         `;
-
     }
-
 }
 
 
 /* =====================================================
    RENDER TIMESHEETS
+=====================================================
+
+   IMPORTANT CHANGE:
+
+   Task numbering REMOVED.
+
+   Multiple lines inside textarea
+   remain one task.
+
+   No:
+
+   1.
+   2.
+   3.
+
+   Only the actual task text is displayed.
 ===================================================== */
 
-function renderTimesheets(
-    records
-) {
+function renderTimesheets(records) {
 
     const table =
         document.getElementById(
             "timesheetTable"
         );
-
 
     if (!table) return;
 
@@ -1980,7 +1482,7 @@ function renderTimesheets(
 
 
     if (
-        !records.length
+        records.length === 0
     ) {
 
         table.innerHTML = `
@@ -2001,7 +1503,6 @@ function renderTimesheets(
         `;
 
         return;
-
     }
 
 
@@ -2019,40 +1520,19 @@ function renderTimesheets(
                 {};
 
 
-            const employeeName =
-                employee.name ||
-                "Unknown";
-
-
             const employeeId =
                 employee.employeeId ||
                 "";
 
 
-            // ------------------------------------------
-            // Display 01 / 02
-            // ------------------------------------------
-
-            const index =
-                employees.findIndex(
-                    employeeItem =>
-                        employeeItem._id ===
-                        employee._id
-                );
-
-
-            const displayId =
-                index >= 0
-                    ? getEmployeeDisplayId(
-                        employee,
-                        index
-                    )
-                    : "";
+            const employeeName =
+                employee.name ||
+                "Unknown";
 
 
             const employeeDisplay =
-                displayId
-                    ? `${displayId}-${employeeName}`
+                employeeId
+                    ? `${employeeId}-${employeeName}`
                     : employeeName;
 
 
@@ -2064,19 +1544,25 @@ function renderTimesheets(
                     : [];
 
 
+            /*
+               IMPORTANT:
+
+               No index + 1.
+
+               No numbering.
+
+               Each task is displayed
+               exactly as stored.
+            */
+
             const taskHtml =
                 tasks.length
-
                     ? tasks
                         .map(
-                            (
-                                task,
-                                index
-                            ) => `
+                            task => `
 
                                 <div class="record-task">
 
-                                    ${index + 1}.
                                     ${escapeHtml(
                                         task.taskName ||
                                         ""
@@ -2087,7 +1573,6 @@ function renderTimesheets(
                             `
                         )
                         .join("")
-
                     : "-";
 
 
@@ -2204,7 +1689,6 @@ function renderTimesheets(
 
         }
     );
-
 }
 
 
@@ -2212,9 +1696,7 @@ function renderTimesheets(
    EDIT
 ===================================================== */
 
-async function editTimesheet(
-    id
-) {
+async function editTimesheet(id) {
 
     try {
 
@@ -2241,18 +1723,13 @@ async function editTimesheet(
                                     `Bearer ${token}`
                             }
                             : {})
-
                     }
-
                 }
             );
 
 
         const result =
-            await response.json()
-                .catch(
-                    () => ({})
-                );
+            await response.json();
 
 
         if (
@@ -2263,7 +1740,6 @@ async function editTimesheet(
                 result.message ||
                 "Failed to load timesheet."
             );
-
         }
 
 
@@ -2271,55 +1747,24 @@ async function editTimesheet(
             result.timesheet;
 
 
-        if (!record) {
-
-            throw new Error(
-                "Timesheet record not found."
-            );
-
-        }
-
-
         editingId =
             record._id;
 
 
-        const employeeSelect =
-            document.getElementById(
-                "employeeName"
+        document.getElementById(
+            "employeeName"
+        ).value =
+            record.employee?._id ||
+            record.employee ||
+            "";
+
+
+        document.getElementById(
+            "date"
+        ).value =
+            formatInputDate(
+                record.date
             );
-
-
-        if (
-            employeeSelect
-        ) {
-
-            employeeSelect.disabled =
-                false;
-
-
-            employeeSelect.value =
-                record.employee?._id ||
-                record.employee ||
-                "";
-
-        }
-
-
-        const date =
-            document.getElementById(
-                "date"
-            );
-
-
-        if (date) {
-
-            date.value =
-                formatInputDate(
-                    record.date
-                );
-
-        }
 
 
         document.getElementById(
@@ -2361,17 +1806,18 @@ async function editTimesheet(
             comments.value =
                 record.comments ||
                 "";
-
         }
 
 
-        setTasks(
+        const tasks =
             Array.isArray(
                 record.tasks
             )
                 ? record.tasks
-                : []
-        );
+                : [];
+
+
+        setTasks(tasks);
 
 
         calculateWorkingHours();
@@ -2384,8 +1830,7 @@ async function editTimesheet(
 
             top: 0,
 
-            behavior:
-                "smooth"
+            behavior: "smooth"
 
         });
 
@@ -2398,13 +1843,10 @@ async function editTimesheet(
             error
         );
 
-
         alert(
             error.message
         );
-
     }
-
 }
 
 
@@ -2415,18 +1857,14 @@ async function editTimesheet(
 async function updateTimesheet() {
 
     if (!editingId) {
-
         return;
-
     }
 
 
     if (
         !validateForm()
     ) {
-
         return;
-
     }
 
 
@@ -2459,24 +1897,18 @@ async function updateTimesheet() {
                                     `Bearer ${token}`
                             }
                             : {})
-
                     },
-
 
                     body:
                         JSON.stringify(
                             data
                         )
-
                 }
             );
 
 
         const result =
-            await response.json()
-                .catch(
-                    () => ({})
-                );
+            await response.json();
 
 
         if (
@@ -2485,10 +1917,8 @@ async function updateTimesheet() {
 
             throw new Error(
                 result.message ||
-                result.error ||
                 "Failed to update timesheet."
             );
-
         }
 
 
@@ -2515,13 +1945,10 @@ async function updateTimesheet() {
             error
         );
 
-
         alert(
             error.message
         );
-
     }
-
 }
 
 
@@ -2529,18 +1956,14 @@ async function updateTimesheet() {
    DELETE
 ===================================================== */
 
-async function deleteTimesheet(
-    id
-) {
+async function deleteTimesheet(id) {
 
     if (
         !confirm(
             "Are you sure you want to delete this timesheet?"
         )
     ) {
-
         return;
-
     }
 
 
@@ -2569,18 +1992,13 @@ async function deleteTimesheet(
                                     `Bearer ${token}`
                             }
                             : {})
-
                     }
-
                 }
             );
 
 
         const result =
-            await response.json()
-                .catch(
-                    () => ({})
-                );
+            await response.json();
 
 
         if (
@@ -2591,7 +2009,6 @@ async function deleteTimesheet(
                 result.message ||
                 "Failed to delete timesheet."
             );
-
         }
 
 
@@ -2611,18 +2028,15 @@ async function deleteTimesheet(
             error
         );
 
-
         alert(
             error.message
         );
-
     }
-
 }
 
 
 /* =====================================================
-   RESET
+   RESET FORM
 ===================================================== */
 
 function resetForm() {
@@ -2646,14 +2060,11 @@ function resetForm() {
                     id
                 );
 
-
             if (element) {
 
                 element.value =
                     "";
-
             }
-
         }
     );
 
@@ -2668,62 +2079,21 @@ function resetForm() {
 
         taskInput.value =
             "";
-
     }
 
 
     setTodayDate();
 
-
     updateTaskCount();
-
 
     calculateWorkingHours();
 
-
     toggleUpdateButton();
-
-
-    // ------------------------------------------
-    // Restore employee selection
-    // ------------------------------------------
-
-    const select =
-        document.getElementById(
-            "employeeName"
-        );
-
-
-    if (
-        select &&
-        getLoggedRole() !== "admin"
-    ) {
-
-        const currentEmployee =
-            employees.find(
-                isCurrentEmployee
-            );
-
-
-        if (
-            currentEmployee
-        ) {
-
-            select.value =
-                currentEmployee._id;
-
-            select.disabled =
-                true;
-
-        }
-
-    }
-
 }
 
 
 /* =====================================================
-   SAVE / UPDATE BUTTON
+   TOGGLE SAVE / UPDATE
 ===================================================== */
 
 function toggleUpdateButton() {
@@ -2733,22 +2103,18 @@ function toggleUpdateButton() {
             "saveBtn"
         );
 
-
     const updateBtn =
         document.getElementById(
             "updateBtn"
         );
 
 
-    if (
-        editingId
-    ) {
+    if (editingId) {
 
         if (saveBtn) {
 
             saveBtn.style.display =
                 "none";
-
         }
 
 
@@ -2756,7 +2122,6 @@ function toggleUpdateButton() {
 
             updateBtn.style.display =
                 "inline-flex";
-
         }
 
     }
@@ -2767,7 +2132,6 @@ function toggleUpdateButton() {
 
             saveBtn.style.display =
                 "inline-flex";
-
         }
 
 
@@ -2775,21 +2139,16 @@ function toggleUpdateButton() {
 
             updateBtn.style.display =
                 "none";
-
         }
-
     }
-
 }
 
 
 /* =====================================================
-   FORMAT DATE
+   DATE FORMAT
 ===================================================== */
 
-function formatDate(
-    value
-) {
+function formatDate(value) {
 
     if (!value) {
         return "-";
@@ -2805,9 +2164,7 @@ function formatDate(
             date.getTime()
         )
     ) {
-
         return "-";
-
     }
 
 
@@ -2815,18 +2172,14 @@ function formatDate(
         "en-IN",
         {
 
-            day:
-                "2-digit",
+            day: "2-digit",
 
-            month:
-                "2-digit",
+            month: "2-digit",
 
-            year:
-                "numeric"
+            year: "numeric"
 
         }
     );
-
 }
 
 
@@ -2834,9 +2187,7 @@ function formatDate(
    INPUT DATE
 ===================================================== */
 
-function formatInputDate(
-    value
-) {
+function formatInputDate(value) {
 
     if (!value) {
         return "";
@@ -2852,9 +2203,7 @@ function formatInputDate(
             date.getTime()
         )
     ) {
-
         return "";
-
     }
 
 
@@ -2880,10 +2229,7 @@ function formatInputDate(
         );
 
 
-    return (
-        `${year}-${month}-${day}`
-    );
-
+    return `${year}-${month}-${day}`;
 }
 
 
@@ -2891,69 +2237,60 @@ function formatInputDate(
    ESCAPE HTML
 ===================================================== */
 
-function escapeHtml(
-    value
-) {
+function escapeHtml(value) {
 
     return String(
         value ?? ""
     )
 
-        .replace(
-            /&/g,
-            "&amp;"
-        )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
 
-        .replace(
-            /</g,
-            "&lt;"
-        )
+    .replace(
+        /</g,
+        "&lt;"
+    )
 
-        .replace(
-            />/g,
-            "&gt;"
-        )
+    .replace(
+        />/g,
+        "&gt;"
+    )
 
-        .replace(
-            /"/g,
-            "&quot;"
-        )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
 
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
+    .replace(
+        /'/g,
+        "&#039;"
+    );
 }
 
 
 /* =====================================================
-   GLOBAL
+   GLOBAL FUNCTIONS
 ===================================================== */
 
 window.saveTimesheet =
     saveTimesheet;
 
-
 window.updateTimesheet =
     updateTimesheet;
-
 
 window.editTimesheet =
     editTimesheet;
 
-
 window.deleteTimesheet =
     deleteTimesheet;
-
 
 window.resetForm =
     resetForm;
 
-
 window.calculateWorkingHours =
     calculateWorkingHours;
-
 
 window.updateTaskCount =
     updateTaskCount;
