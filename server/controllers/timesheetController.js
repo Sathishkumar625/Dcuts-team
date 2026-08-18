@@ -1,26 +1,20 @@
-const Timesheet =
-    require("../models/Timesheet");
-
-const Employee =
-    require("../models/Employee");
+const Timesheet = require("../models/Timesheet");
+const Employee = require("../models/Employee");
 
 
-// ==================================================
+// ======================================================
 // TIME PARSER
-// Accepts:
-//
+// Supports:
 // 9
 // 9.30
 // 9:30
-// 9 30
+// 9 AM
 // 9:30 AM
 // 9.30 PM
-// 9 AM
 // 6 PM
 // 18:30
 // 1830
-// 930
-// ==================================================
+// ======================================================
 
 function parseTime(value) {
 
@@ -40,12 +34,13 @@ function parseTime(value) {
         return null;
     }
 
+
     let period = null;
 
 
-    // ==================================================
+    // ------------------------------------------
     // AM
-    // ==================================================
+    // ------------------------------------------
 
     if (
         /\b(am|a\.m\.)\b/i.test(time)
@@ -55,16 +50,15 @@ function parseTime(value) {
 
         time =
             time.replace(
-                /\s*(am|a\.m\.)\s*/gi,
+                /\s*(a\.m\.|am)\s*/i,
                 ""
             );
-
     }
 
 
-    // ==================================================
+    // ------------------------------------------
     // PM
-    // ==================================================
+    // ------------------------------------------
 
     else if (
         /\b(pm|p\.m\.)\b/i.test(time)
@@ -74,10 +68,9 @@ function parseTime(value) {
 
         time =
             time.replace(
-                /\s*(pm|p\.m\.)\s*/gi,
+                /\s*(p\.m\.|pm)\s*/i,
                 ""
             );
-
     }
 
 
@@ -85,49 +78,42 @@ function parseTime(value) {
         time.trim();
 
 
-    // ==================================================
+    // ------------------------------------------
     // 1830
-    // ==================================================
+    // ------------------------------------------
 
     if (
         /^\d{4}$/.test(time)
     ) {
 
         time =
-            time.substring(0, 2)
-            +
-            ":"
-            +
+            time.substring(0, 2) +
+            ":" +
             time.substring(2);
-
     }
 
 
-    // ==================================================
+    // ------------------------------------------
     // 930
-    // ==================================================
+    // ------------------------------------------
 
     else if (
         /^\d{3}$/.test(time)
     ) {
 
         time =
-            "0" +
-            time;
+            "0" + time;
 
         time =
-            time.substring(0, 2)
-            +
-            ":"
-            +
+            time.substring(0, 2) +
+            ":" +
             time.substring(2);
-
     }
 
 
-    // ==================================================
+    // ------------------------------------------
     // 9.30 / 9 30
-    // ==================================================
+    // ------------------------------------------
 
     time =
         time.replace(
@@ -136,9 +122,10 @@ function parseTime(value) {
         );
 
 
-    // ==================================================
+    // ------------------------------------------
     // ONLY HOUR
-    // ==================================================
+    // 9 -> 9:00
+    // ------------------------------------------
 
     if (
         /^\d{1,2}$/.test(time)
@@ -146,7 +133,6 @@ function parseTime(value) {
 
         time =
             `${time}:00`;
-
     }
 
 
@@ -157,14 +143,12 @@ function parseTime(value) {
     if (
         parts.length !== 2
     ) {
-
         return null;
     }
 
 
     let hours =
         Number(parts[0]);
-
 
     let minutes =
         Number(parts[1]);
@@ -174,7 +158,6 @@ function parseTime(value) {
         !Number.isInteger(hours) ||
         !Number.isInteger(minutes)
     ) {
-
         return null;
     }
 
@@ -183,14 +166,13 @@ function parseTime(value) {
         minutes < 0 ||
         minutes > 59
     ) {
-
         return null;
     }
 
 
-    // ==================================================
+    // ------------------------------------------
     // AM / PM
-    // ==================================================
+    // ------------------------------------------
 
     if (period) {
 
@@ -198,41 +180,29 @@ function parseTime(value) {
             hours < 1 ||
             hours > 12
         ) {
-
             return null;
         }
 
 
-        if (
-            period === "AM"
-        ) {
+        if (period === "AM") {
 
-            if (
-                hours === 12
-            ) {
-
+            if (hours === 12) {
                 hours = 0;
             }
 
-        }
+        } else {
 
-        else {
-
-            if (
-                hours !== 12
-            ) {
-
+            if (hours !== 12) {
                 hours += 12;
             }
-
         }
 
     }
 
 
-    // ==================================================
+    // ------------------------------------------
     // 24 HOUR
-    // ==================================================
+    // ------------------------------------------
 
     else {
 
@@ -240,10 +210,8 @@ function parseTime(value) {
             hours < 0 ||
             hours > 23
         ) {
-
             return null;
         }
-
     }
 
 
@@ -254,9 +222,10 @@ function parseTime(value) {
 }
 
 
-// ==================================================
+
+// ======================================================
 // FORMAT HOURS
-// ==================================================
+// ======================================================
 
 function formatHours(minutes) {
 
@@ -264,7 +233,6 @@ function formatHours(minutes) {
         !Number.isFinite(minutes) ||
         minutes < 0
     ) {
-
         return "0h 0m";
     }
 
@@ -287,72 +255,30 @@ function formatHours(minutes) {
 }
 
 
-// ==================================================
-// SAFE POSITIVE DIFFERENCE
-//
-// No negative values.
-//
-// Example:
-// 09:00 -> 18:30
-// = 570 minutes
-//
-// If result is negative:
-// = 0
-// ==================================================
 
-function safeDifference(
-    start,
-    end
-) {
-
-    if (
-        start === null ||
-        end === null
-    ) {
-
-        return 0;
-    }
-
-
-    const difference =
-        end - start;
-
-
-    if (
-        difference < 0
-    ) {
-
-        return 0;
-    }
-
-
-    return difference;
-}
-
-
-// ==================================================
+// ======================================================
 // CALCULATE ATTENDANCE
 //
 // IMPORTANT:
 //
 // NO FIXED TIME
-// NO FIXED LUNCH
-// NO TIME ORDER VALIDATION
+// NO LUNCH TIME RESTRICTION
+// NO TIME ORDER RESTRICTION
 //
 // User can enter any valid time.
 //
-// Office Hours:
-// Check-out - Check-in
+// Example:
 //
-// Lunch:
-// Lunch End - Lunch Start
+// 09:30 -> 19:00
+// Lunch 13:00 -> 14:00
 //
-// Working:
-// Office Hours - Lunch
+// Office = 9h 30m
+// Lunch  = 1h
+// Working = 8h 30m
 //
-// Missing time:
-// automatically 0
-// ==================================================
+// If times are reversed:
+// negative values are converted to 0.
+// ======================================================
 
 function calculateAttendance(
     checkIn,
@@ -385,83 +311,29 @@ function calculateAttendance(
             : null;
 
 
-    // ==================================================
-    // INVALID TIME FORMAT
-    // ==================================================
+    // ------------------------------------------
+    // DEFAULT OFFICE HOURS
+    // ------------------------------------------
 
-    if (
-        checkIn &&
-        inTime === null
-    ) {
-
-        return {
-
-            valid: false,
-
-            message:
-                "Invalid Check-in time."
-
-        };
-    }
+    const DEFAULT_OFFICE_MINUTES =
+        9 * 60 + 30;
 
 
-    if (
-        lunchStart &&
-        lunchStartTime === null
-    ) {
-
-        return {
-
-            valid: false,
-
-            message:
-                "Invalid Lunch Start time."
-
-        };
-    }
+    let officeMinutes =
+        DEFAULT_OFFICE_MINUTES;
 
 
-    if (
-        lunchEnd &&
-        lunchEndTime === null
-    ) {
-
-        return {
-
-            valid: false,
-
-            message:
-                "Invalid Lunch End time."
-
-        };
-    }
+    let lunchMinutes =
+        0;
 
 
-    if (
-        checkOut &&
-        outTime === null
-    ) {
-
-        return {
-
-            valid: false,
-
-            message:
-                "Invalid Check-out time."
-
-        };
-    }
+    let workingMinutes =
+        DEFAULT_OFFICE_MINUTES;
 
 
-    // ==================================================
-    // OFFICE HOURS
-    //
-    // Only calculate when both check-in
-    // and check-out are available.
-    // ==================================================
-
-    let officeMinutes = 0;
-
+    // ------------------------------------------
+    // CHECK-IN + CHECK-OUT
+    // ------------------------------------------
 
     if (
         inTime !== null &&
@@ -469,23 +341,20 @@ function calculateAttendance(
     ) {
 
         officeMinutes =
-            safeDifference(
-                inTime,
-                outTime
-            );
+            outTime - inTime;
 
+
+        if (
+            officeMinutes < 0
+        ) {
+            officeMinutes = 0;
+        }
     }
 
 
-    // ==================================================
-    // LUNCH HOURS
-    //
-    // Only calculate when both lunch
-    // start and lunch end are available.
-    // ==================================================
-
-    let lunchMinutes = 0;
-
+    // ------------------------------------------
+    // LUNCH
+    // ------------------------------------------
 
     if (
         lunchStartTime !== null &&
@@ -493,19 +362,23 @@ function calculateAttendance(
     ) {
 
         lunchMinutes =
-            safeDifference(
-                lunchStartTime,
-                lunchEndTime
-            );
+            lunchEndTime -
+            lunchStartTime;
 
+
+        if (
+            lunchMinutes < 0
+        ) {
+            lunchMinutes = 0;
+        }
     }
 
 
-    // ==================================================
-    // WORKING HOURS
-    // ==================================================
+    // ------------------------------------------
+    // WORKING
+    // ------------------------------------------
 
-    let workingMinutes =
+    workingMinutes =
         officeMinutes -
         lunchMinutes;
 
@@ -513,7 +386,6 @@ function calculateAttendance(
     if (
         workingMinutes < 0
     ) {
-
         workingMinutes = 0;
     }
 
@@ -542,14 +414,72 @@ function calculateAttendance(
             formatHours(
                 workingMinutes
             )
-
     };
 }
 
 
-// ==================================================
+
+// ======================================================
+// CLEAN TASKS
+// ======================================================
+
+function cleanTaskList(tasks) {
+
+    if (
+        !Array.isArray(tasks)
+    ) {
+        return [];
+    }
+
+
+    return tasks
+
+        .map(
+            task => {
+
+                if (
+                    typeof task === "string"
+                ) {
+
+                    return {
+                        taskName:
+                            task.trim()
+                    };
+                }
+
+
+                return {
+
+                    taskName:
+                        String(
+                            task?.taskName ||
+                            task?.name ||
+                            task?.title ||
+                            ""
+                        ).trim()
+
+                };
+
+            }
+        )
+
+        .filter(
+            task =>
+                task.taskName
+        );
+}
+
+
+
+// ======================================================
 // GET ALL TIMESHEETS
-// ==================================================
+//
+// ADMIN:
+// sees ALL employees' records.
+//
+// EMPLOYEE:
+// sees only own records.
+// ======================================================
 
 async function getTimesheets(
     req,
@@ -565,22 +495,37 @@ async function getTimesheets(
         let query = {};
 
 
-        // ==================================================
+        // ------------------------------------------
         // EMPLOYEE
-        // Employee can see own records.
-        // ==================================================
+        // ------------------------------------------
 
         if (
             user &&
             user.role !== "admin"
         ) {
 
-            query.employee =
+            const employeeId =
                 user.employeeId ||
                 user._id;
 
+
+            if (
+                employeeId
+            ) {
+
+                query.employee =
+                    employeeId;
+
+            }
+
         }
 
+
+        // ------------------------------------------
+        // ADMIN
+        // query remains {}
+        // therefore ALL records
+        // ------------------------------------------
 
         const records =
             await Timesheet
@@ -599,7 +544,7 @@ async function getTimesheets(
                 });
 
 
-        res.json({
+        return res.json({
 
             success: true,
 
@@ -618,12 +563,15 @@ async function getTimesheets(
         );
 
 
-        res.status(500).json({
+        return res.status(500).json({
 
             success: false,
 
             message:
-                "Failed to load timesheets."
+                "Failed to load timesheets.",
+
+            error:
+                error.message
 
         });
 
@@ -632,9 +580,10 @@ async function getTimesheets(
 }
 
 
-// ==================================================
+
+// ======================================================
 // GET ONE TIMESHEET
-// ==================================================
+// ======================================================
 
 async function getTimesheet(
     req,
@@ -672,7 +621,7 @@ async function getTimesheet(
         }
 
 
-        res.json({
+        return res.json({
 
             success: true,
 
@@ -691,12 +640,15 @@ async function getTimesheet(
         );
 
 
-        res.status(500).json({
+        return res.status(500).json({
 
             success: false,
 
             message:
-                "Failed to load timesheet."
+                "Failed to load timesheet.",
+
+            error:
+                error.message
 
         });
 
@@ -705,9 +657,10 @@ async function getTimesheet(
 }
 
 
-// ==================================================
+
+// ======================================================
 // CREATE TIMESHEET
-// ==================================================
+// ======================================================
 
 async function createTimesheet(
     req,
@@ -749,9 +702,9 @@ async function createTimesheet(
         } = req.body;
 
 
-        // ==================================================
+        // ------------------------------------------
         // EMPLOYEE REQUIRED
-        // ==================================================
+        // ------------------------------------------
 
         if (!employee) {
 
@@ -767,9 +720,9 @@ async function createTimesheet(
         }
 
 
-        // ==================================================
+        // ------------------------------------------
         // DATE REQUIRED
-        // ==================================================
+        // ------------------------------------------
 
         if (!date) {
 
@@ -785,30 +738,9 @@ async function createTimesheet(
         }
 
 
-        // ==================================================
-        // TASK REQUIRED
-        // ==================================================
-
-        if (
-            !Array.isArray(tasks) ||
-            tasks.length === 0
-        ) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Please enter at least one task."
-
-            });
-
-        }
-
-
-        // ==================================================
+        // ------------------------------------------
         // VERIFY EMPLOYEE
-        // ==================================================
+        // ------------------------------------------
 
         const employeeExists =
             await Employee.findById(
@@ -830,12 +762,49 @@ async function createTimesheet(
         }
 
 
-        // ==================================================
-        // CALCULATE TIME
+        // ------------------------------------------
+        // TIME FORMAT VALIDATION
         //
-        // No fixed time.
-        // No fixed lunch.
-        // ==================================================
+        // Time fields are optional.
+        //
+        // But if entered, they must be valid.
+        // ------------------------------------------
+
+        const timeFields = [
+            ["checkIn", checkIn],
+            ["lunchStart", lunchStart],
+            ["lunchEnd", lunchEnd],
+            ["checkOut", checkOut]
+        ];
+
+
+        for (
+            const [field, value]
+            of timeFields
+        ) {
+
+            if (
+                value &&
+                parseTime(value) === null
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        `${field} time is invalid.`
+
+                });
+
+            }
+
+        }
+
+
+        // ------------------------------------------
+        // CALCULATE
+        // ------------------------------------------
 
         const attendance =
             calculateAttendance(
@@ -846,91 +815,17 @@ async function createTimesheet(
             );
 
 
-        if (
-            !attendance.valid
-        ) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    attendance.message
-
-            });
-
-        }
-
-
-        // ==================================================
-        // CLEAN TASKS
-        // ==================================================
+        // ------------------------------------------
+        // TASKS
+        // ------------------------------------------
 
         const cleanTasks =
-            Array.isArray(tasks)
-
-                ? tasks
-                    .map(
-                        task => {
-
-                            if (
-                                typeof task ===
-                                "string"
-                            ) {
-
-                                return {
-
-                                    taskName:
-                                        String(
-                                            task
-                                        ).trim()
-
-                                };
-
-                            }
+            cleanTaskList(tasks);
 
 
-                            return {
-
-                                taskName:
-                                    String(
-                                        task.taskName ||
-                                        task.name ||
-                                        task.title ||
-                                        ""
-                                    ).trim()
-
-                            };
-
-                        }
-                    )
-                    .filter(
-                        task =>
-                            task.taskName
-                    )
-
-                : [];
-
-
-        if (
-            cleanTasks.length === 0
-        ) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Please enter at least one task."
-
-            });
-
-        }
-
-
-        // ==================================================
+        // ------------------------------------------
         // CREATE RECORD
-        // ==================================================
+        // ------------------------------------------
 
         const record =
             new Timesheet({
@@ -939,30 +834,18 @@ async function createTimesheet(
 
                 date,
 
-
-                // Time fields
-                //
-                // Empty values remain empty.
-                // No fixed time is inserted.
-
                 checkIn:
-                    checkIn ||
-                    "",
+                    checkIn || "",
 
                 lunchStart:
-                    lunchStart ||
-                    "",
+                    lunchStart || "",
 
                 lunchEnd:
-                    lunchEnd ||
-                    "",
+                    lunchEnd || "",
 
                 checkOut:
-                    checkOut ||
-                    "",
+                    checkOut || "",
 
-
-                // Calculated values
 
                 officeMinutes:
                     attendance.officeMinutes,
@@ -984,31 +867,20 @@ async function createTimesheet(
                     attendance.workingHours,
 
 
-                // Tasks
-
                 tasks:
                     cleanTasks,
 
 
-                // Comments
-
                 comments:
-                    comments ||
-                    "",
+                    comments || "",
 
-
-                // Optional project
 
                 project:
-                    project ||
-                    null,
+                    project || null,
 
                 projectName:
-                    projectName ||
-                    "",
+                    projectName || "",
 
-
-                // Optional video information
 
                 totalVideos:
                     Number(
@@ -1036,9 +908,9 @@ async function createTimesheet(
         await record.save();
 
 
-        // ==================================================
+        // ------------------------------------------
         // POPULATE
-        // ==================================================
+        // ------------------------------------------
 
         const populated =
             await Timesheet
@@ -1055,11 +927,7 @@ async function createTimesheet(
                 );
 
 
-        // ==================================================
-        // RESPONSE
-        // ==================================================
-
-        res.status(201).json({
+        return res.status(201).json({
 
             success: true,
 
@@ -1081,7 +949,7 @@ async function createTimesheet(
         );
 
 
-        res.status(500).json({
+        return res.status(500).json({
 
             success: false,
 
@@ -1098,9 +966,10 @@ async function createTimesheet(
 }
 
 
-// ==================================================
+
+// ======================================================
 // UPDATE TIMESHEET
-// ==================================================
+// ======================================================
 
 async function updateTimesheet(
     req,
@@ -1142,10 +1011,6 @@ async function updateTimesheet(
         } = req.body;
 
 
-        // ==================================================
-        // FIND RECORD
-        // ==================================================
-
         const record =
             await Timesheet.findById(
                 req.params.id
@@ -1166,28 +1031,34 @@ async function updateTimesheet(
         }
 
 
-        // ==================================================
-        // EMPLOYEE VALIDATION
-        // ==================================================
+        // ------------------------------------------
+        // VERIFY TIMES
+        // ------------------------------------------
 
-        if (
-            employee
+        const timeFields = [
+            ["checkIn", checkIn],
+            ["lunchStart", lunchStart],
+            ["lunchEnd", lunchEnd],
+            ["checkOut", checkOut]
+        ];
+
+
+        for (
+            const [field, value]
+            of timeFields
         ) {
 
-            const employeeExists =
-                await Employee.findById(
-                    employee
-                );
+            if (
+                value &&
+                parseTime(value) === null
+            ) {
 
-
-            if (!employeeExists) {
-
-                return res.status(404).json({
+                return res.status(400).json({
 
                     success: false,
 
                     message:
-                        "Employee not found."
+                        `${field} time is invalid.`
 
                 });
 
@@ -1196,75 +1067,9 @@ async function updateTimesheet(
         }
 
 
-        // ==================================================
-        // TASKS
-        // ==================================================
-
-        const cleanTasks =
-            Array.isArray(tasks)
-
-                ? tasks
-                    .map(
-                        task => {
-
-                            if (
-                                typeof task ===
-                                "string"
-                            ) {
-
-                                return {
-
-                                    taskName:
-                                        String(
-                                            task
-                                        ).trim()
-
-                                };
-
-                            }
-
-
-                            return {
-
-                                taskName:
-                                    String(
-                                        task.taskName ||
-                                        task.name ||
-                                        task.title ||
-                                        ""
-                                    ).trim()
-
-                            };
-
-                        }
-                    )
-                    .filter(
-                        task =>
-                            task.taskName
-                    )
-
-                : [];
-
-
-        if (
-            cleanTasks.length === 0
-        ) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Please enter at least one task."
-
-            });
-
-        }
-
-
-        // ==================================================
-        // CALCULATE TIME
-        // ==================================================
+        // ------------------------------------------
+        // CALCULATE
+        // ------------------------------------------
 
         const attendance =
             calculateAttendance(
@@ -1275,29 +1080,19 @@ async function updateTimesheet(
             );
 
 
-        if (
-            !attendance.valid
-        ) {
+        // ------------------------------------------
+        // TASKS
+        // ------------------------------------------
 
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    attendance.message
-
-            });
-
-        }
+        const cleanTasks =
+            cleanTaskList(tasks);
 
 
-        // ==================================================
-        // UPDATE BASIC DATA
-        // ==================================================
+        // ------------------------------------------
+        // UPDATE
+        // ------------------------------------------
 
-        if (
-            employee
-        ) {
+        if (employee) {
 
             record.employee =
                 employee;
@@ -1305,9 +1100,7 @@ async function updateTimesheet(
         }
 
 
-        if (
-            date
-        ) {
+        if (date) {
 
             record.date =
                 date;
@@ -1315,36 +1108,29 @@ async function updateTimesheet(
         }
 
 
-        // ==================================================
-        // TIME VALUES
-        // ==================================================
-
         record.checkIn =
-            checkIn ||
-            "";
+            checkIn || "";
+
 
         record.lunchStart =
-            lunchStart ||
-            "";
+            lunchStart || "";
+
 
         record.lunchEnd =
-            lunchEnd ||
-            "";
+            lunchEnd || "";
+
 
         record.checkOut =
-            checkOut ||
-            "";
+            checkOut || "";
 
-
-        // ==================================================
-        // CALCULATED HOURS
-        // ==================================================
 
         record.officeMinutes =
             attendance.officeMinutes;
 
+
         record.lunchMinutes =
             attendance.lunchMinutes;
+
 
         record.workingMinutes =
             attendance.workingMinutes;
@@ -1353,56 +1139,42 @@ async function updateTimesheet(
         record.officeHours =
             attendance.officeHours;
 
+
         record.lunchHours =
             attendance.lunchHours;
+
 
         record.workingHours =
             attendance.workingHours;
 
 
-        // ==================================================
-        // TASKS
-        // ==================================================
-
         record.tasks =
             cleanTasks;
 
 
-        // ==================================================
-        // COMMENTS
-        // ==================================================
-
         record.comments =
-            comments ||
-            "";
+            comments || "";
 
-
-        // ==================================================
-        // PROJECT
-        // ==================================================
 
         record.project =
-            project ||
-            null;
+            project || null;
+
 
         record.projectName =
-            projectName ||
-            "";
+            projectName || "";
 
-
-        // ==================================================
-        // VIDEOS
-        // ==================================================
 
         record.totalVideos =
             Number(
                 totalVideos || 0
             );
 
+
         record.completedVideos =
             Number(
                 completedVideos || 0
             );
+
 
         record.balanceVideos =
             Number(
@@ -1410,26 +1182,18 @@ async function updateTimesheet(
             );
 
 
-        // ==================================================
-        // STATUS
-        // ==================================================
-
         record.status =
             status ||
             record.status ||
             "Pending";
 
 
-        // ==================================================
-        // SAVE
-        // ==================================================
-
         await record.save();
 
 
-        // ==================================================
+        // ------------------------------------------
         // POPULATE
-        // ==================================================
+        // ------------------------------------------
 
         const populated =
             await Timesheet
@@ -1446,11 +1210,7 @@ async function updateTimesheet(
                 );
 
 
-        // ==================================================
-        // RESPONSE
-        // ==================================================
-
-        res.json({
+        return res.json({
 
             success: true,
 
@@ -1472,7 +1232,7 @@ async function updateTimesheet(
         );
 
 
-        res.status(500).json({
+        return res.status(500).json({
 
             success: false,
 
@@ -1489,9 +1249,10 @@ async function updateTimesheet(
 }
 
 
-// ==================================================
+
+// ======================================================
 // DELETE TIMESHEET
-// ==================================================
+// ======================================================
 
 async function deleteTimesheet(
     req,
@@ -1525,7 +1286,7 @@ async function deleteTimesheet(
         );
 
 
-        res.json({
+        return res.json({
 
             success: true,
 
@@ -1544,7 +1305,7 @@ async function deleteTimesheet(
         );
 
 
-        res.status(500).json({
+        return res.status(500).json({
 
             success: false,
 
@@ -1561,15 +1322,17 @@ async function deleteTimesheet(
 }
 
 
-// ==================================================
-// EXPORT CONTROLLER FUNCTIONS
+
+// ======================================================
+// EXPORTS
 //
 // IMPORTANT:
-// Functions are declared above using:
-// async function functionName()
+// Do NOT use:
+// module.exports = { createTimesheet }
+// when createTimesheet was only exports.createTimesheet.
 //
-// Therefore they can safely be exported here.
-// ==================================================
+// Here all functions are declared properly.
+// ======================================================
 
 module.exports = {
 
@@ -1577,10 +1340,10 @@ module.exports = {
 
     getTimesheets,
 
+    getTimesheet,
+
     getTimesheetById:
         getTimesheet,
-
-    getTimesheet,
 
     updateTimesheet,
 

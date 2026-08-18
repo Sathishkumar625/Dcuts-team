@@ -1,6 +1,5 @@
 /* =====================================================
-   THE D CUTS - DAILY TIMESHEET JS
-   SINGLE TASK TEXTAREA VERSION
+   THE D CUTS - DAILY TIMESHEET
 ===================================================== */
 
 
@@ -10,7 +9,11 @@
 
 const API_BASE =
     window.API_BASE ||
-    "https://dcuts-team.onrender.com/api";
+    (
+        window.location.hostname === "localhost"
+            ? "http://localhost:5000/api"
+            : "/api"
+    );
 
 
 /* =====================================================
@@ -30,9 +33,7 @@ let taskEventsReady = false;
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
-        initializeTimesheet();
-    }
+    initializeTimesheet
 );
 
 
@@ -71,18 +72,26 @@ function setTodayDate() {
 
     if (!input) return;
 
-    const today = new Date();
+
+    const today =
+        new Date();
+
 
     const year =
         today.getFullYear();
 
+
     const month =
-        String(today.getMonth() + 1)
-            .padStart(2, "0");
+        String(
+            today.getMonth() + 1
+        ).padStart(2, "0");
+
 
     const day =
-        String(today.getDate())
-            .padStart(2, "0");
+        String(
+            today.getDate()
+        ).padStart(2, "0");
+
 
     input.value =
         `${year}-${month}-${day}`;
@@ -111,105 +120,304 @@ function getAuthToken() {
 
 function getLoggedUser() {
 
-    let loggedUser = null;
+    let user = null;
 
 
-    /* ================================================
-       loggedUser OBJECT
-    ================================================= */
-
-    try {
-
-        const storedUser =
-            localStorage.getItem(
-                "loggedUser"
-            );
+    const possibleKeys = [
+        "loggedUser",
+        "user",
+        "currentUser"
+    ];
 
 
-        if (storedUser) {
+    for (
+        const key
+        of possibleKeys
+    ) {
 
-            loggedUser =
-                JSON.parse(
-                    storedUser
-                );
+        const value =
+            localStorage.getItem(key);
+
+
+        if (!value) continue;
+
+
+        try {
+
+            const parsed =
+                JSON.parse(value);
+
+
+            if (
+                parsed &&
+                typeof parsed === "object"
+            ) {
+
+                user = parsed;
+
+                break;
+            }
+
+        }
+        catch {
+
+            // Ignore invalid JSON
         }
 
     }
-    catch (error) {
 
-        console.warn(
-            "loggedUser parse error:",
-            error
+
+    return user;
+}
+
+
+/* =====================================================
+   GET LOGGED USER NAME
+===================================================== */
+
+function getLoggedUserName() {
+
+    const user =
+        getLoggedUser();
+
+
+    const values = [
+
+        user?.name,
+
+        user?.userName,
+
+        user?.username,
+
+        user?.displayName,
+
+        user?.employeeName,
+
+        localStorage.getItem(
+            "userName"
+        ),
+
+        localStorage.getItem(
+            "employeeName"
+        )
+
+    ];
+
+
+    for (
+        const value
+        of values
+    ) {
+
+        if (
+            value &&
+            String(value).trim()
+        ) {
+
+            return String(
+                value
+            ).trim();
+
+        }
+
+    }
+
+
+    return "";
+}
+
+
+/* =====================================================
+   GET LOGGED USER EMAIL
+===================================================== */
+
+function getLoggedUserEmail() {
+
+    const user =
+        getLoggedUser();
+
+
+    const values = [
+
+        user?.email,
+
+        localStorage.getItem(
+            "userEmail"
+        ),
+
+        localStorage.getItem(
+            "email"
+        )
+
+    ];
+
+
+    for (
+        const value
+        of values
+    ) {
+
+        if (
+            value &&
+            String(value).trim()
+        ) {
+
+            return String(
+                value
+            ).trim()
+                .toLowerCase();
+
+        }
+
+    }
+
+
+    return "";
+}
+
+
+/* =====================================================
+   GET ROLE
+===================================================== */
+
+function getLoggedRole() {
+
+    const user =
+        getLoggedUser();
+
+
+    return (
+        user?.role ||
+        localStorage.getItem("role") ||
+        ""
+    )
+        .toString()
+        .toLowerCase();
+}
+
+
+/* =====================================================
+   EMPLOYEE MATCH
+===================================================== */
+
+function isCurrentEmployee(
+    employee
+) {
+
+    const loggedName =
+        getLoggedUserName()
+            .toLowerCase()
+            .trim();
+
+
+    const loggedEmail =
+        getLoggedUserEmail()
+            .toLowerCase()
+            .trim();
+
+
+    const employeeName =
+        String(
+            employee?.name || ""
+        )
+            .toLowerCase()
+            .trim();
+
+
+    const employeeEmail =
+        String(
+            employee?.email || ""
+        )
+            .toLowerCase()
+            .trim();
+
+
+    // ------------------------------------------
+    // EMAIL MATCH
+    // ------------------------------------------
+
+    if (
+        loggedEmail &&
+        employeeEmail &&
+        loggedEmail === employeeEmail
+    ) {
+
+        return true;
+
+    }
+
+
+    // ------------------------------------------
+    // NAME MATCH
+    // ------------------------------------------
+
+    if (
+        loggedName &&
+        employeeName
+    ) {
+
+        if (
+            loggedName === employeeName
+        ) {
+
+            return true;
+
+        }
+
+
+        if (
+            loggedName.includes(
+                employeeName
+            ) ||
+            employeeName.includes(
+                loggedName
+            )
+        ) {
+
+            return true;
+
+        }
+
+    }
+
+
+    return false;
+}
+
+
+/* =====================================================
+   EMPLOYEE DISPLAY ID
+===================================================== */
+
+function getEmployeeDisplayId(
+    employee,
+    index
+) {
+
+    // ------------------------------------------
+    // Existing sequence
+    // ------------------------------------------
+
+    if (
+        index !== undefined
+    ) {
+
+        return String(
+            index + 1
+        ).padStart(
+            2,
+            "0"
         );
 
     }
 
 
-    /* ================================================
-       FALLBACK LOCALSTORAGE
-    ================================================= */
-
-    if (!loggedUser) {
-
-        loggedUser = {
-
-            name:
-                localStorage.getItem(
-                    "userName"
-                ) ||
-                localStorage.getItem(
-                    "name"
-                ) ||
-                "",
-
-            email:
-                localStorage.getItem(
-                    "userEmail"
-                ) ||
-                localStorage.getItem(
-                    "email"
-                ) ||
-                "",
-
-            employeeId:
-                localStorage.getItem(
-                    "employeeId"
-                ) ||
-                "",
-
-            role:
-                localStorage.getItem(
-                    "role"
-                ) ||
-                ""
-
-        };
-
-    }
-
-
-    return loggedUser;
+    return "01";
 }
 
 
 /* =====================================================
    LOAD EMPLOYEES
-=====================================================
-
-   IMPORTANT:
-
-   Sathish login
-   -> ONLY Sathish
-
-   Naveen login
-   -> ONLY Naveen
-
-   Display IDs:
-
-   Sathish = 01
-   Naveen  = 02
-
-   Long Mongo Employee IDs are NEVER displayed.
 ===================================================== */
 
 async function loadEmployees() {
@@ -219,6 +427,7 @@ async function loadEmployees() {
             "employeeName"
         );
 
+
     if (!select) return;
 
 
@@ -226,7 +435,7 @@ async function loadEmployees() {
 
         select.innerHTML = `
             <option value="">
-                Loading...
+                Loading employees...
             </option>
         `;
 
@@ -254,281 +463,73 @@ async function loadEmployees() {
                                     `Bearer ${token}`
                             }
                             : {})
+
                     }
+
                 }
             );
 
 
-        if (!response.ok) {
+        const result =
+            await response.json()
+                .catch(
+                    () => ({})
+                );
+
+
+        if (
+            !response.ok
+        ) {
 
             throw new Error(
+                result.message ||
                 "Failed to load employees."
             );
+
         }
-
-
-        const data =
-            await response.json();
 
 
         employees =
-            data.employees ||
-            data.data ||
+            result.employees ||
+            result.data ||
             [];
 
 
-        /* ============================================
-           LOGGED USER
-        ============================================ */
+        // ------------------------------------------
+        // ADMIN
+        // ------------------------------------------
 
-        const loggedUser =
-            getLoggedUser();
+        const role =
+            getLoggedRole();
 
-
-        const loggedName =
-            String(
-                loggedUser?.name ||
-                loggedUser?.displayName ||
-                loggedUser?.employeeName ||
-                ""
-            )
-            .trim()
-            .toLowerCase();
-
-
-        const loggedEmail =
-            String(
-                loggedUser?.email ||
-                ""
-            )
-            .trim()
-            .toLowerCase();
-
-
-        const loggedEmployeeId =
-            String(
-                loggedUser?.employeeId ||
-                ""
-            )
-            .trim()
-            .toLowerCase();
-
-
-        console.log(
-            "Logged User:",
-            loggedUser
-        );
-
-
-        console.log(
-            "Logged Name:",
-            loggedName
-        );
-
-
-        console.log(
-            "Logged Email:",
-            loggedEmail
-        );
-
-
-        /* ============================================
-           FIND LOGGED-IN EMPLOYEE
-        ============================================ */
-
-        let loggedEmployee =
-            null;
-
-
-        /* --------------------------------------------
-           1. EMPLOYEE ID MATCH
-        -------------------------------------------- */
 
         if (
-            loggedEmployeeId
+            role === "admin"
         ) {
 
-            loggedEmployee =
-                employees.find(
-                    employee => {
-
-                        const id =
-                            String(
-                                employee.employeeId ||
-                                employee._id ||
-                                ""
-                            )
-                            .trim()
-                            .toLowerCase();
-
-
-                        return (
-                            id ===
-                            loggedEmployeeId
-                        );
-
-                    }
-                );
-
-        }
-
-
-        /* --------------------------------------------
-           2. EMAIL MATCH
-        -------------------------------------------- */
-
-        if (
-            !loggedEmployee &&
-            loggedEmail
-        ) {
-
-            loggedEmployee =
-                employees.find(
-                    employee => {
-
-                        const email =
-                            String(
-                                employee.email ||
-                                ""
-                            )
-                            .trim()
-                            .toLowerCase();
-
-
-                        return (
-                            email &&
-                            email ===
-                            loggedEmail
-                        );
-
-                    }
-                );
-
-        }
-
-
-        /* --------------------------------------------
-           3. NAME MATCH
-        -------------------------------------------- */
-
-        if (
-            !loggedEmployee &&
-            loggedName
-        ) {
-
-            loggedEmployee =
-                employees.find(
-                    employee => {
-
-                        const employeeName =
-                            String(
-                                employee.name ||
-                                ""
-                            )
-                            .trim()
-                            .toLowerCase();
-
-
-                        if (
-                            !employeeName
-                        ) {
-                            return false;
-                        }
-
-
-                        return (
-                            employeeName ===
-                                loggedName
-                            ||
-                            employeeName.includes(
-                                loggedName
-                            )
-                            ||
-                            loggedName.includes(
-                                employeeName
-                            )
-                        );
-
-                    }
-                );
-
-        }
-
-
-        /* ============================================
-           SPECIAL NAME MATCH
-           
-           Helps when Google name and employee
-           database name are slightly different.
-        ============================================ */
-
-        if (
-            !loggedEmployee &&
-            loggedName
-        ) {
-
-            if (
-                loggedName.includes(
-                    "sathish"
-                )
-            ) {
-
-                loggedEmployee =
-                    employees.find(
-                        employee =>
-                            String(
-                                employee.name ||
-                                ""
-                            )
-                            .toLowerCase()
-                            .includes(
-                                "sathish"
-                            )
-                    );
-
-            }
-
-
-            else if (
-                loggedName.includes(
-                    "naveen"
-                )
-            ) {
-
-                loggedEmployee =
-                    employees.find(
-                        employee =>
-                            String(
-                                employee.name ||
-                                ""
-                            )
-                            .toLowerCase()
-                            .includes(
-                                "naveen"
-                            )
-                    );
-
-            }
-
-        }
-
-
-        /* ============================================
-           IF EMPLOYEE NOT FOUND
-        ============================================ */
-
-        if (
-            !loggedEmployee
-        ) {
-
-            console.warn(
-                "Logged-in employee not found.",
-                {
-                    loggedUser,
-                    employees
-                }
+            renderEmployeeOptions(
+                select,
+                employees
             );
 
+            return;
+        }
+
+
+        // ------------------------------------------
+        // EMPLOYEE
+        // Only logged employee
+        // ------------------------------------------
+
+        const currentEmployee =
+            employees.find(
+                isCurrentEmployee
+            );
+
+
+        if (
+            !currentEmployee
+        ) {
 
             select.innerHTML = `
                 <option value="">
@@ -536,61 +537,37 @@ async function loadEmployees() {
                 </option>
             `;
 
+            console.warn(
+                "CURRENT EMPLOYEE NOT FOUND",
+                {
+                    loggedName:
+                        getLoggedUserName(),
+
+                    loggedEmail:
+                        getLoggedUserEmail(),
+
+                    employees
+                }
+            );
 
             return;
         }
 
 
-        /* ============================================
-           SIMPLE DISPLAY ID
-           
-           Sathish = 01
-           Naveen  = 02
-        ============================================ */
-
-        const employeeName =
-            String(
-                loggedEmployee.name ||
-                ""
-            )
-            .trim()
-            .toLowerCase();
+        const index =
+            employees.indexOf(
+                currentEmployee
+            );
 
 
-        let simpleId =
-            "01";
+        const displayId =
+            getEmployeeDisplayId(
+                currentEmployee,
+                index
+            );
 
 
-        if (
-            employeeName.includes(
-                "naveen"
-            )
-        ) {
-
-            simpleId =
-                "02";
-
-        }
-
-
-        else if (
-            employeeName.includes(
-                "sathish"
-            )
-        ) {
-
-            simpleId =
-                "01";
-
-        }
-
-
-        /* ============================================
-           ONLY LOGGED-IN EMPLOYEE
-        ============================================ */
-
-        select.innerHTML =
-            "";
+        select.innerHTML = "";
 
 
         const option =
@@ -600,11 +577,11 @@ async function loadEmployees() {
 
 
         option.value =
-            loggedEmployee._id;
+            currentEmployee._id;
 
 
         option.textContent =
-            `${simpleId}-${loggedEmployee.name}`;
+            `${displayId}-${currentEmployee.name || "Employee"}`;
 
 
         option.selected =
@@ -616,31 +593,12 @@ async function loadEmployees() {
         );
 
 
-        /* ============================================
-           AUTO SELECT
-        ============================================ */
-
-        select.value =
-            loggedEmployee._id;
-
-
-        /* ============================================
-           KEEP ONLY CURRENT EMPLOYEE
-        ============================================ */
-
-        employees =
-            [
-                loggedEmployee
-            ];
-
-
-        console.log(
-            "Selected employee:",
-            option.textContent
-        );
+        // Make sure employee cannot
+        // select another employee.
+        select.disabled =
+            true;
 
     }
-
 
     catch (error) {
 
@@ -657,34 +615,77 @@ async function loadEmployees() {
         `;
 
     }
+
+}
+
+
+/* =====================================================
+   RENDER EMPLOYEE OPTIONS
+===================================================== */
+
+function renderEmployeeOptions(
+    select,
+    list
+) {
+
+    select.innerHTML = `
+        <option value="">
+            Select Employee
+        </option>
+    `;
+
+
+    list.forEach(
+        (
+            employee,
+            index
+        ) => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                employee._id;
+
+
+            const displayId =
+                getEmployeeDisplayId(
+                    employee,
+                    index
+                );
+
+
+            option.textContent =
+                `${displayId}-${employee.name || "Unknown"}`;
+
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
 }
 
 
 /* =====================================================
    FLEXIBLE TIME PARSER
-=====================================================
-
-   ACCEPTS:
-
-   9
-   9.30
-   9:30
-   9 30
-   9:30 AM
-   9.30 AM
-   9 AM
-   6 PM
-   18:30
-   1830
 ===================================================== */
 
-function parseFlexibleTime(value) {
+function parseFlexibleTime(
+    value
+) {
 
     if (
         value === null ||
         value === undefined
     ) {
+
         return null;
+
     }
 
 
@@ -699,22 +700,12 @@ function parseFlexibleTime(value) {
     }
 
 
-    time =
-        time
-            .replace(
-                /\s+/g,
-                " "
-            )
-            .trim();
-
-
-    let period = null;
+    let period =
+        null;
 
 
     if (
-        /\b(am|a\.m\.)\b/i.test(
-            time
-        )
+        /\b(am|a\.m\.)\b/i.test(time)
     ) {
 
         period =
@@ -729,11 +720,8 @@ function parseFlexibleTime(value) {
 
     }
 
-
     else if (
-        /\b(pm|p\.m\.)\b/i.test(
-            time
-        )
+        /\b(pm|p\.m\.)\b/i.test(time)
     ) {
 
         period =
@@ -753,59 +741,35 @@ function parseFlexibleTime(value) {
         time.trim();
 
 
-    /* 0930 -> 09:30 */
-
+    // 1830
     if (
-        /^\d{4}$/.test(
-            time
-        )
+        /^\d{4}$/.test(time)
     ) {
 
         time =
-            time.substring(
-                0,
-                2
-            )
-            +
-            ":"
-            +
-            time.substring(
-                2
-            );
+            time.substring(0, 2) +
+            ":" +
+            time.substring(2);
 
     }
 
-
-    /* 930 -> 09:30 */
-
+    // 930
     else if (
-        /^\d{3}$/.test(
-            time
-        )
+        /^\d{3}$/.test(time)
     ) {
 
         time =
-            "0" +
-            time;
-
+            "0" + time;
 
         time =
-            time.substring(
-                0,
-                2
-            )
-            +
-            ":"
-            +
-            time.substring(
-                2
-            );
+            time.substring(0, 2) +
+            ":" +
+            time.substring(2);
 
     }
 
 
-    /* 9.30 / 9 30 */
-
+    // 9.30 / 9 30
     time =
         time.replace(
             /[.\s]+/g,
@@ -813,12 +777,9 @@ function parseFlexibleTime(value) {
         );
 
 
-    /* ONLY HOUR */
-
+    // 9
     if (
-        /^\d{1,2}$/.test(
-            time
-        )
+        /^\d{1,2}$/.test(time)
     ) {
 
         time =
@@ -834,32 +795,27 @@ function parseFlexibleTime(value) {
     if (
         parts.length !== 2
     ) {
+
         return null;
+
     }
 
 
     let hours =
-        Number(
-            parts[0]
-        );
+        Number(parts[0]);
 
 
     let minutes =
-        Number(
-            parts[1]
-        );
+        Number(parts[1]);
 
 
     if (
-        !Number.isInteger(
-            hours
-        ) ||
-        !Number.isInteger(
-            minutes
-        )
+        !Number.isInteger(hours) ||
+        !Number.isInteger(minutes)
     ) {
 
         return null;
+
     }
 
 
@@ -869,10 +825,9 @@ function parseFlexibleTime(value) {
     ) {
 
         return null;
+
     }
 
-
-    /* 12 HOUR */
 
     if (period) {
 
@@ -882,24 +837,23 @@ function parseFlexibleTime(value) {
         ) {
 
             return null;
+
         }
 
 
         if (
-            period ===
-            "AM"
+            period === "AM"
         ) {
 
             if (
                 hours === 12
             ) {
 
-                hours =
-                    0;
+                hours = 0;
+
             }
 
         }
-
 
         else {
 
@@ -908,14 +862,12 @@ function parseFlexibleTime(value) {
             ) {
 
                 hours += 12;
+
             }
 
         }
 
     }
-
-
-    /* 24 HOUR */
 
     else {
 
@@ -925,6 +877,7 @@ function parseFlexibleTime(value) {
         ) {
 
             return null;
+
         }
 
     }
@@ -934,20 +887,7 @@ function parseFlexibleTime(value) {
         hours * 60 +
         minutes
     );
-}
 
-
-/* =====================================================
-   TIME ALIAS
-===================================================== */
-
-function timeToMinutes(
-    value
-) {
-
-    return parseFlexibleTime(
-        value
-    );
 }
 
 
@@ -967,6 +907,7 @@ function formatDuration(
     ) {
 
         return "0h 0m";
+
     }
 
 
@@ -986,14 +927,13 @@ function formatDuration(
         totalMinutes % 60;
 
 
-    return (
-        `${hours}h ${minutes}m`
-    );
+    return `${hours}h ${minutes}m`;
+
 }
 
 
 /* =====================================================
-   TIME EVENTS
+   TIME CALCULATION EVENTS
 ===================================================== */
 
 function setupTimeCalculation() {
@@ -1020,9 +960,7 @@ function setupTimeCalculation() {
                 );
 
 
-            if (!input) {
-                return;
-            }
+            if (!input) return;
 
 
             input.addEventListener(
@@ -1044,30 +982,12 @@ function setupTimeCalculation() {
 
         }
     );
+
 }
 
 
 /* =====================================================
-   CALCULATE HOURS
-=====================================================
-
-   DEFAULT OFFICE HOURS:
-   9 HOURS 30 MINUTES
-
-   User can enter ANY time.
-
-   No fixed time restriction.
-
-   AM / PM supported.
-
-   Example:
-
-   09:30 AM -> 07:00 PM
-   Lunch 01:00 PM -> 02:00 PM
-
-   Office = 9h 30m
-   Lunch  = 1h
-   Working = 8h 30m
+   CALCULATE WORKING HOURS
 ===================================================== */
 
 function calculateWorkingHours() {
@@ -1075,25 +995,25 @@ function calculateWorkingHours() {
     const checkIn =
         document.getElementById(
             "checkIn"
-        )?.value?.trim();
+        )?.value?.trim() || "";
 
 
     const lunchStart =
         document.getElementById(
             "lunchStart"
-        )?.value?.trim();
+        )?.value?.trim() || "";
 
 
     const lunchEnd =
         document.getElementById(
             "lunchEnd"
-        )?.value?.trim();
+        )?.value?.trim() || "";
 
 
     const checkOut =
         document.getElementById(
             "checkOut"
-        )?.value?.trim();
+        )?.value?.trim() || "";
 
 
     const officeElement =
@@ -1118,51 +1038,57 @@ function calculateWorkingHours() {
         9 * 60 + 30;
 
 
-    /* DEFAULT */
-
-    if (officeElement) {
-
-        officeElement.textContent =
-            "9h 30m";
-    }
+    let officeMinutes =
+        DEFAULT_OFFICE_MINUTES;
 
 
-    if (lunchElement) {
-
-        lunchElement.textContent =
-            "0h 0m";
-    }
+    let lunchMinutes =
+        0;
 
 
-    if (workingElement) {
-
-        workingElement.textContent =
-            "9h 30m";
-    }
+    let workingMinutes =
+        DEFAULT_OFFICE_MINUTES;
 
 
-    /* NO TIME ENTERED */
-
-    if (
-        !checkIn &&
-        !lunchStart &&
-        !lunchEnd &&
-        !checkOut
-    ) {
-
-        return;
-    }
-
-
-    /* PARSE */
+    // ------------------------------------------
+    // OFFICE
+    // ------------------------------------------
 
     const inTime =
         checkIn
-            ? parseFlexibleTime(
-                checkIn
-            )
+            ? parseFlexibleTime(checkIn)
             : null;
 
+
+    const outTime =
+        checkOut
+            ? parseFlexibleTime(checkOut)
+            : null;
+
+
+    if (
+        inTime !== null &&
+        outTime !== null
+    ) {
+
+        officeMinutes =
+            outTime - inTime;
+
+
+        if (
+            officeMinutes < 0
+        ) {
+
+            officeMinutes = 0;
+
+        }
+
+    }
+
+
+    // ------------------------------------------
+    // LUNCH
+    // ------------------------------------------
 
     const lunchStartTime =
         lunchStart
@@ -1180,90 +1106,6 @@ function calculateWorkingHours() {
             : null;
 
 
-    const outTime =
-        checkOut
-            ? parseFlexibleTime(
-                checkOut
-            )
-            : null;
-
-
-    /* INVALID FORMAT */
-
-    if (
-
-        (
-            checkIn &&
-            inTime === null
-        )
-
-        ||
-
-        (
-            lunchStart &&
-            lunchStartTime === null
-        )
-
-        ||
-
-        (
-            lunchEnd &&
-            lunchEndTime === null
-        )
-
-        ||
-
-        (
-            checkOut &&
-            outTime === null
-        )
-
-    ) {
-
-        if (workingElement) {
-
-            workingElement.textContent =
-                "0h 0m";
-        }
-
-
-        return;
-    }
-
-
-    /* OFFICE HOURS */
-
-    let officeMinutes =
-        DEFAULT_OFFICE_MINUTES;
-
-
-    if (
-        inTime !== null &&
-        outTime !== null
-    ) {
-
-        officeMinutes =
-            outTime -
-            inTime;
-
-
-        if (
-            officeMinutes < 0
-        ) {
-
-            officeMinutes =
-                0;
-        }
-
-    }
-
-
-    /* LUNCH */
-
-    let lunchMinutes =
-        0;
-
-
     if (
         lunchStartTime !== null &&
         lunchEndTime !== null
@@ -1278,16 +1120,18 @@ function calculateWorkingHours() {
             lunchMinutes < 0
         ) {
 
-            lunchMinutes =
-                0;
+            lunchMinutes = 0;
+
         }
 
     }
 
 
-    /* WORKING */
+    // ------------------------------------------
+    // WORKING
+    // ------------------------------------------
 
-    let workingMinutes =
+    workingMinutes =
         officeMinutes -
         lunchMinutes;
 
@@ -1296,12 +1140,14 @@ function calculateWorkingHours() {
         workingMinutes < 0
     ) {
 
-        workingMinutes =
-            0;
+        workingMinutes = 0;
+
     }
 
 
-    /* DISPLAY */
+    // ------------------------------------------
+    // DISPLAY
+    // ------------------------------------------
 
     if (officeElement) {
 
@@ -1309,6 +1155,7 @@ function calculateWorkingHours() {
             formatDuration(
                 officeMinutes
             );
+
     }
 
 
@@ -1318,6 +1165,7 @@ function calculateWorkingHours() {
             formatDuration(
                 lunchMinutes
             );
+
     }
 
 
@@ -1327,34 +1175,14 @@ function calculateWorkingHours() {
             formatDuration(
                 workingMinutes
             );
+
     }
+
 }
 
 
 /* =====================================================
-   TIME ERROR
-===================================================== */
-
-function showTimeError(
-    message
-) {
-
-    const element =
-        document.getElementById(
-            "workingHours"
-        );
-
-
-    if (element) {
-
-        element.textContent =
-            "0h 0m";
-    }
-}
-
-
-/* =====================================================
-   TASK INPUT EVENTS
+   TASK EVENTS
 ===================================================== */
 
 function setupTaskInputEvents() {
@@ -1371,6 +1199,7 @@ function setupTaskInputEvents() {
     ) {
 
         return;
+
     }
 
 
@@ -1394,11 +1223,12 @@ function setupTaskInputEvents() {
         "change",
         updateTaskCount
     );
+
 }
 
 
 /* =====================================================
-   UPDATE TASK COUNT
+   TASK COUNT
 ===================================================== */
 
 function updateTaskCount() {
@@ -1421,6 +1251,7 @@ function updateTaskCount() {
     ) {
 
         return;
+
     }
 
 
@@ -1447,6 +1278,7 @@ function updateTaskCount() {
                 ? "Task"
                 : "Tasks"
         }`;
+
 }
 
 
@@ -1467,27 +1299,23 @@ function getTasks() {
     }
 
 
-    const lines =
-        taskInput.value
-            .split(/\r?\n/)
-            .map(
-                task =>
-                    task.trim()
-            )
-            .filter(
-                task =>
-                    task.length > 0
-            );
+    return taskInput.value
+        .split(/\r?\n/)
+        .map(
+            task =>
+                task.trim()
+        )
+        .filter(
+            task =>
+                task.length > 0
+        )
+        .map(
+            task => ({
+                taskName:
+                    task
+            })
+        );
 
-
-    return lines.map(
-        task => ({
-
-            taskName:
-                task
-
-        })
-    );
 }
 
 
@@ -1505,25 +1333,20 @@ function setTasks(
         );
 
 
-    if (!taskInput) {
-        return;
-    }
+    if (!taskInput) return;
 
 
     if (
-        !Array.isArray(
-            tasks
-        )
+        !Array.isArray(tasks)
     ) {
 
         taskInput.value =
             "";
 
-
         updateTaskCount();
 
-
         return;
+
     }
 
 
@@ -1538,6 +1361,7 @@ function setTasks(
                     ) {
 
                         return task;
+
                     }
 
 
@@ -1560,6 +1384,7 @@ function setTasks(
 
 
     updateTaskCount();
+
 }
 
 
@@ -1579,7 +1404,7 @@ function validateTimeInput(
 
 
     if (!input) {
-        return null;
+        return true;
     }
 
 
@@ -1587,10 +1412,9 @@ function validateTimeInput(
         input.value.trim();
 
 
-    /* TIME OPTIONAL */
-
+    // Empty = allowed
     if (!value) {
-        return null;
+        return true;
     }
 
 
@@ -1605,26 +1429,20 @@ function validateTimeInput(
     ) {
 
         alert(
-            `${label} time is invalid.\n\n` +
-            `Accepted examples:\n` +
-            `09:30\n` +
-            `18:30\n` +
-            `0930\n` +
-            `1830\n` +
-            `9.30\n` +
-            `9:30 AM\n` +
-            `6 PM`
+            `${label} time is invalid.\n\nAccepted examples:\n09:30\n18:30\n0930\n1830\n9.30\n9:30 AM\n6 PM`
         );
 
 
         input.focus();
 
 
-        return "INVALID";
+        return false;
+
     }
 
 
-    return parsed;
+    return true;
+
 }
 
 
@@ -1646,18 +1464,14 @@ function validateForm() {
         )?.value;
 
 
-    const tasks =
-        getTasks();
-
-
     if (!employee) {
 
         alert(
             "Please select employee."
         );
 
-
         return false;
+
     }
 
 
@@ -1667,59 +1481,49 @@ function validateForm() {
             "Please select date."
         );
 
-
         return false;
+
     }
 
 
     const timeFields = [
 
-        [
-            "checkIn",
-            "Check-in"
-        ],
+        ["checkIn", "Check-in"],
 
-        [
-            "lunchStart",
-            "Lunch Start"
-        ],
+        ["lunchStart", "Lunch Start"],
 
-        [
-            "lunchEnd",
-            "Lunch End"
-        ],
+        ["lunchEnd", "Lunch End"],
 
-        [
-            "checkOut",
-            "Check-out"
-        ]
+        ["checkOut", "Check-out"]
 
     ];
 
 
     for (
-        const [id, label]
+        const [
+            id,
+            label
+        ]
         of timeFields
     ) {
 
-        const result =
-            validateTimeInput(
+        if (
+            !validateTimeInput(
                 id,
                 label
-            );
-
-
-        if (
-            result ===
-            "INVALID"
+            )
         ) {
 
             return false;
+
         }
+
     }
 
 
-    /* TASK REQUIRED */
+    const tasks =
+        getTasks();
+
 
     if (
         tasks.length === 0
@@ -1730,30 +1534,20 @@ function validateForm() {
         );
 
 
-        const taskInput =
-            document.getElementById(
+        document
+            .getElementById(
                 "taskInput"
-            );
-
-
-        taskInput?.focus();
+            )
+            ?.focus();
 
 
         return false;
+
     }
 
 
-    /*
-       NO TIME ORDER VALIDATION.
-
-       User can enter any time.
-
-       Negative values are simply
-       converted to 0.
-    */
-
-
     return true;
+
 }
 
 
@@ -1811,9 +1605,13 @@ function collectFormData() {
 
     const inTime =
         checkIn
-            ? parseFlexibleTime(
-                checkIn
-            )
+            ? parseFlexibleTime(checkIn)
+            : null;
+
+
+    const outTime =
+        checkOut
+            ? parseFlexibleTime(checkOut)
             : null;
 
 
@@ -1829,14 +1627,6 @@ function collectFormData() {
         lunchEnd
             ? parseFlexibleTime(
                 lunchEnd
-            )
-            : null;
-
-
-    const outTime =
-        checkOut
-            ? parseFlexibleTime(
-                checkOut
             )
             : null;
 
@@ -1863,8 +1653,8 @@ function collectFormData() {
             officeMinutes < 0
         ) {
 
-            officeMinutes =
-                0;
+            officeMinutes = 0;
+
         }
 
     }
@@ -1888,8 +1678,8 @@ function collectFormData() {
             lunchMinutes < 0
         ) {
 
-            lunchMinutes =
-                0;
+            lunchMinutes = 0;
+
         }
 
     }
@@ -1904,8 +1694,8 @@ function collectFormData() {
         workingMinutes < 0
     ) {
 
-        workingMinutes =
-            0;
+        workingMinutes = 0;
+
     }
 
 
@@ -1923,37 +1713,43 @@ function collectFormData() {
 
         checkOut,
 
+
         officeMinutes,
 
         lunchMinutes,
 
         workingMinutes,
 
+
         officeHours:
             formatDuration(
                 officeMinutes
             ),
+
 
         lunchHours:
             formatDuration(
                 lunchMinutes
             ),
 
+
         workingHours:
             formatDuration(
                 workingMinutes
             ),
+
 
         tasks,
 
         comments
 
     };
+
 }
 
 
 /* =====================================================
-   SAVE
+   SAVE TIMESHEET
 ===================================================== */
 
 async function saveTimesheet() {
@@ -1963,6 +1759,7 @@ async function saveTimesheet() {
     ) {
 
         return;
+
     }
 
 
@@ -1998,6 +1795,7 @@ async function saveTimesheet() {
 
                     },
 
+
                     body:
                         JSON.stringify(
                             data
@@ -2008,7 +1806,10 @@ async function saveTimesheet() {
 
 
         const result =
-            await response.json();
+            await response.json()
+                .catch(
+                    () => ({})
+                );
 
 
         if (
@@ -2017,8 +1818,10 @@ async function saveTimesheet() {
 
             throw new Error(
                 result.message ||
+                result.error ||
                 "Failed to save timesheet."
             );
+
         }
 
 
@@ -2034,7 +1837,6 @@ async function saveTimesheet() {
 
     }
 
-
     catch (error) {
 
         console.error(
@@ -2044,9 +1846,12 @@ async function saveTimesheet() {
 
 
         alert(
-            error.message
+            error.message ||
+            "Failed to save timesheet."
         );
+
     }
+
 }
 
 
@@ -2062,9 +1867,7 @@ async function loadTimesheets() {
         );
 
 
-    if (!table) {
-        return;
-    }
+    if (!table) return;
 
 
     try {
@@ -2100,7 +1903,10 @@ async function loadTimesheets() {
 
 
         const result =
-            await response.json();
+            await response.json()
+                .catch(
+                    () => ({})
+                );
 
 
         if (
@@ -2111,6 +1917,7 @@ async function loadTimesheets() {
                 result.message ||
                 "Failed to load timesheets."
             );
+
         }
 
 
@@ -2120,7 +1927,6 @@ async function loadTimesheets() {
         );
 
     }
-
 
     catch (error) {
 
@@ -2146,12 +1952,14 @@ async function loadTimesheets() {
             </tr>
 
         `;
+
     }
+
 }
 
 
 /* =====================================================
-   RENDER
+   RENDER TIMESHEETS
 ===================================================== */
 
 function renderTimesheets(
@@ -2164,9 +1972,7 @@ function renderTimesheets(
         );
 
 
-    if (!table) {
-        return;
-    }
+    if (!table) return;
 
 
     table.innerHTML =
@@ -2174,7 +1980,7 @@ function renderTimesheets(
 
 
     if (
-        records.length === 0
+        !records.length
     ) {
 
         table.innerHTML = `
@@ -2194,8 +2000,8 @@ function renderTimesheets(
 
         `;
 
-
         return;
+
     }
 
 
@@ -2218,45 +2024,36 @@ function renderTimesheets(
                 "Unknown";
 
 
-            /* =========================================
-               SIMPLE EMPLOYEE ID
-            ========================================= */
-
-            const employeeNameLower =
-                String(
-                    employeeName
-                )
-                .toLowerCase();
+            const employeeId =
+                employee.employeeId ||
+                "";
 
 
-            let simpleId =
-                "01";
+            // ------------------------------------------
+            // Display 01 / 02
+            // ------------------------------------------
+
+            const index =
+                employees.findIndex(
+                    employeeItem =>
+                        employeeItem._id ===
+                        employee._id
+                );
 
 
-            if (
-                employeeNameLower.includes(
-                    "naveen"
-                )
-            ) {
-
-                simpleId =
-                    "02";
-            }
-
-
-            else if (
-                employeeNameLower.includes(
-                    "sathish"
-                )
-            ) {
-
-                simpleId =
-                    "01";
-            }
+            const displayId =
+                index >= 0
+                    ? getEmployeeDisplayId(
+                        employee,
+                        index
+                    )
+                    : "";
 
 
             const employeeDisplay =
-                `${simpleId}-${employeeName}`;
+                displayId
+                    ? `${displayId}-${employeeName}`
+                    : employeeName;
 
 
             const tasks =
@@ -2277,9 +2074,7 @@ function renderTimesheets(
                                 index
                             ) => `
 
-                                <div
-                                    class="record-task"
-                                >
+                                <div class="record-task">
 
                                     ${index + 1}.
                                     ${escapeHtml(
@@ -2333,9 +2128,7 @@ function renderTimesheets(
 
                 <td>
 
-                    <div
-                        class="record-tasks"
-                    >
+                    <div class="record-tasks">
 
                         ${taskHtml}
 
@@ -2373,9 +2166,7 @@ function renderTimesheets(
 
                 <td>
 
-                    <div
-                        class="record-actions"
-                    >
+                    <div class="record-actions">
 
                         <button
                             type="button"
@@ -2384,9 +2175,7 @@ function renderTimesheets(
                             title="Edit"
                         >
 
-                            <i
-                                class="fa-solid fa-pen"
-                            ></i>
+                            <i class="fa-solid fa-pen"></i>
 
                         </button>
 
@@ -2398,9 +2187,7 @@ function renderTimesheets(
                             title="Delete"
                         >
 
-                            <i
-                                class="fa-solid fa-trash"
-                            ></i>
+                            <i class="fa-solid fa-trash"></i>
 
                         </button>
 
@@ -2417,6 +2204,7 @@ function renderTimesheets(
 
         }
     );
+
 }
 
 
@@ -2461,7 +2249,10 @@ async function editTimesheet(
 
 
         const result =
-            await response.json();
+            await response.json()
+                .catch(
+                    () => ({})
+                );
 
 
         if (
@@ -2472,6 +2263,7 @@ async function editTimesheet(
                 result.message ||
                 "Failed to load timesheet."
             );
+
         }
 
 
@@ -2479,31 +2271,56 @@ async function editTimesheet(
             result.timesheet;
 
 
+        if (!record) {
+
+            throw new Error(
+                "Timesheet record not found."
+            );
+
+        }
+
+
         editingId =
             record._id;
 
 
-        /* EMPLOYEE */
-
-        document.getElementById(
-            "employeeName"
-        ).value =
-            record.employee?._id ||
-            record.employee ||
-            "";
-
-
-        /* DATE */
-
-        document.getElementById(
-            "date"
-        ).value =
-            formatInputDate(
-                record.date
+        const employeeSelect =
+            document.getElementById(
+                "employeeName"
             );
 
 
-        /* CHECK IN */
+        if (
+            employeeSelect
+        ) {
+
+            employeeSelect.disabled =
+                false;
+
+
+            employeeSelect.value =
+                record.employee?._id ||
+                record.employee ||
+                "";
+
+        }
+
+
+        const date =
+            document.getElementById(
+                "date"
+            );
+
+
+        if (date) {
+
+            date.value =
+                formatInputDate(
+                    record.date
+                );
+
+        }
+
 
         document.getElementById(
             "checkIn"
@@ -2512,16 +2329,12 @@ async function editTimesheet(
             "";
 
 
-        /* LUNCH START */
-
         document.getElementById(
             "lunchStart"
         ).value =
             record.lunchStart ||
             "";
 
-
-        /* LUNCH END */
 
         document.getElementById(
             "lunchEnd"
@@ -2530,16 +2343,12 @@ async function editTimesheet(
             "";
 
 
-        /* CHECK OUT */
-
         document.getElementById(
             "checkOut"
         ).value =
             record.checkOut ||
             "";
 
-
-        /* COMMENTS */
 
         const comments =
             document.getElementById(
@@ -2552,21 +2361,16 @@ async function editTimesheet(
             comments.value =
                 record.comments ||
                 "";
+
         }
 
 
-        /* TASKS */
-
-        const tasks =
+        setTasks(
             Array.isArray(
                 record.tasks
             )
                 ? record.tasks
-                : [];
-
-
-        setTasks(
-            tasks
+                : []
         );
 
 
@@ -2578,8 +2382,7 @@ async function editTimesheet(
 
         window.scrollTo({
 
-            top:
-                0,
+            top: 0,
 
             behavior:
                 "smooth"
@@ -2587,7 +2390,6 @@ async function editTimesheet(
         });
 
     }
-
 
     catch (error) {
 
@@ -2600,7 +2402,9 @@ async function editTimesheet(
         alert(
             error.message
         );
+
     }
+
 }
 
 
@@ -2611,7 +2415,9 @@ async function editTimesheet(
 async function updateTimesheet() {
 
     if (!editingId) {
+
         return;
+
     }
 
 
@@ -2620,6 +2426,7 @@ async function updateTimesheet() {
     ) {
 
         return;
+
     }
 
 
@@ -2655,6 +2462,7 @@ async function updateTimesheet() {
 
                     },
 
+
                     body:
                         JSON.stringify(
                             data
@@ -2665,7 +2473,10 @@ async function updateTimesheet() {
 
 
         const result =
-            await response.json();
+            await response.json()
+                .catch(
+                    () => ({})
+                );
 
 
         if (
@@ -2674,8 +2485,10 @@ async function updateTimesheet() {
 
             throw new Error(
                 result.message ||
+                result.error ||
                 "Failed to update timesheet."
             );
+
         }
 
 
@@ -2695,7 +2508,6 @@ async function updateTimesheet() {
 
     }
 
-
     catch (error) {
 
         console.error(
@@ -2707,7 +2519,9 @@ async function updateTimesheet() {
         alert(
             error.message
         );
+
     }
+
 }
 
 
@@ -2726,6 +2540,7 @@ async function deleteTimesheet(
     ) {
 
         return;
+
     }
 
 
@@ -2762,7 +2577,10 @@ async function deleteTimesheet(
 
 
         const result =
-            await response.json();
+            await response.json()
+                .catch(
+                    () => ({})
+                );
 
 
         if (
@@ -2773,6 +2591,7 @@ async function deleteTimesheet(
                 result.message ||
                 "Failed to delete timesheet."
             );
+
         }
 
 
@@ -2785,7 +2604,6 @@ async function deleteTimesheet(
 
     }
 
-
     catch (error) {
 
         console.error(
@@ -2797,12 +2615,14 @@ async function deleteTimesheet(
         alert(
             error.message
         );
+
     }
+
 }
 
 
 /* =====================================================
-   RESET FORM
+   RESET
 ===================================================== */
 
 function resetForm() {
@@ -2831,6 +2651,7 @@ function resetForm() {
 
                 element.value =
                     "";
+
             }
 
         }
@@ -2847,6 +2668,7 @@ function resetForm() {
 
         taskInput.value =
             "";
+
     }
 
 
@@ -2860,11 +2682,48 @@ function resetForm() {
 
 
     toggleUpdateButton();
+
+
+    // ------------------------------------------
+    // Restore employee selection
+    // ------------------------------------------
+
+    const select =
+        document.getElementById(
+            "employeeName"
+        );
+
+
+    if (
+        select &&
+        getLoggedRole() !== "admin"
+    ) {
+
+        const currentEmployee =
+            employees.find(
+                isCurrentEmployee
+            );
+
+
+        if (
+            currentEmployee
+        ) {
+
+            select.value =
+                currentEmployee._id;
+
+            select.disabled =
+                true;
+
+        }
+
+    }
+
 }
 
 
 /* =====================================================
-   TOGGLE SAVE / UPDATE
+   SAVE / UPDATE BUTTON
 ===================================================== */
 
 function toggleUpdateButton() {
@@ -2881,12 +2740,15 @@ function toggleUpdateButton() {
         );
 
 
-    if (editingId) {
+    if (
+        editingId
+    ) {
 
         if (saveBtn) {
 
             saveBtn.style.display =
                 "none";
+
         }
 
 
@@ -2894,10 +2756,10 @@ function toggleUpdateButton() {
 
             updateBtn.style.display =
                 "inline-flex";
+
         }
 
     }
-
 
     else {
 
@@ -2905,6 +2767,7 @@ function toggleUpdateButton() {
 
             saveBtn.style.display =
                 "inline-flex";
+
         }
 
 
@@ -2912,14 +2775,16 @@ function toggleUpdateButton() {
 
             updateBtn.style.display =
                 "none";
+
         }
 
     }
+
 }
 
 
 /* =====================================================
-   DATE FORMAT
+   FORMAT DATE
 ===================================================== */
 
 function formatDate(
@@ -2932,9 +2797,7 @@ function formatDate(
 
 
     const date =
-        new Date(
-            value
-        );
+        new Date(value);
 
 
     if (
@@ -2944,6 +2807,7 @@ function formatDate(
     ) {
 
         return "-";
+
     }
 
 
@@ -2962,6 +2826,7 @@ function formatDate(
 
         }
     );
+
 }
 
 
@@ -2979,9 +2844,7 @@ function formatInputDate(
 
 
     const date =
-        new Date(
-            value
-        );
+        new Date(value);
 
 
     if (
@@ -2991,6 +2854,7 @@ function formatInputDate(
     ) {
 
         return "";
+
     }
 
 
@@ -3001,8 +2865,7 @@ function formatInputDate(
     const month =
         String(
             date.getMonth() + 1
-        )
-        .padStart(
+        ).padStart(
             2,
             "0"
         );
@@ -3011,8 +2874,7 @@ function formatInputDate(
     const day =
         String(
             date.getDate()
-        )
-        .padStart(
+        ).padStart(
             2,
             "0"
         );
@@ -3021,6 +2883,7 @@ function formatInputDate(
     return (
         `${year}-${month}-${day}`
     );
+
 }
 
 
@@ -3036,35 +2899,36 @@ function escapeHtml(
         value ?? ""
     )
 
-    .replace(
-        /&/g,
-        "&amp;"
-    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
 
-    .replace(
-        /</g,
-        "&lt;"
-    )
+        .replace(
+            /</g,
+            "&lt;"
+        )
 
-    .replace(
-        />/g,
-        "&gt;"
-    )
+        .replace(
+            />/g,
+            "&gt;"
+        )
 
-    .replace(
-        /"/g,
-        "&quot;"
-    )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
 
-    .replace(
-        /'/g,
-        "&#039;"
-    );
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
 }
 
 
 /* =====================================================
-   GLOBAL FUNCTIONS
+   GLOBAL
 ===================================================== */
 
 window.saveTimesheet =
