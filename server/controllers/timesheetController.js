@@ -1264,3 +1264,22 @@ async function (
     }
 
 };
+/* =====================================================
+   EXPORT CONTROLLER FUNCTIONS
+===================================================== */
+
+module.exports = {
+
+    createTimesheet,
+
+    getTimesheets,
+
+    // Route compatibility
+    getTimesheetById:
+        getTimesheet,
+
+    updateTimesheet,
+
+    deleteTimesheet
+
+};
