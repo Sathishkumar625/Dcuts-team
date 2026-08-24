@@ -23,9 +23,10 @@ const {
 const {
     createTimesheet,
     getTimesheets,
-    getTimesheet,
+    getTimesheetById,
     updateTimesheet,
-    deleteTimesheet
+    deleteTimesheet,
+    updateStatus
 } =
     require("../controllers/timesheetController");
 
@@ -44,6 +45,8 @@ router.post(
 
 /* =====================================================
    GET ALL TIMESHEETS
+   ADMIN    -> ALL
+   EMPLOYEE -> OWN
 ===================================================== */
 
 router.get(
@@ -62,7 +65,7 @@ router.get(
     "/:id",
     authMiddleware,
     authenticatedUser,
-    getTimesheet
+    getTimesheetById
 );
 
 
@@ -75,6 +78,19 @@ router.put(
     authMiddleware,
     authenticatedUser,
     updateTimesheet
+);
+
+
+/* =====================================================
+   UPDATE STATUS
+   ADMIN ONLY
+===================================================== */
+
+router.patch(
+    "/:id/status",
+    authMiddleware,
+    authenticatedUser,
+    updateStatus
 );
 
 

@@ -1,20 +1,111 @@
-const Timesheet = require("../models/Timesheet");
-const Employee = require("../models/Employee");
+/* =====================================================
+   THE D CUTS - TIMESHEET CONTROLLER
+   ADMIN / EMPLOYEE
+   TASK + ATTENDANCE + STATUS SUPPORT
+===================================================== */
+
+const mongoose = require("mongoose");
+
+const Timesheet =
+    require("../models/Timesheet");
+
+const Employee =
+    require("../models/Employee");
 
 
-// ======================================================
-// TIME PARSER
-// Supports:
-//
-// 9
-// 9.30
-// 9:30
-// 9:30 AM
-// 9.30 PM
-// 18:30
-// 1830
-// 930
-// ======================================================
+/* =====================================================
+   POPULATE
+===================================================== */
+
+const employeePopulate =
+    "employeeId name email phone department designation role status";
+
+
+/* =====================================================
+   ADMIN CHECK
+===================================================== */
+
+function isAdmin(req) {
+
+    return (
+        req.user &&
+        String(req.user.role || "")
+            .toLowerCase()
+            .trim() === "admin"
+    );
+
+}
+
+
+/* =====================================================
+   LOGGED-IN EMPLOYEE
+===================================================== */
+
+async function getLoggedInEmployee(req) {
+
+    if (
+        !req.user ||
+        !req.user.email
+    ) {
+        return null;
+    }
+
+    const email =
+        String(req.user.email)
+            .toLowerCase()
+            .trim();
+
+    return await Employee.findOne({
+        email
+    });
+
+}
+
+
+/* =====================================================
+   ACCESS CHECK
+===================================================== */
+
+async function userCanAccessTimesheet(
+    req,
+    timesheet
+) {
+
+    /* ADMIN */
+
+    if (isAdmin(req)) {
+        return true;
+    }
+
+
+    /* EMPLOYEE */
+
+    const employee =
+        await getLoggedInEmployee(req);
+
+    if (!employee) {
+        return false;
+    }
+
+
+    if (
+        !timesheet.employee
+    ) {
+        return false;
+    }
+
+
+    return (
+        timesheet.employee.toString() ===
+        employee._id.toString()
+    );
+
+}
+
+
+/* =====================================================
+   TIME PARSER
+===================================================== */
 
 function parseTime(value) {
 
@@ -34,37 +125,33 @@ function parseTime(value) {
         return null;
     }
 
+
     let period = null;
 
 
-    // AM
-
     if (
-        /\b(am|a\.m\.)\b/i.test(time)
+        /\b(am|a\.m\.)\b/.test(time)
     ) {
 
         period = "AM";
 
         time =
             time.replace(
-                /\s*(am|a\.m\.)/gi,
+                /\s*(am|a\.m\.)/g,
                 ""
             );
 
     }
 
-
-    // PM
-
     else if (
-        /\b(pm|p\.m\.)\b/i.test(time)
+        /\b(pm|p\.m\.)\b/.test(time)
     ) {
 
         period = "PM";
 
         time =
             time.replace(
-                /\s*(pm|p\.m\.)/gi,
+                /\s*(pm|p\.m\.)/g,
                 ""
             );
 
@@ -75,23 +162,21 @@ function parseTime(value) {
         time.trim();
 
 
-    // 1830
+    /* 1830 */
 
     if (
         /^\d{4}$/.test(time)
     ) {
 
         time =
-            time.substring(0, 2)
-            +
-            ":"
-            +
+            time.substring(0, 2) +
+            ":" +
             time.substring(2);
 
     }
 
 
-    // 930
+    /* 930 */
 
     else if (
         /^\d{3}$/.test(time)
@@ -101,16 +186,14 @@ function parseTime(value) {
             "0" + time;
 
         time =
-            time.substring(0, 2)
-            +
-            ":"
-            +
+            time.substring(0, 2) +
+            ":" +
             time.substring(2);
 
     }
 
 
-    // 9.30 / 9 30
+    /* 9.30 */
 
     time =
         time.replace(
@@ -119,7 +202,7 @@ function parseTime(value) {
         );
 
 
-    // Only hour
+    /* 9 */
 
     if (
         /^\d{1,2}$/.test(time)
@@ -145,7 +228,6 @@ function parseTime(value) {
     let hours =
         Number(parts[0]);
 
-
     let minutes =
         Number(parts[1]);
 
@@ -154,7 +236,6 @@ function parseTime(value) {
         !Number.isInteger(hours) ||
         !Number.isInteger(minutes)
     ) {
-
         return null;
     }
 
@@ -163,14 +244,11 @@ function parseTime(value) {
         minutes < 0 ||
         minutes > 59
     ) {
-
         return null;
     }
 
 
-    // ==============================================
-    // AM / PM
-    // ==============================================
+    /* AM / PM */
 
     if (period) {
 
@@ -178,7 +256,6 @@ function parseTime(value) {
             hours < 1 ||
             hours > 12
         ) {
-
             return null;
         }
 
@@ -190,9 +267,7 @@ function parseTime(value) {
             if (
                 hours === 12
             ) {
-
                 hours = 0;
-
             }
 
         }
@@ -202,19 +277,12 @@ function parseTime(value) {
             if (
                 hours !== 12
             ) {
-
                 hours += 12;
-
             }
 
         }
 
     }
-
-
-    // ==============================================
-    // 24 HOUR
-    // ==============================================
 
     else {
 
@@ -222,7 +290,6 @@ function parseTime(value) {
             hours < 0 ||
             hours > 23
         ) {
-
             return null;
         }
 
@@ -233,21 +300,22 @@ function parseTime(value) {
         hours * 60 +
         minutes
     );
+
 }
 
 
+/* =====================================================
+   FORMAT HOURS
+===================================================== */
 
-// ======================================================
-// FORMAT HOURS
-// ======================================================
-
-function formatHours(minutes) {
+function formatHours(
+    minutes
+) {
 
     if (
         !Number.isFinite(minutes) ||
         minutes < 0
     ) {
-
         return "0h 0m";
     }
 
@@ -267,30 +335,13 @@ function formatHours(minutes) {
 
 
     return `${hours}h ${mins}m`;
+
 }
 
 
-
-// ======================================================
-// CALCULATE ATTENDANCE
-//
-// IMPORTANT:
-//
-// NO FIXED TIME RESTRICTION.
-//
-// User can enter any valid time.
-//
-// Example:
-//
-// 9:30 AM
-// 1:30 PM
-// 2:30 PM
-// 7:30 PM
-//
-// Office = 10h
-// Lunch = 1h
-// Working = 9h
-// ======================================================
+/* =====================================================
+   ATTENDANCE CALCULATION
+===================================================== */
 
 function calculateAttendance(
     checkIn,
@@ -302,14 +353,11 @@ function calculateAttendance(
     const inTime =
         parseTime(checkIn);
 
-
     const lunchStartTime =
         parseTime(lunchStart);
 
-
     const lunchEndTime =
         parseTime(lunchEnd);
-
 
     const outTime =
         parseTime(checkOut);
@@ -323,73 +371,76 @@ function calculateAttendance(
     ) {
 
         return {
-
             valid: false,
-
             message:
                 "Invalid attendance time."
-
         };
 
     }
 
 
-    // ==============================================
-    // OFFICE HOURS
-    // ==============================================
-
-    let officeMinutes =
-        outTime -
-        inTime;
-
-
-    // Never negative
-
     if (
-        officeMinutes < 0
+        lunchStartTime <= inTime
     ) {
 
-        officeMinutes = 0;
+        return {
+            valid: false,
+            message:
+                "Lunch start must be after check-in."
+        };
 
     }
 
 
-    // ==============================================
-    // LUNCH HOURS
-    // ==============================================
+    if (
+        lunchEndTime <= lunchStartTime
+    ) {
 
-    let lunchMinutes =
+        return {
+            valid: false,
+            message:
+                "Lunch end must be after lunch start."
+        };
+
+    }
+
+
+    if (
+        outTime <= lunchEndTime
+    ) {
+
+        return {
+            valid: false,
+            message:
+                "Check-out must be after lunch end."
+        };
+
+    }
+
+
+    const officeMinutes =
+        outTime - inTime;
+
+
+    const lunchMinutes =
         lunchEndTime -
         lunchStartTime;
 
 
-    // Never negative
-
-    if (
-        lunchMinutes < 0
-    ) {
-
-        lunchMinutes = 0;
-
-    }
-
-
-    // ==============================================
-    // WORKING HOURS
-    // ==============================================
-
-    let workingMinutes =
+    const workingMinutes =
         officeMinutes -
         lunchMinutes;
 
-
-    // Never negative
 
     if (
         workingMinutes < 0
     ) {
 
-        workingMinutes = 0;
+        return {
+            valid: false,
+            message:
+                "Working hours cannot be negative."
+        };
 
     }
 
@@ -424,588 +475,56 @@ function calculateAttendance(
 }
 
 
+/* =====================================================
+   CLEAN TASKS
+===================================================== */
 
-// ======================================================
-// GET EMPLOYEE BY ID / EMPLOYEE ID / EMAIL
-// ======================================================
-
-async function findEmployeeForUser(user) {
-
-    if (!user) {
-        return null;
-    }
-
-
-    // ==============================================
-    // Try MongoDB _id
-    // ==============================================
+function cleanTasks(tasks) {
 
     if (
-        user.employeeId
+        !Array.isArray(tasks)
     ) {
-
-        try {
-
-            const employee =
-                await Employee.findById(
-                    user.employeeId
-                );
-
-            if (employee) {
-
-                return employee;
-
-            }
-
-        }
-
-        catch (error) {
-
-            // employeeId may be "01"
-            // so ignore invalid ObjectId
-
-        }
-
+        return [];
     }
 
 
-    // ==============================================
-    // Try employeeId
-    // Example: 01 / 02
-    // ==============================================
+    return tasks
 
-    if (
-        user.employeeId
-    ) {
+        .map(task => ({
 
-        const employee =
-            await Employee.findOne({
+            taskName:
+                String(
+                    task?.taskName ||
+                    task?.task ||
+                    ""
+                ).trim()
 
-                employeeId:
-                    String(
-                        user.employeeId
-                    )
+        }))
 
-            });
+        .filter(
+            task =>
+                task.taskName
+        );
 
-
-        if (employee) {
-
-            return employee;
-
-        }
-
-    }
-
-
-    // ==============================================
-    // Try email
-    // ==============================================
-
-    if (
-        user.email
-    ) {
-
-        const employee =
-            await Employee.findOne({
-
-                email:
-                    String(
-                        user.email
-                    ).toLowerCase()
-
-            });
-
-
-        if (employee) {
-
-            return employee;
-
-        }
-
-    }
-
-
-    // ==============================================
-    // Try name
-    // ==============================================
-
-    if (
-        user.name
-    ) {
-
-        const employee =
-            await Employee.findOne({
-
-                name:
-                    String(
-                        user.name
-                    )
-
-            });
-
-
-        if (employee) {
-
-            return employee;
-
-        }
-
-    }
-
-
-    return null;
 }
 
 
+/* =====================================================
+   CREATE TIMESHEET
+===================================================== */
 
-// ======================================================
-// GET ALL TIMESHEETS
-//
-// ADMIN
-// -> all records
-//
-// EMPLOYEE
-// -> own records only
-// ======================================================
+const createTimesheet =
+    async (req, res) => {
 
-exports.getTimesheets =
-async function (
-    req,
-    res
-) {
+        try {
 
-    try {
-
-        const user =
-            req.user;
-
-
-        let query = {};
-
-
-        // ==============================================
-        // EMPLOYEE LOGIN
-        // ==============================================
-
-        if (
-            user &&
-            user.role !== "admin"
-        ) {
-
-            const employee =
-                await findEmployeeForUser(
-                    user
-                );
-
-
-            if (
-                !employee
-            ) {
-
-                return res.json({
-
-                    success: true,
-
-                    timesheets: []
-
-                });
-
-            }
-
-
-            query.employee =
-                employee._id;
-
-        }
-
-
-        // ==============================================
-        // LOAD RECORDS
-        //
-        // IMPORTANT:
-        // NO Project populate.
-        // This prevents:
-        // Schema hasn't been registered for "Project"
-        // ==============================================
-
-        const records =
-            await Timesheet
-                .find(query)
-                .populate(
-                    "employee",
-                    "name employeeId email"
-                )
-                .sort({
-
-                    date: -1,
-
-                    createdAt: -1
-
-                });
-
-
-        res.json({
-
-            success: true,
-
-            timesheets:
-                records
-
-        });
-
-    }
-
-
-    catch (error) {
-
-        console.error(
-            "GET TIMESHEETS ERROR:",
-            error
-        );
-
-
-        res.status(500).json({
-
-            success: false,
-
-            message:
-                "Failed to load timesheets."
-
-        });
-
-    }
-
-};
-
-
-
-// ======================================================
-// GET ONE TIMESHEET
-// ======================================================
-
-exports.getTimesheet =
-async function (
-    req,
-    res
-) {
-
-    try {
-
-        const record =
-            await Timesheet
-                .findById(
-                    req.params.id
-                )
-                .populate(
-                    "employee",
-                    "name employeeId email"
-                );
-
-
-        if (
-            !record
-        ) {
-
-            return res.status(404).json({
-
-                success: false,
-
-                message:
-                    "Timesheet not found."
-
-            });
-
-        }
-
-
-        res.json({
-
-            success: true,
-
-            timesheet:
-                record
-
-        });
-
-    }
-
-
-    catch (error) {
-
-        console.error(
-            "GET TIMESHEET ERROR:",
-            error
-        );
-
-
-        res.status(500).json({
-
-            success: false,
-
-            message:
-                "Failed to load timesheet."
-
-        });
-
-    }
-
-};
-
-
-
-// ======================================================
-// CREATE TIMESHEET
-// ======================================================
-
-exports.createTimesheet =
-async function (
-    req,
-    res
-) {
-
-    try {
-
-        const {
-
-            employee,
-
-            date,
-
-            checkIn,
-
-            lunchStart,
-
-            lunchEnd,
-
-            checkOut,
-
-            tasks,
-
-            comments,
-
-            project,
-
-            projectName,
-
-            totalVideos,
-
-            completedVideos,
-
-            balanceVideos,
-
-            status
-
-        } = req.body;
-
-
-        // ==============================================
-        // REQUIRED EMPLOYEE
-        // ==============================================
-
-        if (
-            !employee
-        ) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Employee is required."
-
-            });
-
-        }
-
-
-        // ==============================================
-        // REQUIRED DATE
-        // ==============================================
-
-        if (
-            !date
-        ) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Date is required."
-
-            });
-
-        }
-
-
-        // ==============================================
-        // REQUIRED TIMES
-        // ==============================================
-
-        if (
-            !checkIn
-        ) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Check-in time is required."
-
-            });
-
-        }
-
-
-        if (
-            !lunchStart
-        ) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Lunch start time is required."
-
-            });
-
-        }
-
-
-        if (
-            !lunchEnd
-        ) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Lunch end time is required."
-
-            });
-
-        }
-
-
-        if (
-            !checkOut
-        ) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Check-out time is required."
-
-            });
-
-        }
-
-
-        // ==============================================
-        // VERIFY EMPLOYEE
-        // ==============================================
-
-        const employeeExists =
-            await Employee.findById(
-                employee
-            );
-
-
-        if (
-            !employeeExists
-        ) {
-
-            return res.status(404).json({
-
-                success: false,
-
-                message:
-                    "Employee not found."
-
-            });
-
-        }
-
-
-        // ==============================================
-        // CALCULATE ATTENDANCE
-        // ==============================================
-
-        const attendance =
-            calculateAttendance(
-
-                checkIn,
-
-                lunchStart,
-
-                lunchEnd,
-
-                checkOut
-
-            );
-
-
-        if (
-            !attendance.valid
-        ) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    attendance.message
-
-            });
-
-        }
-
-
-        // ==============================================
-        // CLEAN TASKS
-        // ==============================================
-
-        const cleanTasks =
-            Array.isArray(tasks)
-
-                ? tasks
-                    .map(
-                        task => ({
-
-                            taskName:
-                                String(
-
-                                    task.taskName ||
-                                    task.name ||
-                                    task.title ||
-                                    ""
-
-                                ).trim()
-
-                        })
-                    )
-                    .filter(
-                        task =>
-                            task.taskName
-                    )
-
-                : [];
-
-
-        // ==============================================
-        // CREATE RECORD
-        // ==============================================
-
-        const record =
-            new Timesheet({
+            const {
 
                 employee,
+
+                project,
+
+                projectName,
 
                 date,
 
@@ -1017,210 +536,590 @@ async function (
 
                 checkOut,
 
+                tasks,
 
-                officeMinutes:
-                    attendance.officeMinutes,
+                comments,
 
-                lunchMinutes:
-                    attendance.lunchMinutes,
+                totalVideos,
 
-                workingMinutes:
-                    attendance.workingMinutes,
+                completedVideos,
 
+                balanceVideos
 
-                officeHours:
-                    attendance.officeHours,
-
-                lunchHours:
-                    attendance.lunchHours,
-
-                workingHours:
-                    attendance.workingHours,
+            } = req.body;
 
 
-                tasks:
-                    cleanTasks,
+            /* ==========================================
+               VALIDATION
+            ========================================== */
+
+            if (!date) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Date is required."
+
+                });
+
+            }
 
 
-                comments:
-                    comments || "",
+            /* ==========================================
+               EMPLOYEE
+            ========================================== */
+
+            let employeeId;
 
 
-                // Keep project information
-                // but DO NOT populate it
+            if (
+                isAdmin(req)
+            ) {
 
-                project:
-                    project || null,
+                if (!employee) {
 
-                projectName:
-                    projectName || "",
+                    return res.status(400).json({
 
+                        success: false,
 
-                totalVideos:
-                    Number(
-                        totalVideos || 0
-                    ),
+                        message:
+                            "Admin must select an employee."
 
+                    });
 
-                completedVideos:
-                    Number(
-                        completedVideos || 0
-                    ),
+                }
 
 
-                balanceVideos:
-                    Number(
-                        balanceVideos || 0
-                    ),
+                if (
+                    !mongoose.Types.ObjectId.isValid(
+                        employee
+                    )
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        message:
+                            "Invalid Employee ID."
+
+                    });
+
+                }
 
 
-                status:
-                    status ||
-                    "Pending"
-
-            });
-
-
-        await record.save();
+                const employeeData =
+                    await Employee.findById(
+                        employee
+                    );
 
 
-        // ==============================================
-        // LOAD SAVED RECORD
-        // ==============================================
+                if (!employeeData) {
 
-        const populated =
-            await Timesheet
-                .findById(
-                    record._id
-                )
-                .populate(
-                    "employee",
-                    "name employeeId email"
+                    return res.status(404).json({
+
+                        success: false,
+
+                        message:
+                            "Employee not found."
+
+                    });
+
+                }
+
+
+                employeeId =
+                    employeeData._id;
+
+            }
+
+            else {
+
+                const employeeData =
+                    await getLoggedInEmployee(
+                        req
+                    );
+
+
+                if (!employeeData) {
+
+                    return res.status(403).json({
+
+                        success: false,
+
+                        message:
+                            "Employee profile not found for this login."
+
+                    });
+
+                }
+
+
+                employeeId =
+                    employeeData._id;
+
+            }
+
+
+            /* ==========================================
+               ATTENDANCE
+            ========================================== */
+
+            const attendance =
+                calculateAttendance(
+                    checkIn,
+                    lunchStart,
+                    lunchEnd,
+                    checkOut
                 );
 
 
-        // ==============================================
-        // RESPONSE
-        // ==============================================
+            if (
+                !attendance.valid
+            ) {
 
-        res.status(201).json({
+                return res.status(400).json({
 
-            success: true,
+                    success: false,
 
-            message:
-                "Timesheet saved successfully.",
+                    message:
+                        attendance.message
 
-            timesheet:
-                populated
+                });
 
-        });
-
-    }
+            }
 
 
-    catch (error) {
+            /* ==========================================
+               TASKS
+            ========================================== */
 
-        console.error(
-            "CREATE TIMESHEET ERROR:",
-            error
-        );
-
-
-        res.status(500).json({
-
-            success: false,
-
-            message:
-                "Failed to save timesheet.",
-
-            error:
-                error.message
-
-        });
-
-    }
-
-};
+            const finalTasks =
+                cleanTasks(tasks);
 
 
+            if (
+                finalTasks.length === 0
+            ) {
 
-// ======================================================
-// UPDATE TIMESHEET
-// ======================================================
+                return res.status(400).json({
 
-exports.updateTimesheet =
-async function (
-    req,
-    res
-) {
+                    success: false,
 
-    try {
+                    message:
+                        "Please enter at least one task."
 
-        const {
+                });
 
-            employee,
-
-            date,
-
-            checkIn,
-
-            lunchStart,
-
-            lunchEnd,
-
-            checkOut,
-
-            tasks,
-
-            comments,
-
-            project,
-
-            projectName,
-
-            totalVideos,
-
-            completedVideos,
-
-            balanceVideos,
-
-            status
-
-        } = req.body;
+            }
 
 
-        // ==============================================
-        // FIND RECORD
-        // ==============================================
+            /* ==========================================
+               VIDEO DATA
+            ========================================== */
 
-        const record =
-            await Timesheet.findById(
-                req.params.id
-            );
+            const total =
+                Math.max(
+                    Number(
+                        totalVideos
+                    ) || 0,
+                    0
+                );
 
 
-        if (
-            !record
-        ) {
+            const completed =
+                Math.max(
+                    Number(
+                        completedVideos
+                    ) || 0,
+                    0
+                );
 
-            return res.status(404).json({
 
-                success: false,
+            const balance =
+                Math.max(
+                    total -
+                    completed,
+                    0
+                );
+
+
+            /* ==========================================
+               CREATE
+            ========================================== */
+
+            const timesheet =
+                await Timesheet.create({
+
+                    employee:
+                        employeeId,
+
+                    project:
+                        project ||
+                        "",
+
+                    projectName:
+                        String(
+                            projectName ||
+                            project ||
+                            ""
+                        ).trim(),
+
+                    date,
+
+                    checkIn,
+
+                    lunchStart,
+
+                    lunchEnd,
+
+                    checkOut,
+
+                    officeMinutes:
+                        attendance.officeMinutes,
+
+                    lunchMinutes:
+                        attendance.lunchMinutes,
+
+                    workingMinutes:
+                        attendance.workingMinutes,
+
+                    officeHours:
+                        attendance.officeHours,
+
+                    lunchHours:
+                        attendance.lunchHours,
+
+                    workingHours:
+                        attendance.workingHours,
+
+                    tasks:
+                        finalTasks,
+
+                    comments:
+                        String(
+                            comments ||
+                            ""
+                        ).trim(),
+
+                    totalVideos:
+                        total,
+
+                    completedVideos:
+                        completed,
+
+                    balanceVideos:
+                        balance,
+
+                    /* IMPORTANT */
+
+                    status:
+                        "Pending"
+
+                });
+
+
+            /* ==========================================
+               POPULATE
+            ========================================== */
+
+            const saved =
+                await Timesheet
+                    .findById(
+                        timesheet._id
+                    )
+                    .populate(
+                        "employee",
+                        employeePopulate
+                    );
+
+
+            return res.status(201).json({
+
+                success: true,
 
                 message:
-                    "Timesheet not found."
+                    "Timesheet Saved Successfully",
+
+                timesheet:
+                    saved
 
             });
 
         }
 
+        catch (error) {
 
-        // ==============================================
-        // CALCULATE
-        // ==============================================
+            console.error(
+                "CREATE TIMESHEET ERROR:",
+                error
+            );
 
-        const attendance =
-            calculateAttendance(
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    error.message ||
+                    "Failed to create timesheet."
+
+            });
+
+        }
+
+    };
+
+
+/* =====================================================
+   GET TIMESHEETS
+   ADMIN -> ALL
+   EMPLOYEE -> OWN
+===================================================== */
+
+const getTimesheets =
+    async (req, res) => {
+
+        try {
+
+            let query = {};
+
+
+            if (
+                !isAdmin(req)
+            ) {
+
+                const employee =
+                    await getLoggedInEmployee(
+                        req
+                    );
+
+
+                if (!employee) {
+
+                    return res.status(200).json({
+
+                        success: true,
+
+                        count: 0,
+
+                        timesheets: []
+
+                    });
+
+                }
+
+
+                query.employee =
+                    employee._id;
+
+            }
+
+
+            const timesheets =
+                await Timesheet
+
+                    .find(query)
+
+                    .populate(
+                        "employee",
+                        employeePopulate
+                    )
+
+                    .sort({
+
+                        date: -1,
+
+                        createdAt: -1
+
+                    });
+
+
+            return res.status(200).json({
+
+                success: true,
+
+                count:
+                    timesheets.length,
+
+                timesheets
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "GET TIMESHEETS ERROR:",
+                error
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Failed to load timesheets."
+
+            });
+
+        }
+
+    };
+
+
+/* =====================================================
+   GET SINGLE
+===================================================== */
+
+const getTimesheetById =
+    async (req, res) => {
+
+        try {
+
+            const timesheet =
+                await Timesheet
+
+                    .findById(
+                        req.params.id
+                    )
+
+                    .populate(
+                        "employee",
+                        employeePopulate
+                    );
+
+
+            if (!timesheet) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Timesheet not found."
+
+                });
+
+            }
+
+
+            const allowed =
+                await userCanAccessTimesheet(
+                    req,
+                    timesheet
+                );
+
+
+            if (!allowed) {
+
+                return res.status(403).json({
+
+                    success: false,
+
+                    message:
+                        "Access Denied."
+
+                });
+
+            }
+
+
+            return res.status(200).json({
+
+                success: true,
+
+                timesheet
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "GET TIMESHEET ERROR:",
+                error
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Failed to load timesheet."
+
+            });
+
+        }
+
+    };
+
+
+/* =====================================================
+   UPDATE TIMESHEET
+===================================================== */
+
+const updateTimesheet =
+    async (req, res) => {
+
+        try {
+
+            const record =
+                await Timesheet.findById(
+                    req.params.id
+                );
+
+
+            if (!record) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Timesheet not found."
+
+                });
+
+            }
+
+
+            const allowed =
+                await userCanAccessTimesheet(
+                    req,
+                    record
+                );
+
+
+            if (!allowed) {
+
+                return res.status(403).json({
+
+                    success: false,
+
+                    message:
+                        "Access Denied."
+
+                });
+
+            }
+
+
+            const {
+
+                employee,
+
+                project,
+
+                projectName,
+
+                date,
 
                 checkIn,
 
@@ -1228,298 +1127,655 @@ async function (
 
                 lunchEnd,
 
-                checkOut
+                checkOut,
 
-            );
+                tasks,
+
+                comments,
+
+                totalVideos,
+
+                completedVideos,
+
+                status
+
+            } = req.body;
 
 
-        if (
-            !attendance.valid
-        ) {
+            /* ==========================================
+               EMPLOYEE
+            ========================================== */
 
-            return res.status(400).json({
+            if (
+                employee !== undefined &&
+                isAdmin(req)
+            ) {
 
-                success: false,
+                if (
+                    !mongoose.Types.ObjectId.isValid(
+                        employee
+                    )
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        message:
+                            "Invalid Employee ID."
+
+                    });
+
+                }
+
+
+                const employeeData =
+                    await Employee.findById(
+                        employee
+                    );
+
+
+                if (!employeeData) {
+
+                    return res.status(404).json({
+
+                        success: false,
+
+                        message:
+                            "Employee not found."
+
+                    });
+
+                }
+
+
+                record.employee =
+                    employeeData._id;
+
+            }
+
+
+            /* ==========================================
+               BASIC DATA
+            ========================================== */
+
+            if (
+                project !== undefined
+            ) {
+
+                record.project =
+                    project;
+
+            }
+
+
+            if (
+                projectName !== undefined
+            ) {
+
+                record.projectName =
+                    String(
+                        projectName
+                    ).trim();
+
+            }
+
+
+            if (
+                date !== undefined
+            ) {
+
+                record.date =
+                    date;
+
+            }
+
+
+            /* ==========================================
+               ATTENDANCE
+            ========================================== */
+
+            const newCheckIn =
+                checkIn !== undefined
+                    ? checkIn
+                    : record.checkIn;
+
+
+            const newLunchStart =
+                lunchStart !== undefined
+                    ? lunchStart
+                    : record.lunchStart;
+
+
+            const newLunchEnd =
+                lunchEnd !== undefined
+                    ? lunchEnd
+                    : record.lunchEnd;
+
+
+            const newCheckOut =
+                checkOut !== undefined
+                    ? checkOut
+                    : record.checkOut;
+
+
+            if (
+                newCheckIn &&
+                newLunchStart &&
+                newLunchEnd &&
+                newCheckOut
+            ) {
+
+                const attendance =
+                    calculateAttendance(
+
+                        newCheckIn,
+
+                        newLunchStart,
+
+                        newLunchEnd,
+
+                        newCheckOut
+
+                    );
+
+
+                if (
+                    !attendance.valid
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        message:
+                            attendance.message
+
+                    });
+
+                }
+
+
+                record.checkIn =
+                    newCheckIn;
+
+                record.lunchStart =
+                    newLunchStart;
+
+                record.lunchEnd =
+                    newLunchEnd;
+
+                record.checkOut =
+                    newCheckOut;
+
+
+                record.officeMinutes =
+                    attendance.officeMinutes;
+
+                record.lunchMinutes =
+                    attendance.lunchMinutes;
+
+                record.workingMinutes =
+                    attendance.workingMinutes;
+
+
+                record.officeHours =
+                    attendance.officeHours;
+
+                record.lunchHours =
+                    attendance.lunchHours;
+
+                record.workingHours =
+                    attendance.workingHours;
+
+            }
+
+
+            /* ==========================================
+               TASKS
+            ========================================== */
+
+            if (
+                tasks !== undefined
+            ) {
+
+                const finalTasks =
+                    cleanTasks(tasks);
+
+
+                record.tasks =
+                    finalTasks;
+
+            }
+
+
+            /* ==========================================
+               COMMENTS
+            ========================================== */
+
+            if (
+                comments !== undefined
+            ) {
+
+                record.comments =
+                    String(
+                        comments
+                    ).trim();
+
+            }
+
+
+            /* ==========================================
+               VIDEOS
+            ========================================== */
+
+            if (
+                totalVideos !== undefined
+            ) {
+
+                record.totalVideos =
+                    Math.max(
+                        Number(
+                            totalVideos
+                        ) || 0,
+                        0
+                    );
+
+            }
+
+
+            if (
+                completedVideos !== undefined
+            ) {
+
+                record.completedVideos =
+                    Math.max(
+                        Number(
+                            completedVideos
+                        ) || 0,
+                        0
+                    );
+
+            }
+
+
+            record.balanceVideos =
+                Math.max(
+
+                    Number(
+                        record.totalVideos
+                    ) || 0
+
+                    -
+
+                    Number(
+                        record.completedVideos
+                    ) || 0,
+
+                    0
+
+                );
+
+
+            /* ==========================================
+               STATUS
+            ========================================== */
+
+            if (
+                status !== undefined
+            ) {
+
+                const allowedStatuses = [
+
+                    "Pending",
+
+                    "Approved",
+
+                    "Rejected",
+
+                    "Completed"
+
+                ];
+
+
+                if (
+                    !allowedStatuses.includes(
+                        status
+                    )
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        message:
+                            "Invalid status."
+
+                    });
+
+                }
+
+
+                if (
+                    !isAdmin(req)
+                ) {
+
+                    return res.status(403).json({
+
+                        success: false,
+
+                        message:
+                            "Only Admin can change status."
+
+                    });
+
+                }
+
+
+                record.status =
+                    status;
+
+            }
+
+
+            await record.save();
+
+
+            const updated =
+                await Timesheet
+
+                    .findById(
+                        record._id
+                    )
+
+                    .populate(
+                        "employee",
+                        employeePopulate
+                    );
+
+
+            return res.status(200).json({
+
+                success: true,
 
                 message:
-                    attendance.message
+                    "Timesheet Updated Successfully",
+
+                timesheet:
+                    updated
 
             });
 
         }
 
+        catch (error) {
 
-        // ==============================================
-        // CLEAN TASKS
-        // ==============================================
-
-        const cleanTasks =
-            Array.isArray(tasks)
-
-                ? tasks
-                    .map(
-                        task => ({
-
-                            taskName:
-                                String(
-
-                                    task.taskName ||
-                                    task.name ||
-                                    task.title ||
-                                    ""
-
-                                ).trim()
-
-                        })
-                    )
-                    .filter(
-                        task =>
-                            task.taskName
-                    )
-
-                : [];
+            console.error(
+                "UPDATE TIMESHEET ERROR:",
+                error
+            );
 
 
-        // ==============================================
-        // UPDATE
-        // ==============================================
+            return res.status(500).json({
 
-        if (
-            employee
-        ) {
+                success: false,
 
-            record.employee =
-                employee;
+                message:
+                    error.message ||
+                    "Failed to update timesheet."
+
+            });
 
         }
 
-
-        if (
-            date
-        ) {
-
-            record.date =
-                date;
-
-        }
+    };
 
 
-        record.checkIn =
-            checkIn || "";
+/* =====================================================
+   DELETE
+===================================================== */
 
+const deleteTimesheet =
+    async (req, res) => {
 
-        record.lunchStart =
-            lunchStart || "";
+        try {
 
-
-        record.lunchEnd =
-            lunchEnd || "";
-
-
-        record.checkOut =
-            checkOut || "";
-
-
-        record.officeMinutes =
-            attendance.officeMinutes;
-
-
-        record.lunchMinutes =
-            attendance.lunchMinutes;
-
-
-        record.workingMinutes =
-            attendance.workingMinutes;
-
-
-        record.officeHours =
-            attendance.officeHours;
-
-
-        record.lunchHours =
-            attendance.lunchHours;
-
-
-        record.workingHours =
-            attendance.workingHours;
-
-
-        record.tasks =
-            cleanTasks;
-
-
-        record.comments =
-            comments || "";
-
-
-        record.project =
-            project || null;
-
-
-        record.projectName =
-            projectName || "";
-
-
-        record.totalVideos =
-            Number(
-                totalVideos || 0
-            );
-
-
-        record.completedVideos =
-            Number(
-                completedVideos || 0
-            );
-
-
-        record.balanceVideos =
-            Number(
-                balanceVideos || 0
-            );
-
-
-        record.status =
-            status ||
-            record.status ||
-            "Pending";
-
-
-        await record.save();
-
-
-        // ==============================================
-        // RETURN UPDATED RECORD
-        // ==============================================
-
-        const populated =
-            await Timesheet
-                .findById(
-                    record._id
-                )
-                .populate(
-                    "employee",
-                    "name employeeId email"
+            const timesheet =
+                await Timesheet.findById(
+                    req.params.id
                 );
 
 
-        res.json({
+            if (!timesheet) {
 
-            success: true,
+                return res.status(404).json({
 
-            message:
-                "Timesheet updated successfully.",
+                    success: false,
 
-            timesheet:
-                populated
+                    message:
+                        "Timesheet not found."
 
-        });
+                });
 
-    }
-
-
-    catch (error) {
-
-        console.error(
-            "UPDATE TIMESHEET ERROR:",
-            error
-        );
+            }
 
 
-        res.status(500).json({
-
-            success: false,
-
-            message:
-                "Failed to update timesheet.",
-
-            error:
-                error.message
-
-        });
-
-    }
-
-};
+            const allowed =
+                await userCanAccessTimesheet(
+                    req,
+                    timesheet
+                );
 
 
+            if (!allowed) {
 
-// ======================================================
-// DELETE TIMESHEET
-// ======================================================
+                return res.status(403).json({
 
-exports.deleteTimesheet =
-async function (
-    req,
-    res
-) {
+                    success: false,
 
-    try {
+                    message:
+                        "Access Denied."
 
-        const record =
-            await Timesheet.findById(
+                });
+
+            }
+
+
+            await Timesheet.findByIdAndDelete(
                 req.params.id
             );
 
 
-        if (
-            !record
-        ) {
+            return res.status(200).json({
 
-            return res.status(404).json({
-
-                success: false,
+                success: true,
 
                 message:
-                    "Timesheet not found."
+                    "Timesheet Deleted Successfully"
 
             });
 
         }
 
+        catch (error) {
 
-        await Timesheet.findByIdAndDelete(
-            req.params.id
-        );
-
-
-        res.json({
-
-            success: true,
-
-            message:
-                "Timesheet deleted successfully."
-
-        });
-
-    }
+            console.error(
+                "DELETE TIMESHEET ERROR:",
+                error
+            );
 
 
-    catch (error) {
+            return res.status(500).json({
 
-        console.error(
-            "DELETE TIMESHEET ERROR:",
-            error
-        );
+                success: false,
+
+                message:
+                    error.message ||
+                    "Failed to delete timesheet."
+
+            });
+
+        }
+
+    };
 
 
-        res.status(500).json({
+/* =====================================================
+   UPDATE STATUS
+   ADMIN ONLY
+===================================================== */
 
-            success: false,
+const updateStatus =
+    async (req, res) => {
 
-            message:
-                "Failed to delete timesheet."
+        try {
 
-        });
+            if (
+                !isAdmin(req)
+            ) {
 
-    }
+                return res.status(403).json({
+
+                    success: false,
+
+                    message:
+                        "Only Admin can update status."
+
+                });
+
+            }
+
+
+            const {
+                status
+            } = req.body;
+
+
+            const allowedStatuses = [
+
+                "Pending",
+
+                "Approved",
+
+                "Rejected",
+
+                "Completed"
+
+            ];
+
+
+            if (
+                !allowedStatuses.includes(
+                    status
+                )
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Invalid status."
+
+                });
+
+            }
+
+
+            const timesheet =
+                await Timesheet
+
+                    .findByIdAndUpdate(
+
+                        req.params.id,
+
+                        {
+                            status
+                        },
+
+                        {
+                            new: true,
+
+                            runValidators: true
+                        }
+
+                    )
+
+                    .populate(
+
+                        "employee",
+
+                        employeePopulate
+
+                    );
+
+
+            if (!timesheet) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Timesheet not found."
+
+                });
+
+            }
+
+
+            return res.status(200).json({
+
+                success: true,
+
+                message:
+                    "Timesheet Status Updated",
+
+                timesheet
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "UPDATE STATUS ERROR:",
+                error
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    error.message ||
+                    "Failed to update status."
+
+            });
+
+        }
+
+    };
+
+
+/* =====================================================
+   EXPORT
+===================================================== */
+
+module.exports = {
+
+    createTimesheet,
+
+    getTimesheets,
+
+    getTimesheetById,
+
+    updateTimesheet,
+
+    deleteTimesheet,
+
+    updateStatus
 
 };
-
-
-
-// ======================================================
-// ROUTE COMPATIBILITY
-// ======================================================
-
-exports.getTimesheetById =
-    exports.getTimesheet;

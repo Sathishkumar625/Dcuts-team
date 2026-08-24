@@ -1,65 +1,35 @@
 /* =========================================================
    THE D CUTS
-   PROFESSIONAL REPORT SYSTEM
-   EXCEL STYLE TABLE
+   PROFESSIONAL REPORTS CONTROLLER
+   TIMESHEET REPORTS
 ========================================================= */
+
+"use strict";
 
 
 /* =========================================================
-   API
+   API CONFIG
 ========================================================= */
 
-const REPORT_API_BASE = "/api";
+const REPORTS_API_BASE =
+    window.API_BASE_URL ||
+    window.apiBaseUrl ||
+    "/api";
+
+
+const TIMESHEET_API =
+    `${REPORTS_API_BASE}/timesheets`;
 
 
 /* =========================================================
-   GLOBAL DATA
+   STATE
 ========================================================= */
 
 let allReports = [];
 
 let filteredReports = [];
 
-let clientsData = [];
-
-let employeesData = [];
-
-
-/* =========================================================
-   AUTH TOKEN
-========================================================= */
-
-function getReportToken() {
-
-    return (
-        localStorage.getItem("token") ||
-        ""
-    );
-
-}
-
-
-function reportAuthHeaders() {
-
-    const token =
-        getReportToken();
-
-
-    return {
-
-        "Content-Type":
-            "application/json",
-
-        ...(token
-            ? {
-                Authorization:
-                    `Bearer ${token}`
-            }
-            : {})
-
-    };
-
-}
+let currentReport = null;
 
 
 /* =========================================================
@@ -68,32 +38,61 @@ function reportAuthHeaders() {
 
 document.addEventListener(
     "DOMContentLoaded",
-    async function () {
+    () => {
 
-        setupEvents();
-
-        await loadReports();
+        initializeReportsPage();
 
     }
 );
 
 
 /* =========================================================
-   SETUP EVENTS
+   INITIALIZE
 ========================================================= */
 
-function setupEvents() {
+function initializeReportsPage() {
+
+    bindReportEvents();
+
+    loadReports();
+
+}
 
 
-    const search =
+/* =========================================================
+   EVENTS
+========================================================= */
+
+function bindReportEvents() {
+
+
+    /* Refresh */
+
+    const refreshButton =
+        document.getElementById(
+            "refreshReports"
+        );
+
+    if (refreshButton) {
+
+        refreshButton.addEventListener(
+            "click",
+            loadReports
+        );
+
+    }
+
+
+    /* Search */
+
+    const searchInput =
         document.getElementById(
             "reportSearch"
         );
 
+    if (searchInput) {
 
-    if (search) {
-
-        search.addEventListener(
+        searchInput.addEventListener(
             "input",
             applyFilters
         );
@@ -101,11 +100,12 @@ function setupEvents() {
     }
 
 
+    /* Employee */
+
     const employeeFilter =
         document.getElementById(
             "employeeFilter"
         );
-
 
     if (employeeFilter) {
 
@@ -117,11 +117,12 @@ function setupEvents() {
     }
 
 
+    /* Client */
+
     const clientFilter =
         document.getElementById(
             "clientFilter"
         );
-
 
     if (clientFilter) {
 
@@ -133,11 +134,12 @@ function setupEvents() {
     }
 
 
+    /* Status */
+
     const statusFilter =
         document.getElementById(
             "statusFilter"
         );
-
 
     if (statusFilter) {
 
@@ -149,11 +151,12 @@ function setupEvents() {
     }
 
 
+    /* Date */
+
     const dateFilter =
         document.getElementById(
             "dateFilter"
         );
-
 
     if (dateFilter) {
 
@@ -165,15 +168,16 @@ function setupEvents() {
     }
 
 
-    const clear =
+    /* Clear */
+
+    const clearButton =
         document.getElementById(
             "clearFilters"
         );
 
+    if (clearButton) {
 
-    if (clear) {
-
-        clear.addEventListener(
+        clearButton.addEventListener(
             "click",
             clearFilters
         );
@@ -181,15 +185,16 @@ function setupEvents() {
     }
 
 
-    const emptyClear =
+    /* Empty clear */
+
+    const emptyClearButton =
         document.getElementById(
             "emptyClearFilters"
         );
 
+    if (emptyClearButton) {
 
-    if (emptyClear) {
-
-        emptyClear.addEventListener(
+        emptyClearButton.addEventListener(
             "click",
             clearFilters
         );
@@ -197,35 +202,16 @@ function setupEvents() {
     }
 
 
-    const refresh =
-        document.getElementById(
-            "refreshReports"
-        );
+    /* CSV */
 
-
-    if (refresh) {
-
-        refresh.addEventListener(
-            "click",
-            async function () {
-
-                await loadReports();
-
-            }
-        );
-
-    }
-
-
-    const exportBtn =
+    const exportButton =
         document.getElementById(
             "exportCSV"
         );
 
+    if (exportButton) {
 
-    if (exportBtn) {
-
-        exportBtn.addEventListener(
+        exportButton.addEventListener(
             "click",
             exportCSV
         );
@@ -233,17 +219,18 @@ function setupEvents() {
     }
 
 
-    const printBtn =
+    /* Print */
+
+    const printButton =
         document.getElementById(
             "printReport"
         );
 
+    if (printButton) {
 
-    if (printBtn) {
-
-        printBtn.addEventListener(
+        printButton.addEventListener(
             "click",
-            function () {
+            () => {
 
                 window.print();
 
@@ -253,11 +240,12 @@ function setupEvents() {
     }
 
 
+    /* Modal close */
+
     const closeModal =
         document.getElementById(
             "closeModal"
         );
-
 
     if (closeModal) {
 
@@ -269,30 +257,39 @@ function setupEvents() {
     }
 
 
-    const modal =
-        document.getElementById(
-            "reportModal"
+    /* Modal overlay */
+
+    const overlay =
+        document.querySelector(
+            ".modal-overlay"
         );
 
+    if (overlay) {
 
-    if (modal) {
-
-        const overlay =
-            modal.querySelector(
-                ".modal-overlay"
-            );
-
-
-        if (overlay) {
-
-            overlay.addEventListener(
-                "click",
-                closeReportModal
-            );
-
-        }
+        overlay.addEventListener(
+            "click",
+            closeReportModal
+        );
 
     }
+
+
+    /* ESC */
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Escape"
+            ) {
+
+                closeReportModal();
+
+            }
+
+        }
+    );
 
 }
 
@@ -305,41 +302,58 @@ async function loadReports() {
 
     showLoading();
 
-
     try {
 
-        await loadClients();
+        const response =
+            await fetch(
+                TIMESHEET_API,
+                {
+                    method: "GET",
 
-        await loadEmployees();
+                    credentials: "include",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    }
+
+                }
+            );
 
 
-        let reports =
-            await loadTimesheetsFromAPI();
+        const data =
+            await parseJSONResponse(
+                response
+            );
 
 
-        /*
-            If API returns no data,
-            use localStorage as fallback.
-        */
+        if (!response.ok) {
 
-        if (
-            !Array.isArray(reports) ||
-            reports.length === 0
-        ) {
-
-            reports =
-                loadTimesheetsFromStorage();
+            throw new Error(
+                data?.message ||
+                `Failed to load reports (${response.status})`
+            );
 
         }
 
 
         allReports =
             normalizeReports(
-                reports
+                data
             );
 
 
-        populateFilters();
+        populateEmployeeFilter(
+            allReports
+        );
+
+
+        populateClientFilter(
+            allReports
+        );
+
 
         applyFilters();
 
@@ -349,24 +363,27 @@ async function loadReports() {
     catch (error) {
 
         console.error(
-            "REPORT LOAD ERROR:",
+            "LOAD REPORTS ERROR:",
             error
         );
 
 
-        const fallback =
-            loadTimesheetsFromStorage();
+        allReports = [];
+
+        filteredReports = [];
 
 
-        allReports =
-            normalizeReports(
-                fallback
-            );
+        updateSummary([]);
 
 
-        populateFilters();
+        renderReports([]);
 
-        applyFilters();
+
+        showToast(
+            error.message ||
+            "Failed to load reports.",
+            "error"
+        );
 
     }
 
@@ -374,60 +391,38 @@ async function loadReports() {
 
 
 /* =========================================================
-   LOAD CLIENTS
+   RESPONSE PARSER
 ========================================================= */
 
-async function loadClients() {
+async function parseJSONResponse(
+    response
+) {
+
+    const text =
+        await response.text();
+
+
+    if (!text) {
+
+        return {};
+
+    }
+
 
     try {
 
-        const response =
-            await fetch(
-                `${REPORT_API_BASE}/clients`,
-                {
-                    method: "GET",
-
-                    headers:
-                        reportAuthHeaders()
-                }
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Client API failed"
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        clientsData =
-            data.clients ||
-            data.data ||
-            [];
-
+        return JSON.parse(text);
 
     }
 
-    catch (error) {
+    catch {
 
-        console.warn(
-            "Using local clients:",
-            error
-        );
+        return {
 
+            message:
+                text
 
-        clientsData =
-            JSON.parse(
-                localStorage.getItem(
-                    "clients"
-                ) || "[]"
-            );
+        };
 
     }
 
@@ -435,373 +430,257 @@ async function loadClients() {
 
 
 /* =========================================================
-   LOAD EMPLOYEES
-========================================================= */
-
-async function loadEmployees() {
-
-    try {
-
-        const response =
-            await fetch(
-                `${REPORT_API_BASE}/employees`,
-                {
-                    method: "GET",
-
-                    headers:
-                        reportAuthHeaders()
-                }
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Employee API failed"
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        employeesData =
-            data.employees ||
-            data.data ||
-            [];
-
-
-    }
-
-    catch (error) {
-
-        console.warn(
-            "Using local employees:",
-            error
-        );
-
-
-        employeesData =
-            JSON.parse(
-                localStorage.getItem(
-                    "employees"
-                ) || "[]"
-            );
-
-    }
-
-}
-
-
-/* =========================================================
-   LOAD TIMESHEETS API
-========================================================= */
-
-async function loadTimesheetsFromAPI() {
-
-    const response =
-        await fetch(
-            `${REPORT_API_BASE}/timesheets`,
-            {
-                method: "GET",
-
-                headers:
-                    reportAuthHeaders()
-            }
-        );
-
-
-    if (!response.ok) {
-
-        throw new Error(
-            "Unable to load timesheets"
-        );
-
-    }
-
-
-    const data =
-        await response.json();
-
-
-    return (
-        data.timesheets ||
-        data.data ||
-        []
-    );
-
-}
-
-
-/* =========================================================
-   LOCAL STORAGE FALLBACK
-========================================================= */
-
-function loadTimesheetsFromStorage() {
-
-    try {
-
-        return JSON.parse(
-            localStorage.getItem(
-                "timesheets"
-            ) || "[]"
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "LOCAL TIMESHEET ERROR:",
-            error
-        );
-
-
-        return [];
-
-    }
-
-}
-
-
-/* =========================================================
-   NORMALIZE
+   NORMALIZE REPORT DATA
 ========================================================= */
 
 function normalizeReports(
-    records
+    data
 ) {
 
-    if (!Array.isArray(records)) {
+    let reports = [];
 
-        return [];
+
+    if (
+        Array.isArray(data)
+    ) {
+
+        reports = data;
+
+    }
+
+    else if (
+        Array.isArray(
+            data?.timesheets
+        )
+    ) {
+
+        reports =
+            data.timesheets;
+
+    }
+
+    else if (
+        Array.isArray(
+            data?.reports
+        )
+    ) {
+
+        reports =
+            data.reports;
+
+    }
+
+    else if (
+        Array.isArray(
+            data?.data
+        )
+    ) {
+
+        reports =
+            data.data;
 
     }
 
 
-    return records.map(
-        function (item, index) {
-
-            const employee =
-                resolveEmployee(
-                    item.employee
-                );
-
-
-            const client =
-                resolveClient(
-                    item.client ||
-                    item.project
-                );
-
-
-            const total =
-                Number(
-                    item.totalVideos
-                ) || 0;
-
-
-            const completed =
-                Number(
-                    item.completedVideos
-                ) || 0;
-
-
-            const balance =
-                Math.max(
-                    Number(
-                        item.balanceVideos
-                    ) ||
-                    total - completed,
-                    0
-                );
-
-
-            const working =
-                item.workingHours ||
-                item.hoursWorked ||
-                "0h 0m";
-
-
-            const office =
-                item.officeHours ||
-                item.officeWorked ||
-                "—";
-
-
-            const lunch =
-                item.lunchHours ||
-                item.lunchBreak ||
-                "—";
-
-
-            const project =
-                item.projectName ||
-                item.project?.name ||
-                item.project?.projectName ||
-                item.project ||
-                client?.code ||
-                "—";
-
-
-            const task =
-                item.taskDetails ||
-                item.comments ||
-                item.task ||
-                item.description ||
-                "—";
-
-
-            const status =
-                balance === 0 &&
-                total > 0
-                    ? "Completed"
-                    : "Pending";
-
-
-            return {
-
-                original:
-                    item,
-
-                index:
-                    index,
-
-                id:
-                    item._id ||
-                    item.id ||
-                    `REPORT-${index + 1}`,
-
-                employeeId:
-                    employee?.employeeId ||
-                    item.employeeId ||
-                    employee?._id ||
-                    item.employee ||
-                    "—",
-
-                employeeName:
-                    employee?.name ||
-                    item.employeeName ||
-                    "Unknown Employee",
-
-                date:
-                    formatDate(
-                        item.date
-                    ),
-
-                rawDate:
-                    item.date || "",
-
-                clientCode:
-                    client?.code ||
-                    item.clientCode ||
-                    "—",
-
-                clientName:
-                    client?.name ||
-                    item.clientName ||
-                    "—",
-
-                project:
-                    project,
-
-                task:
-                    task,
-
-                totalVideos:
-                    total,
-
-                completedVideos:
-                    completed,
-
-                balanceVideos:
-                    balance,
-
-                officeHours:
-                    office,
-
-                lunchHours:
-                    lunch,
-
-                workingHours:
-                    working,
-
-                status:
-                    status
-
-            };
-
-        }
+    return reports.map(
+        normalizeReport
     );
 
 }
 
 
 /* =========================================================
-   RESOLVE EMPLOYEE
+   NORMALIZE SINGLE REPORT
 ========================================================= */
 
-function resolveEmployee(
-    employee
+function normalizeReport(
+    report
 ) {
 
-    if (!employee) {
+    const employee =
+        report?.employee &&
+        typeof report.employee === "object"
+            ? report.employee
+            : null;
 
-        return null;
+
+    const tasks =
+        Array.isArray(
+            report?.tasks
+        )
+            ? report.tasks
+            : [];
+
+
+    const totalVideos =
+        Math.max(
+            Number(
+                report?.totalVideos
+            ) || 0,
+            0
+        );
+
+
+    const completedVideos =
+        Math.max(
+            Number(
+                report?.completedVideos
+            ) || 0,
+            0
+        );
+
+
+    const balanceVideos =
+        Math.max(
+            totalVideos -
+            completedVideos,
+            0
+        );
+
+
+    return {
+
+        ...report,
+
+        employee,
+
+        employeeId:
+            employee?.employeeId ||
+            employee?.id ||
+            report?.employeeId ||
+            "",
+
+        employeeName:
+            employee?.name ||
+            report?.employeeName ||
+            "Unknown Employee",
+
+        employeeEmail:
+            employee?.email ||
+            "",
+
+        employeeDepartment:
+            employee?.department ||
+            "",
+
+        employeeDesignation:
+            employee?.designation ||
+            "",
+
+        employeeRole:
+            employee?.role ||
+            "",
+
+        project:
+            report?.projectName ||
+            getProjectName(
+                report?.project
+            ) ||
+            "",
+
+        client:
+            report?.clientName ||
+            getClientName(
+                report?.client
+            ) ||
+            getClientName(
+                report?.project
+            ) ||
+            "",
+
+        taskText:
+            tasks
+                .map(
+                    task =>
+                        task?.taskName ||
+                        task?.task ||
+                        ""
+                )
+                .filter(Boolean)
+                .join(", "),
+
+        totalVideos,
+
+        completedVideos,
+
+        balanceVideos,
+
+        status:
+            report?.status ||
+            "Pending",
+
+        workingMinutes:
+            Number(
+                report?.workingMinutes
+            ) || 0,
+
+        officeMinutes:
+            Number(
+                report?.officeMinutes
+            ) || 0,
+
+        lunchMinutes:
+            Number(
+                report?.lunchMinutes
+            ) || 0
+
+    };
+
+}
+
+
+/* =========================================================
+   PROJECT NAME
+========================================================= */
+
+function getProjectName(
+    project
+) {
+
+    if (!project) {
+
+        return "";
 
     }
 
 
     if (
-        typeof employee ===
-        "object"
+        typeof project === "string"
     ) {
 
-        return employee;
+        return project;
 
     }
 
 
     return (
-        employeesData.find(
-            function (item) {
-
-                return (
-                    String(
-                        item._id
-                    ) ===
-                    String(
-                        employee
-                    )
-                );
-
-            }
-        ) || null
+        project?.name ||
+        project?.projectName ||
+        project?.title ||
+        project?.code ||
+        ""
     );
 
 }
 
 
 /* =========================================================
-   RESOLVE CLIENT
+   CLIENT NAME
 ========================================================= */
 
-function resolveClient(
+function getClientName(
     client
 ) {
 
     if (!client) {
 
-        return null;
+        return "";
 
     }
 
 
     if (
-        typeof client ===
-        "object"
+        typeof client === "string"
     ) {
 
         return client;
@@ -810,149 +689,120 @@ function resolveClient(
 
 
     return (
-        clientsData.find(
-            function (item) {
-
-                return (
-
-                    String(
-                        item._id
-                    ) ===
-                    String(
-                        client
-                    )
-
-                    ||
-
-                    String(
-                        item.code
-                    ).toLowerCase() ===
-                    String(
-                        client
-                    ).toLowerCase()
-
-                );
-
-            }
-        ) || null
+        client?.name ||
+        client?.clientName ||
+        client?.code ||
+        ""
     );
 
 }
 
 
 /* =========================================================
-   POPULATE FILTERS
+   FILTER OPTIONS
 ========================================================= */
 
-function populateFilters() {
+function populateEmployeeFilter(
+    reports
+) {
 
-
-    const employeeSelect =
+    const select =
         document.getElementById(
             "employeeFilter"
         );
 
 
-    const clientSelect =
-        document.getElementById(
-            "clientFilter"
-        );
+    if (!select) {
 
-
-    if (employeeSelect) {
-
-        const employees =
-            [...new Map(
-                allReports.map(
-                    function (item) {
-
-                        return [
-                            item.employeeId,
-                            item.employeeName
-                        ];
-
-                    }
-                )
-            )];
-
-
-        employeeSelect.innerHTML = `
-            <option value="">
-                All Employees
-            </option>
-        `;
-
-
-        employees.forEach(
-            function ([id, name]) {
-
-                employeeSelect.innerHTML += `
-
-                    <option value="${escapeHtml(id)}">
-
-                        ${escapeHtml(name)}
-
-                    </option>
-
-                `;
-
-            }
-        );
+        return;
 
     }
 
 
-    if (clientSelect) {
+    const currentValue =
+        select.value;
 
-        const clients =
-            [...new Map(
-                allReports.map(
-                    function (item) {
 
-                        return [
-                            item.clientCode,
-                            item.clientName
-                        ];
+    const employees =
+        new Map();
 
-                    }
+
+    reports.forEach(
+        report => {
+
+            const id =
+                report.employee?._id ||
+                report.employeeId ||
+                report.employeeName;
+
+
+            if (!id) {
+
+                return;
+
+            }
+
+
+            employees.set(
+                String(id),
+                report.employeeName
+            );
+
+        }
+    );
+
+
+    select.innerHTML = `
+
+        <option value="">
+            All Employees
+        </option>
+
+    `;
+
+
+    [...employees.entries()]
+        .sort(
+            (a, b) =>
+                a[1].localeCompare(
+                    b[1]
                 )
-            )];
+        )
+        .forEach(
+            ([id, name]) => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
 
 
-        clientSelect.innerHTML = `
-            <option value="">
-                All Clients
-            </option>
-        `;
+                option.value =
+                    id;
+
+                option.textContent =
+                    name;
 
 
-        clients.forEach(
-            function ([code, name]) {
-
-                if (
-                    !code ||
-                    code === "—"
-                ) {
-
-                    return;
-
-                }
-
-
-                clientSelect.innerHTML += `
-
-                    <option value="${escapeHtml(code)}">
-
-                        ${escapeHtml(code)}
-                        -
-                        ${escapeHtml(name)}
-
-                    </option>
-
-                `;
+                select.appendChild(
+                    option
+                );
 
             }
         );
+
+
+    if (
+        [...select.options]
+            .some(
+                option =>
+                    option.value ===
+                    currentValue
+            )
+    ) {
+
+        select.value =
+            currentValue;
 
     }
 
@@ -960,126 +810,269 @@ function populateFilters() {
 
 
 /* =========================================================
-   FILTERS
+   CLIENT FILTER
+========================================================= */
+
+function populateClientFilter(
+    reports
+) {
+
+    const select =
+        document.getElementById(
+            "clientFilter"
+        );
+
+
+    if (!select) {
+
+        return;
+
+    }
+
+
+    const currentValue =
+        select.value;
+
+
+    const clients =
+        new Set();
+
+
+    reports.forEach(
+        report => {
+
+            if (
+                report.client
+            ) {
+
+                clients.add(
+                    report.client
+                );
+
+            }
+
+        }
+    );
+
+
+    select.innerHTML = `
+
+        <option value="">
+            All Clients
+        </option>
+
+    `;
+
+
+    [...clients]
+        .sort(
+            (a, b) =>
+                a.localeCompare(b)
+        )
+        .forEach(
+            client => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    client;
+
+                option.textContent =
+                    client;
+
+
+                select.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+    if (
+        [...select.options]
+            .some(
+                option =>
+                    option.value ===
+                    currentValue
+            )
+    ) {
+
+        select.value =
+            currentValue;
+
+    }
+
+}
+
+
+/* =========================================================
+   APPLY FILTERS
 ========================================================= */
 
 function applyFilters() {
-
 
     const search =
         (
             document.getElementById(
                 "reportSearch"
-            )?.value || ""
+            )?.value ||
+            ""
         )
-        .trim()
-        .toLowerCase();
+            .trim()
+            .toLowerCase();
 
 
     const employee =
         document.getElementById(
             "employeeFilter"
-        )?.value || "";
+        )?.value ||
+        "";
 
 
     const client =
         document.getElementById(
             "clientFilter"
-        )?.value || "";
+        )?.value ||
+        "";
 
 
     const status =
         document.getElementById(
             "statusFilter"
-        )?.value || "";
+        )?.value ||
+        "";
 
 
-    const date =
+    const selectedDate =
         document.getElementById(
             "dateFilter"
-        )?.value || "";
+        )?.value ||
+        "";
 
 
     filteredReports =
         allReports.filter(
-            function (item) {
+            report => {
 
 
-                const searchText = [
+                /* SEARCH */
 
-                    item.employeeId,
+                if (search) {
 
-                    item.employeeName,
+                    const searchText = [
 
-                    item.clientCode,
+                        report.employeeId,
 
-                    item.clientName,
+                        report.employeeName,
 
-                    item.project,
+                        report.employeeEmail,
 
-                    item.task
+                        report.employeeDepartment,
 
-                ]
-                .join(" ")
-                .toLowerCase();
+                        report.employeeDesignation,
 
+                        report.client,
 
-                if (
-                    search &&
-                    !searchText.includes(
-                        search
-                    )
-                ) {
+                        report.project,
 
-                    return false;
+                        report.taskText,
 
-                }
+                        report.comments,
 
+                        report.status
 
-                if (
-                    employee &&
-                    item.employeeId !==
-                    employee
-                ) {
-
-                    return false;
-
-                }
+                    ]
+                        .join(" ")
+                        .toLowerCase();
 
 
-                if (
-                    client &&
-                    item.clientCode !==
-                    client
-                ) {
+                    if (
+                        !searchText.includes(
+                            search
+                        )
+                    ) {
 
-                    return false;
+                        return false;
+
+                    }
 
                 }
 
 
-                if (
-                    status &&
-                    item.status !==
-                    status
-                ) {
+                /* EMPLOYEE */
 
-                    return false;
+                if (employee) {
 
-                }
-
-
-                if (date) {
-
-                    const itemDate =
-                        normalizeDateForFilter(
-                            item.rawDate
+                    const employeeId =
+                        String(
+                            report.employee?._id ||
+                            report.employeeId ||
+                            ""
                         );
 
 
                     if (
-                        itemDate !==
-                        date
+                        employeeId !==
+                        String(employee)
+                    ) {
+
+                        return false;
+
+                    }
+
+                }
+
+
+                /* CLIENT */
+
+                if (client) {
+
+                    if (
+                        report.client !==
+                        client
+                    ) {
+
+                        return false;
+
+                    }
+
+                }
+
+
+                /* STATUS */
+
+                if (status) {
+
+                    if (
+                        String(
+                            report.status
+                        ).toLowerCase() !==
+                        String(
+                            status
+                        ).toLowerCase()
+                    ) {
+
+                        return false;
+
+                    }
+
+                }
+
+
+                /* DATE */
+
+                if (selectedDate) {
+
+                    if (
+                        formatDateInput(
+                            report.date
+                        ) !==
+                        selectedDate
                     ) {
 
                         return false;
@@ -1095,12 +1088,12 @@ function applyFilters() {
         );
 
 
-    renderTable(
+    updateSummary(
         filteredReports
     );
 
 
-    updateSummary(
+    renderReports(
         filteredReports
     );
 
@@ -1108,58 +1101,133 @@ function applyFilters() {
 
 
 /* =========================================================
-   RENDER TABLE
+   CLEAR FILTERS
 ========================================================= */
 
-function renderTable(
+function clearFilters() {
+
+    const searchInput =
+        document.getElementById(
+            "reportSearch"
+        );
+
+    const employeeFilter =
+        document.getElementById(
+            "employeeFilter"
+        );
+
+    const clientFilter =
+        document.getElementById(
+            "clientFilter"
+        );
+
+    const statusFilter =
+        document.getElementById(
+            "statusFilter"
+        );
+
+    const dateFilter =
+        document.getElementById(
+            "dateFilter"
+        );
+
+
+    if (searchInput) {
+
+        searchInput.value = "";
+
+    }
+
+
+    if (employeeFilter) {
+
+        employeeFilter.value = "";
+
+    }
+
+
+    if (clientFilter) {
+
+        clientFilter.value = "";
+
+    }
+
+
+    if (statusFilter) {
+
+        statusFilter.value = "";
+
+    }
+
+
+    if (dateFilter) {
+
+        dateFilter.value = "";
+
+    }
+
+
+    applyFilters();
+
+}
+
+
+/* =========================================================
+   RENDER REPORTS
+========================================================= */
+
+function renderReports(
     reports
 ) {
 
-
-    const body =
+    const tbody =
         document.getElementById(
             "reportTableBody"
         );
 
 
-    const empty =
+    const emptyState =
         document.getElementById(
             "emptyState"
         );
 
 
-    if (!body) {
+    if (!tbody) {
 
         return;
 
     }
 
 
-    body.innerHTML = "";
+    tbody.innerHTML = "";
 
 
     if (
-        !reports ||
-        reports.length === 0
+        !reports.length
     ) {
 
-        if (empty) {
+        if (emptyState) {
 
-            empty.classList.remove(
+            emptyState.classList.remove(
                 "hidden"
             );
 
         }
 
 
+        updateRecordInfo(
+            0
+        );
+
+
         return;
 
     }
 
 
-    if (empty) {
+    if (emptyState) {
 
-        empty.classList.add(
+        emptyState.classList.add(
             "hidden"
         );
 
@@ -1167,375 +1235,606 @@ function renderTable(
 
 
     reports.forEach(
-        function (item, index) {
-
-
-            const row =
-                document.createElement(
-                    "tr"
-                );
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${index + 1}
-                </td>
-
-
-                <td class="employee-id">
-
-                    ${escapeHtml(
-                        item.employeeId
-                    )}
-
-                </td>
-
-
-                <td>
-
-                    <div class="employee-cell">
-
-                        <div class="employee-avatar">
-
-                            ${getInitials(
-                                item.employeeName
-                            )}
-
-                        </div>
-
-
-                        <div class="employee-info">
-
-                            <strong>
-
-                                ${escapeHtml(
-                                    item.employeeName
-                                )}
-
-                            </strong>
-
-                            <small>
-                                Employee
-                            </small>
-
-                        </div>
-
-                    </div>
-
-                </td>
-
-
-                <td>
-
-                    ${escapeHtml(
-                        item.date
-                    )}
-
-                </td>
-
-
-                <td>
-
-                    <span class="client-badge">
-
-                        ${escapeHtml(
-                            item.clientCode
-                        )}
-
-                    </span>
-
-                </td>
-
-
-                <td>
-
-                    <span class="project-name">
-
-                        ${escapeHtml(
-                            item.project
-                        )}
-
-                    </span>
-
-                </td>
-
-
-                <td>
-
-                    <div class="task-details">
-
-                        ${escapeHtml(
-                            item.task
-                        )}
-
-                    </div>
-
-                </td>
-
-
-                <td class="number-cell total-number">
-
-                    ${item.totalVideos}
-
-                </td>
-
-
-                <td class="number-cell completed-number">
-
-                    ${item.completedVideos}
-
-                </td>
-
-
-                <td class="
-                    number-cell
-                    ${
-                        item.balanceVideos === 0
-                            ? "balance-zero"
-                            : "balance-number"
-                    }
-                ">
-
-                    ${item.balanceVideos}
-
-                </td>
-
-
-                <td class="hours-cell">
-
-                    ${escapeHtml(
-                        item.officeHours
-                    )}
-
-                </td>
-
-
-                <td class="hours-cell">
-
-                    ${escapeHtml(
-                        item.lunchHours
-                    )}
-
-                </td>
-
-
-                <td class="hours-cell">
-
-                    ${escapeHtml(
-                        item.workingHours
-                    )}
-
-                </td>
-
-
-                <td>
-
-                    <span class="
-                        status-badge
-                        ${
-                            item.status ===
-                            "Completed"
-                                ? "status-completed"
-                                : "status-pending"
-                        }
-                    ">
-
-                        ${item.status}
-
-                    </span>
-
-                </td>
-
-
-                <td>
-
-                    <div class="row-actions">
-
-
-                        <button
-                            class="row-action view-action"
-                            title="View"
-                            onclick="viewReport('${escapeAttr(item.id)}')"
-                        >
-
-                            <i class="fa-solid fa-eye"></i>
-
-                        </button>
-
-
-                        <button
-                            class="row-action edit-action"
-                            title="Edit"
-                            onclick="editReport('${escapeAttr(item.id)}')"
-                        >
-
-                            <i class="fa-solid fa-pen"></i>
-
-                        </button>
-
-
-                        <button
-                            class="row-action delete-action"
-                            title="Delete"
-                            onclick="deleteReport('${escapeAttr(item.id)}')"
-                        >
-
-                            <i class="fa-solid fa-trash"></i>
-
-                        </button>
-
-
-                    </div>
-
-                </td>
-
-            `;
-
-
-            body.appendChild(
-                row
+        (report, index) => {
+
+            tbody.appendChild(
+                createReportRow(
+                    report,
+                    index
+                )
             );
 
         }
     );
 
 
-    const info =
-        document.getElementById(
-            "recordInfo"
-        );
-
-
-    if (info) {
-
-        info.textContent =
-            `Showing ${reports.length} ${
-                reports.length === 1
-                    ? "record"
-                    : "records"
-            }`;
-
-    }
+    updateRecordInfo(
+        reports.length
+    );
 
 }
 
 
 /* =========================================================
-   SUMMARY
+   CREATE TABLE ROW
 ========================================================= */
 
-function updateSummary(
-    reports
+function createReportRow(
+    report,
+    index
 ) {
 
-
-    let total =
-        0;
-
-
-    let completed =
-        0;
+    const row =
+        document.createElement(
+            "tr"
+        );
 
 
-    let balance =
-        0;
+    const employeeId =
+        escapeHTML(
+            report.employeeId ||
+            "-"
+        );
 
 
-    let workingMinutes =
-        0;
+    const employeeName =
+        escapeHTML(
+            report.employeeName ||
+            "Unknown"
+        );
 
 
-    reports.forEach(
-        function (item) {
-
-            total +=
-                Number(
-                    item.totalVideos
-                ) || 0;
+    const initials =
+        getInitials(
+            report.employeeName
+        );
 
 
-            completed +=
-                Number(
-                    item.completedVideos
-                ) || 0;
+    const date =
+        formatDisplayDate(
+            report.date
+        );
 
 
-            balance +=
-                Number(
-                    item.balanceVideos
-                ) || 0;
+    const client =
+        escapeHTML(
+            report.client ||
+            "-"
+        );
 
 
-            workingMinutes +=
-                parseHours(
-                    item.workingHours
-                );
+    const project =
+        escapeHTML(
+            report.project ||
+            "-"
+        );
+
+
+    const taskText =
+        escapeHTML(
+            report.taskText ||
+            "-"
+        );
+
+
+    const officeHours =
+        report.officeHours ||
+        formatMinutes(
+            report.officeMinutes
+        );
+
+
+    const lunchHours =
+        report.lunchHours ||
+        formatMinutes(
+            report.lunchMinutes
+        );
+
+
+    const workingHours =
+        report.workingHours ||
+        formatMinutes(
+            report.workingMinutes
+        );
+
+
+    const status =
+        report.status ||
+        "Pending";
+
+
+    const statusClass =
+        getStatusClass(
+            status
+        );
+
+
+    const balanceClass =
+        Number(
+            report.balanceVideos
+        ) === 0
+            ? "balance-zero"
+            : "balance-number";
+
+
+    const isPending =
+        String(status)
+            .toLowerCase()
+            .trim() ===
+        "pending";
+
+
+    row.innerHTML = `
+
+        <td>
+            ${index + 1}
+        </td>
+
+
+        <td class="employee-id">
+            ${employeeId}
+        </td>
+
+
+        <td>
+
+            <div class="employee-cell">
+
+                <div class="employee-avatar">
+                    ${escapeHTML(initials)}
+                </div>
+
+                <div class="employee-info">
+
+                    <strong>
+                        ${employeeName}
+                    </strong>
+
+                    <small>
+                        ${escapeHTML(
+                            report.employeeDesignation ||
+                            report.employeeDepartment ||
+                            ""
+                        )}
+                    </small>
+
+                </div>
+
+            </div>
+
+        </td>
+
+
+        <td>
+            ${date}
+        </td>
+
+
+        <td>
+
+            <span class="client-badge">
+                ${client}
+            </span>
+
+        </td>
+
+
+        <td class="project-name">
+            ${project}
+        </td>
+
+
+        <td>
+
+            <div class="task-details">
+                ${taskText}
+            </div>
+
+        </td>
+
+
+        <td class="number-cell total-number">
+            ${report.totalVideos}
+        </td>
+
+
+        <td class="number-cell completed-number">
+            ${report.completedVideos}
+        </td>
+
+
+        <td class="number-cell ${balanceClass}">
+            ${report.balanceVideos}
+        </td>
+
+
+        <td class="hours-cell">
+            ${escapeHTML(officeHours)}
+        </td>
+
+
+        <td class="hours-cell">
+            ${escapeHTML(lunchHours)}
+        </td>
+
+
+        <td class="hours-cell">
+            ${escapeHTML(workingHours)}
+        </td>
+
+
+        <td>
+
+            <span class="status-badge ${statusClass}">
+                ${escapeHTML(status)}
+            </span>
+
+        </td>
+
+
+        <td>
+
+            <div class="row-actions">
+
+                <!-- VIEW -->
+
+                <button
+                    type="button"
+                    class="row-action view-action"
+                    title="View"
+                    data-action="view"
+                    data-id="${escapeHTML(
+                        String(report._id || "")
+                    )}"
+                >
+
+                    <i class="fa-solid fa-eye"></i>
+
+                </button>
+
+
+                <!-- EDIT -->
+
+                <button
+                    type="button"
+                    class="row-action edit-action"
+                    title="Edit"
+                    data-action="edit"
+                    data-id="${escapeHTML(
+                        String(report._id || "")
+                    )}"
+                >
+
+                    <i class="fa-solid fa-pen"></i>
+
+                </button>
+
+
+                <!-- APPROVE -->
+
+                ${
+                    isPending
+                        ? `
+                            <button
+                                type="button"
+                                class="row-action approve-action"
+                                title="Approve"
+                                data-action="approve"
+                                data-id="${escapeHTML(
+                                    String(report._id || "")
+                                )}"
+                            >
+
+                                <i class="fa-solid fa-circle-check"></i>
+
+                            </button>
+                        `
+                        : ""
+                }
+
+
+                <!-- DELETE -->
+
+                <button
+                    type="button"
+                    class="row-action delete-action"
+                    title="Delete"
+                    data-action="delete"
+                    data-id="${escapeHTML(
+                        String(report._id || "")
+                    )}"
+                >
+
+                    <i class="fa-solid fa-trash"></i>
+
+                </button>
+
+            </div>
+
+        </td>
+
+    `;
+
+
+    row.querySelectorAll(
+        "[data-action]"
+    ).forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const action =
+                        button.dataset.action;
+
+                    const id =
+                        button.dataset.id;
+
+
+                    handleRowAction(
+                        action,
+                        id
+                    );
+
+                }
+            );
 
         }
     );
 
 
-    setText(
-        "totalRecords",
-        reports.length
-    );
-
-
-    setText(
-        "totalVideos",
-        total
-    );
-
-
-    setText(
-        "completedVideos",
-        completed
-    );
-
-
-    setText(
-        "balanceVideos",
-        balance
-    );
-
-
-    setText(
-        "workingHours",
-        formatMinutes(
-            workingMinutes
-        )
-    );
+    return row;
 
 }
 
 
 /* =========================================================
-   VIEW REPORT
+   ROW ACTION
 ========================================================= */
 
-function viewReport(
+async function handleRowAction(
+    action,
     id
 ) {
 
-
-    const item =
+    const report =
         allReports.find(
-            function (report) {
-
-                return String(
-                    report.id
-                ) === String(id);
-
-            }
+            item =>
+                String(item._id) ===
+                String(id)
         );
 
 
-    if (!item) {
+    if (!report) {
+
+        showToast(
+            "Report not found.",
+            "error"
+        );
 
         return;
 
     }
+
+
+    /* VIEW */
+
+    if (
+        action === "view"
+    ) {
+
+        openReportModal(
+            report
+        );
+
+        return;
+
+    }
+
+
+    /* EDIT */
+
+    if (
+        action === "edit"
+    ) {
+
+        editReport(
+            report
+        );
+
+        return;
+
+    }
+
+
+    /* APPROVE */
+
+    if (
+        action === "approve"
+    ) {
+
+        await approveReport(
+            report
+        );
+
+        return;
+
+    }
+
+
+    /* DELETE */
+
+    if (
+        action === "delete"
+    ) {
+
+        await deleteReport(
+            report
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   APPROVE REPORT
+========================================================= */
+
+async function approveReport(
+    report
+) {
+
+    if (!report?._id) {
+
+        showToast(
+            "Invalid report ID.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const currentStatus =
+        String(
+            report.status ||
+            "Pending"
+        )
+            .toLowerCase()
+            .trim();
+
+
+    if (
+        currentStatus !==
+        "pending"
+    ) {
+
+        showToast(
+            "This report is already processed.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+
+    const employee =
+        report.employeeName ||
+        "this employee";
+
+
+    const confirmed =
+        window.confirm(
+            `Approve this timesheet report for ${employee}?`
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${TIMESHEET_API}/${encodeURIComponent(
+                    report._id
+                )}`,
+                {
+
+                    method:
+                        "PUT",
+
+                    credentials:
+                        "include",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            status:
+                                "Approved"
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await parseJSONResponse(
+                response
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data?.message ||
+                `Failed to approve report (${response.status})`
+            );
+
+        }
+
+
+        showToast(
+            "Report approved successfully.",
+            "success"
+        );
+
+
+        await loadReports();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "APPROVE REPORT ERROR:",
+            error
+        );
+
+
+        showToast(
+            error.message ||
+            "Failed to approve report.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   VIEW MODAL
+========================================================= */
+
+function openReportModal(
+    report
+) {
+
+    currentReport =
+        report;
+
+
+    const modal =
+        document.getElementById(
+            "reportModal"
+        );
 
 
     const title =
@@ -1550,234 +1849,370 @@ function viewReport(
         );
 
 
+    if (!modal || !content) {
+
+        return;
+
+    }
+
+
     if (title) {
 
         title.textContent =
-            `${item.employeeName} - ${item.project}`;
+            `${report.employeeName} - ${formatDisplayDate(report.date)}`;
 
     }
 
 
-    if (content) {
-
-        content.innerHTML = `
-
-            <div class="modal-grid">
-
-
-                <div class="modal-item">
-
-                    <span>
-                        Employee ID
-                    </span>
-
-                    <strong>
-                        ${escapeHtml(
-                            item.employeeId
-                        )}
-                    </strong>
-
-                </div>
-
-
-                <div class="modal-item">
-
-                    <span>
-                        Employee
-                    </span>
-
-                    <strong>
-                        ${escapeHtml(
-                            item.employeeName
-                        )}
-                    </strong>
-
-                </div>
-
-
-                <div class="modal-item">
-
-                    <span>
-                        Date
-                    </span>
-
-                    <strong>
-                        ${escapeHtml(
-                            item.date
-                        )}
-                    </strong>
-
-                </div>
-
-
-                <div class="modal-item">
-
-                    <span>
-                        Client
-                    </span>
-
-                    <strong>
-                        ${escapeHtml(
-                            item.clientCode
-                        )}
-                        -
-                        ${escapeHtml(
-                            item.clientName
-                        )}
-                    </strong>
-
-                </div>
-
-
-                <div class="modal-item">
-
-                    <span>
-                        Project
-                    </span>
-
-                    <strong>
-                        ${escapeHtml(
-                            item.project
-                        )}
-                    </strong>
-
-                </div>
-
-
-                <div class="modal-item">
-
-                    <span>
-                        Status
-                    </span>
-
-                    <strong>
-                        ${escapeHtml(
-                            item.status
-                        )}
-                    </strong>
-
-                </div>
-
-
-                <div class="modal-item">
-
-                    <span>
-                        Total Videos
-                    </span>
-
-                    <strong>
-                        ${item.totalVideos}
-                    </strong>
-
-                </div>
-
-
-                <div class="modal-item">
-
-                    <span>
-                        Completed Videos
-                    </span>
-
-                    <strong>
-                        ${item.completedVideos}
-                    </strong>
-
-                </div>
-
-
-                <div class="modal-item">
-
-                    <span>
-                        Balance Videos
-                    </span>
-
-                    <strong>
-                        ${item.balanceVideos}
-                    </strong>
-
-                </div>
-
-
-                <div class="modal-item">
-
-                    <span>
-                        Office Hours
-                    </span>
-
-                    <strong>
-                        ${escapeHtml(
-                            item.officeHours
-                        )}
-                    </strong>
-
-                </div>
-
-
-                <div class="modal-item">
-
-                    <span>
-                        Lunch
-                    </span>
-
-                    <strong>
-                        ${escapeHtml(
-                            item.lunchHours
-                        )}
-                    </strong>
-
-                </div>
-
-
-                <div class="modal-item">
-
-                    <span>
-                        Working Hours
-                    </span>
-
-                    <strong>
-                        ${escapeHtml(
-                            item.workingHours
-                        )}
-                    </strong>
-
-                </div>
-
-
-                <div class="modal-item full">
-
-                    <span>
-                        Task Details
-                    </span>
-
-                    <strong>
-                        ${escapeHtml(
-                            item.task
-                        )}
-                    </strong>
-
-                </div>
-
+    const tasks =
+        Array.isArray(
+            report.tasks
+        )
+            ? report.tasks
+                .map(
+                    task =>
+                        task?.taskName ||
+                        task?.task ||
+                        ""
+                )
+                .filter(Boolean)
+                .join("<br>")
+            : escapeHTML(
+                report.taskText ||
+                "-"
+            );
+
+
+    content.innerHTML = `
+
+        <div class="modal-grid">
+
+
+            <div class="modal-item">
+
+                <span>
+                    Employee ID
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.employeeId ||
+                        "-"
+                    )}
+                </strong>
 
             </div>
 
-        `;
 
-    }
+            <div class="modal-item">
+
+                <span>
+                    Employee
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.employeeName ||
+                        "-"
+                    )}
+                </strong>
+
+            </div>
 
 
-    const modal =
-        document.getElementById(
-            "reportModal"
-        );
+            <div class="modal-item">
+
+                <span>
+                    Email
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.employeeEmail ||
+                        "-"
+                    )}
+                </strong>
+
+            </div>
 
 
-    if (modal) {
+            <div class="modal-item">
 
-        modal.classList.remove(
-            "hidden"
-        );
+                <span>
+                    Department
+                </span>
 
-    }
+                <strong>
+                    ${escapeHTML(
+                        report.employeeDepartment ||
+                        "-"
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Date
+                </span>
+
+                <strong>
+                    ${formatDisplayDate(
+                        report.date
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Client
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.client ||
+                        "-"
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Project
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.project ||
+                        "-"
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Status
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.status ||
+                        "Pending"
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Check In
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.checkIn ||
+                        "-"
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Lunch Start
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.lunchStart ||
+                        "-"
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Lunch End
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.lunchEnd ||
+                        "-"
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Check Out
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.checkOut ||
+                        "-"
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Office Time
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.officeHours ||
+                        formatMinutes(
+                            report.officeMinutes
+                        )
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Lunch Time
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.lunchHours ||
+                        formatMinutes(
+                            report.lunchMinutes
+                        )
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Working Time
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.workingHours ||
+                        formatMinutes(
+                            report.workingMinutes
+                        )
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Total Videos
+                </span>
+
+                <strong>
+                    ${report.totalVideos}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Completed Videos
+                </span>
+
+                <strong>
+                    ${report.completedVideos}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item">
+
+                <span>
+                    Balance Videos
+                </span>
+
+                <strong>
+                    ${report.balanceVideos}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item full">
+
+                <span>
+                    Tasks
+                </span>
+
+                <strong>
+                    ${tasks || "-"}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-item full">
+
+                <span>
+                    Comments
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        report.comments ||
+                        "-"
+                    )}
+                </strong>
+
+            </div>
+
+
+        </div>
+
+    `;
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+
+    document.body.style.overflow =
+        "hidden";
 
 }
 
@@ -1794,13 +2229,24 @@ function closeReportModal() {
         );
 
 
-    if (modal) {
+    if (!modal) {
 
-        modal.classList.add(
-            "hidden"
-        );
+        return;
 
     }
+
+
+    modal.classList.add(
+        "hidden"
+    );
+
+
+    document.body.style.overflow =
+        "";
+
+
+    currentReport =
+        null;
 
 }
 
@@ -1810,44 +2256,29 @@ function closeReportModal() {
 ========================================================= */
 
 function editReport(
-    id
+    report
 ) {
 
-    const item =
-        allReports.find(
-            function (report) {
+    if (!report?._id) {
 
-                return String(
-                    report.id
-                ) === String(id);
-
-            }
+        showToast(
+            "Invalid report ID.",
+            "error"
         );
-
-
-    if (!item) {
 
         return;
 
     }
 
 
-    /*
-        Existing Timesheet page is the
-        correct editing interface.
-
-        Send the user there with the
-        record ID.
-    */
-
-    sessionStorage.setItem(
-        "editTimesheetId",
-        item.id
-    );
+    const target =
+        `timesheet.html?edit=${encodeURIComponent(
+            report._id
+        )}`;
 
 
     window.location.href =
-        "timesheet.html";
+        target;
 
 }
 
@@ -1857,33 +2288,24 @@ function editReport(
 ========================================================= */
 
 async function deleteReport(
-    id
+    report
 ) {
 
-
-    const item =
-        allReports.find(
-            function (report) {
-
-                return String(
-                    report.id
-                ) === String(id);
-
-            }
-        );
-
-
-    if (!item) {
+    if (!report?._id) {
 
         return;
 
     }
 
 
+    const employee =
+        report.employeeName ||
+        "this employee";
+
+
     const confirmed =
-        confirm(
-            `Delete this timesheet report?\n\n` +
-            `${item.employeeName} - ${item.project}`
+        window.confirm(
+            `Delete this timesheet report for ${employee}?`
         );
 
 
@@ -1896,39 +2318,71 @@ async function deleteReport(
 
     try {
 
-
         const response =
             await fetch(
-                `${REPORT_API_BASE}/timesheets/${id}`,
+                `${TIMESHEET_API}/${encodeURIComponent(
+                    report._id
+                )}`,
                 {
-                    method: "DELETE",
 
-                    headers:
-                        reportAuthHeaders()
+                    method:
+                        "DELETE",
+
+                    credentials:
+                        "include",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    }
+
                 }
             );
 
 
-        const result =
-            await response.json();
+        const data =
+            await parseJSONResponse(
+                response
+            );
 
 
         if (!response.ok) {
 
             throw new Error(
-                result.message ||
+                data?.message ||
                 "Failed to delete report."
             );
 
         }
 
 
-        alert(
-            "Report deleted successfully."
+        allReports =
+            allReports.filter(
+                item =>
+                    String(item._id) !==
+                    String(report._id)
+            );
+
+
+        populateEmployeeFilter(
+            allReports
         );
 
 
-        await loadReports();
+        populateClientFilter(
+            allReports
+        );
+
+
+        applyFilters();
+
+
+        showToast(
+            "Report deleted successfully.",
+            "success"
+        );
 
     }
 
@@ -1940,59 +2394,10 @@ async function deleteReport(
         );
 
 
-        /*
-            LocalStorage fallback
-            for older records.
-        */
-
-        const local =
-            loadTimesheetsFromStorage();
-
-
-        const index =
-            local.findIndex(
-                function (item) {
-
-                    return String(
-                        item._id ||
-                        item.id
-                    ) === String(id);
-
-                }
-            );
-
-
-        if (index !== -1) {
-
-            local.splice(
-                index,
-                1
-            );
-
-
-            localStorage.setItem(
-                "timesheets",
-                JSON.stringify(
-                    local
-                )
-            );
-
-
-            alert(
-                "Report deleted successfully."
-            );
-
-
-            await loadReports();
-
-            return;
-
-        }
-
-
-        alert(
+        showToast(
             error.message ||
-            "Unable to delete report."
+            "Failed to delete report.",
+            "error"
         );
 
     }
@@ -2001,235 +2406,134 @@ async function deleteReport(
 
 
 /* =========================================================
-   EXPORT CSV
+   SUMMARY
 ========================================================= */
 
-function exportCSV() {
+function updateSummary(
+    reports
+) {
+
+    const totalRecords =
+        reports.length;
 
 
-    if (
-        !filteredReports.length
-    ) {
-
-        alert(
-            "No report data to export."
+    const totalVideos =
+        reports.reduce(
+            (
+                total,
+                report
+            ) =>
+                total +
+                Number(
+                    report.totalVideos
+                ),
+            0
         );
+
+
+    const completedVideos =
+        reports.reduce(
+            (
+                total,
+                report
+            ) =>
+                total +
+                Number(
+                    report.completedVideos
+                ),
+            0
+        );
+
+
+    const balanceVideos =
+        reports.reduce(
+            (
+                total,
+                report
+            ) =>
+                total +
+                Number(
+                    report.balanceVideos
+                ),
+            0
+        );
+
+
+    const workingMinutes =
+        reports.reduce(
+            (
+                total,
+                report
+            ) =>
+                total +
+                Number(
+                    report.workingMinutes
+                ),
+            0
+        );
+
+
+    setText(
+        "totalRecords",
+        totalRecords
+    );
+
+
+    setText(
+        "totalVideos",
+        totalVideos
+    );
+
+
+    setText(
+        "completedVideos",
+        completedVideos
+    );
+
+
+    setText(
+        "balanceVideos",
+        balanceVideos
+    );
+
+
+    setText(
+        "workingHours",
+        formatMinutes(
+            workingMinutes
+        )
+    );
+
+}
+
+
+/* =========================================================
+   RECORD INFO
+========================================================= */
+
+function updateRecordInfo(
+    count
+) {
+
+    const element =
+        document.getElementById(
+            "recordInfo"
+        );
+
+
+    if (!element) {
 
         return;
 
     }
 
 
-    const headers = [
-
-        "Employee ID",
-
-        "Employee",
-
-        "Date",
-
-        "Client",
-
-        "Client Name",
-
-        "Project",
-
-        "Task Details",
-
-        "Total Videos",
-
-        "Completed Videos",
-
-        "Balance Videos",
-
-        "Office Hours",
-
-        "Lunch",
-
-        "Working Hours",
-
-        "Status"
-
-    ];
-
-
-    const rows =
-        filteredReports.map(
-            function (item) {
-
-                return [
-
-                    item.employeeId,
-
-                    item.employeeName,
-
-                    item.date,
-
-                    item.clientCode,
-
-                    item.clientName,
-
-                    item.project,
-
-                    item.task,
-
-                    item.totalVideos,
-
-                    item.completedVideos,
-
-                    item.balanceVideos,
-
-                    item.officeHours,
-
-                    item.lunchHours,
-
-                    item.workingHours,
-
-                    item.status
-
-                ];
-
-            }
-        );
-
-
-    const csv = [
-
-        headers,
-
-        ...rows
-
-    ]
-    .map(
-        function (row) {
-
-            return row
-                .map(
-                    function (value) {
-
-                        return `"${String(
-                            value ?? ""
-                        )
-                        .replace(
-                            /"/g,
-                            '""'
-                        )}"`;
-
-                    }
-                )
-                .join(",");
-
-        }
-    )
-    .join("\n");
-
-
-    const blob =
-        new Blob(
-            [csv],
-            {
-                type:
-                    "text/csv;charset=utf-8;"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(
-            blob
-        );
-
-
-    const link =
-        document.createElement(
-            "a"
-        );
-
-
-    link.href =
-        url;
-
-
-    link.download =
-        `DCUTS_Report_${getFileDate()}.csv`;
-
-
-    document.body.appendChild(
-        link
-    );
-
-
-    link.click();
-
-
-    link.remove();
-
-
-    URL.revokeObjectURL(
-        url
-    );
-
-}
-
-
-/* =========================================================
-   CLEAR FILTERS
-========================================================= */
-
-function clearFilters() {
-
-
-    const search =
-        document.getElementById(
-            "reportSearch"
-        );
-
-
-    const employee =
-        document.getElementById(
-            "employeeFilter"
-        );
-
-
-    const client =
-        document.getElementById(
-            "clientFilter"
-        );
-
-
-    const status =
-        document.getElementById(
-            "statusFilter"
-        );
-
-
-    const date =
-        document.getElementById(
-            "dateFilter"
-        );
-
-
-    if (search)
-        search.value = "";
-
-
-    if (employee)
-        employee.value = "";
-
-
-    if (client)
-        client.value = "";
-
-
-    if (status)
-        status.value = "";
-
-
-    if (date)
-        date.value = "";
-
-
-    applyFilters();
+    element.textContent =
+        `Showing ${count} ${
+            count === 1
+                ? "record"
+                : "records"
+        }`;
 
 }
 
@@ -2240,21 +2544,35 @@ function clearFilters() {
 
 function showLoading() {
 
-
-    const body =
+    const tbody =
         document.getElementById(
             "reportTableBody"
         );
 
 
-    if (!body) {
+    const emptyState =
+        document.getElementById(
+            "emptyState"
+        );
+
+
+    if (emptyState) {
+
+        emptyState.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    if (!tbody) {
 
         return;
 
     }
 
 
-    body.innerHTML = `
+    tbody.innerHTML = `
 
         <tr>
 
@@ -2281,17 +2599,16 @@ function showLoading() {
 
 
 /* =========================================================
-   DATE
+   FORMAT DATE
 ========================================================= */
 
-function formatDate(
+function formatDisplayDate(
     value
 ) {
 
-
     if (!value) {
 
-        return "—";
+        return "-";
 
     }
 
@@ -2306,7 +2623,7 @@ function formatDate(
         )
     ) {
 
-        return String(value);
+        return "-";
 
     }
 
@@ -2323,10 +2640,13 @@ function formatDate(
 }
 
 
-function normalizeDateForFilter(
+/* =========================================================
+   DATE INPUT FORMAT
+========================================================= */
+
+function formatDateInput(
     value
 ) {
-
 
     if (!value) {
 
@@ -2345,8 +2665,7 @@ function normalizeDateForFilter(
         )
     ) {
 
-        return String(value)
-            .substring(0,10);
+        return "";
 
     }
 
@@ -2358,15 +2677,19 @@ function normalizeDateForFilter(
     const month =
         String(
             date.getMonth() + 1
-        )
-        .padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
 
 
     const day =
         String(
             date.getDate()
-        )
-        .padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
 
 
     return `${year}-${month}-${day}`;
@@ -2375,112 +2698,18 @@ function normalizeDateForFilter(
 
 
 /* =========================================================
-   HOURS
+   FORMAT MINUTES
 ========================================================= */
-
-function parseHours(
-    value
-) {
-
-
-    if (
-        typeof value ===
-        "number"
-    ) {
-
-        return Math.round(
-            value * 60
-        );
-
-    }
-
-
-    if (!value) {
-
-        return 0;
-
-    }
-
-
-    const text =
-        String(value)
-        .toLowerCase()
-        .trim();
-
-
-    let minutes = 0;
-
-
-    const hourMatch =
-        text.match(
-            /(\d+(?:\.\d+)?)\s*h/
-        );
-
-
-    const minuteMatch =
-        text.match(
-            /(\d+)\s*m/
-        );
-
-
-    if (hourMatch) {
-
-        minutes +=
-            parseFloat(
-                hourMatch[1]
-            ) * 60;
-
-    }
-
-
-    if (minuteMatch) {
-
-        minutes +=
-            parseInt(
-                minuteMatch[1],
-                10
-            );
-
-    }
-
-
-    if (
-        !hourMatch &&
-        !minuteMatch
-    ) {
-
-        const decimal =
-            parseFloat(text);
-
-
-        if (
-            !Number.isNaN(
-                decimal
-            )
-        ) {
-
-            minutes =
-                decimal * 60;
-
-        }
-
-    }
-
-
-    return Math.round(
-        minutes
-    );
-
-}
-
 
 function formatMinutes(
     minutes
 ) {
 
-
     minutes =
-        Number(minutes) || 0;
+        Math.max(
+            Number(minutes) || 0,
+            0
+        );
 
 
     const hours =
@@ -2499,6 +2728,54 @@ function formatMinutes(
 
 
 /* =========================================================
+   STATUS CLASS
+========================================================= */
+
+function getStatusClass(
+    status
+) {
+
+    const value =
+        String(
+            status || ""
+        )
+            .toLowerCase()
+            .trim();
+
+
+    if (
+        value === "completed"
+    ) {
+
+        return "status-completed";
+
+    }
+
+
+    if (
+        value === "approved"
+    ) {
+
+        return "status-approved";
+
+    }
+
+
+    if (
+        value === "rejected"
+    ) {
+
+        return "status-rejected";
+
+    }
+
+
+    return "status-pending";
+
+}
+
+
+/* =========================================================
    INITIALS
 ========================================================= */
 
@@ -2506,13 +2783,18 @@ function getInitials(
     name
 ) {
 
+    if (!name) {
+
+        return "?";
+
+    }
+
 
     const parts =
-        String(
-            name || "E"
-        )
-        .trim()
-        .split(/\s+/);
+        String(name)
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
 
 
     if (
@@ -2520,7 +2802,7 @@ function getInitials(
     ) {
 
         return parts[0]
-            .substring(0,2)
+            .substring(0, 2)
             .toUpperCase();
 
     }
@@ -2529,14 +2811,13 @@ function getInitials(
     return (
         parts[0][0] +
         parts[parts.length - 1][0]
-    )
-    .toUpperCase();
+    ).toUpperCase();
 
 }
 
 
 /* =========================================================
-   HELPERS
+   SET TEXT
 ========================================================= */
 
 function setText(
@@ -2553,76 +2834,422 @@ function setText(
     if (element) {
 
         element.textContent =
-            value;
+            String(value);
 
     }
 
 }
 
 
-function escapeHtml(
-    value
-) {
+/* =========================================================
+   CSV EXPORT
+========================================================= */
 
-    return String(
-        value ?? ""
-    )
-    .replace(
-        /&/g,
-        "&amp;"
-    )
-    .replace(
-        /</g,
-        "&lt;"
-    )
-    .replace(
-        />/g,
-        "&gt;"
-    )
-    .replace(
-        /"/g,
-        "&quot;"
-    )
-    .replace(
-        /'/g,
-        "&#039;"
+function exportCSV() {
+
+    if (
+        !filteredReports.length
+    ) {
+
+        showToast(
+            "No reports available to export.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+
+    const headers = [
+
+        "No",
+
+        "Employee ID",
+
+        "Employee",
+
+        "Date",
+
+        "Client",
+
+        "Project",
+
+        "Task Details",
+
+        "Total Videos",
+
+        "Completed Videos",
+
+        "Balance Videos",
+
+        "Office Hours",
+
+        "Lunch Hours",
+
+        "Working Hours",
+
+        "Status",
+
+        "Check In",
+
+        "Lunch Start",
+
+        "Lunch End",
+
+        "Check Out",
+
+        "Comments"
+
+    ];
+
+
+    const rows =
+        filteredReports.map(
+            (report, index) => [
+
+                index + 1,
+
+                report.employeeId,
+
+                report.employeeName,
+
+                formatDisplayDate(
+                    report.date
+                ),
+
+                report.client,
+
+                report.project,
+
+                report.taskText,
+
+                report.totalVideos,
+
+                report.completedVideos,
+
+                report.balanceVideos,
+
+                report.officeHours ||
+                    formatMinutes(
+                        report.officeMinutes
+                    ),
+
+                report.lunchHours ||
+                    formatMinutes(
+                        report.lunchMinutes
+                    ),
+
+                report.workingHours ||
+                    formatMinutes(
+                        report.workingMinutes
+                    ),
+
+                report.status,
+
+                report.checkIn,
+
+                report.lunchStart,
+
+                report.lunchEnd,
+
+                report.checkOut,
+
+                report.comments
+
+            ]
+        );
+
+
+    const csv = [
+
+        headers,
+
+        ...rows
+
+    ]
+        .map(
+            row =>
+                row
+                    .map(
+                        csvEscape
+                    )
+                    .join(",")
+        )
+        .join("\r\n");
+
+
+    const blob =
+        new Blob(
+            [
+                "\uFEFF" +
+                csv
+            ],
+            {
+                type:
+                    "text/csv;charset=utf-8;"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        `THE-D-CUTS-Report-${getTodayString()}.csv`;
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    link.remove();
+
+
+    URL.revokeObjectURL(
+        url
+    );
+
+
+    showToast(
+        "CSV exported successfully.",
+        "success"
     );
 
 }
 
 
-function escapeAttr(
+/* =========================================================
+   CSV ESCAPE
+========================================================= */
+
+function csvEscape(
     value
 ) {
 
-    return String(
-        value ?? ""
-    )
-    .replace(
-        /'/g,
-        "\\'"
-    );
+    const text =
+        String(
+            value ??
+            ""
+        );
+
+
+    if (
+        /[",\r\n]/.test(text)
+    ) {
+
+        return `"${text.replace(
+            /"/g,
+            '""'
+        )}"`;
+
+    }
+
+
+    return text;
 
 }
 
 
-function getFileDate() {
+/* =========================================================
+   TODAY
+========================================================= */
+
+function getTodayString() {
 
     const date =
         new Date();
 
 
     return [
+
         date.getFullYear(),
 
         String(
             date.getMonth() + 1
-        ).padStart(2,"0"),
+        ).padStart(
+            2,
+            "0"
+        ),
 
         String(
             date.getDate()
-        ).padStart(2,"0")
+        ).padStart(
+            2,
+            "0"
+        )
 
     ].join("-");
 
 }
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(
+    value
+) {
+
+    return String(
+        value ??
+        ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function showToast(
+    message,
+    type = "info"
+) {
+
+    if (
+        typeof window.showToast ===
+        "function" &&
+        window.showToast !==
+        showToast
+    ) {
+
+        window.showToast(
+            message,
+            type
+        );
+
+        return;
+
+    }
+
+
+    let container =
+        document.querySelector(
+            ".toast-container"
+        );
+
+
+    if (!container) {
+
+        container =
+            document.createElement(
+                "div"
+            );
+
+        container.className =
+            "toast-container";
+
+        document.body.appendChild(
+            container
+        );
+
+    }
+
+
+    const toast =
+        document.createElement(
+            "div"
+        );
+
+
+    toast.className =
+        `toast toast-${type}`;
+
+
+    toast.textContent =
+        message;
+
+
+    toast.style.cssText = `
+
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 100000;
+        padding: 13px 18px;
+        border-radius: 10px;
+        background: #111827;
+        border: 1px solid rgba(255,255,255,.12);
+        color: #f8fafc;
+        box-shadow: 0 15px 40px rgba(0,0,0,.35);
+        font-size: 13px;
+        font-weight: 600;
+
+    `;
+
+
+    container.appendChild(
+        toast
+    );
+
+
+    setTimeout(
+        () => {
+
+            toast.remove();
+
+        },
+        3000
+    );
+
+}
+
+
+/* =========================================================
+   GLOBAL ACCESS
+========================================================= */
+
+window.loadReports =
+    loadReports;
+
+window.applyReportFilters =
+    applyFilters;
+
+window.exportReportCSV =
+    exportCSV;
+
+window.closeReportModal =
+    closeReportModal;
+
+window.approveReport =
+    approveReport;
