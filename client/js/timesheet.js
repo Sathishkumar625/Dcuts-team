@@ -2776,3 +2776,565 @@ window.calculateWorkingHours =
 
 window.updateTaskCount =
     updateTaskCount;
+    /* =====================================================
+   EMPLOYEE ID CARD
+   SIDE PANEL - NO PAGE NAVIGATION
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        setupEmployeeIdCard();
+
+    }
+);
+
+
+function setupEmployeeIdCard() {
+
+    const trigger =
+        document.getElementById(
+            "employeeCardTrigger"
+        );
+
+    const panel =
+        document.getElementById(
+            "employeeIdPanel"
+        );
+
+    const overlay =
+        document.getElementById(
+            "employeeCardOverlay"
+        );
+
+    const close =
+        document.getElementById(
+            "employeeCardClose"
+        );
+
+
+    if (
+        !trigger ||
+        !panel ||
+        !overlay ||
+        !close
+    ) {
+
+        return;
+
+    }
+
+
+    trigger.addEventListener(
+        "click",
+        () => {
+
+            openEmployeeIdCard();
+
+        }
+    );
+
+
+    close.addEventListener(
+        "click",
+        () => {
+
+            closeEmployeeIdCard();
+
+        }
+    );
+
+
+    overlay.addEventListener(
+        "click",
+        () => {
+
+            closeEmployeeIdCard();
+
+        }
+    );
+
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Escape"
+            ) {
+
+                closeEmployeeIdCard();
+
+            }
+
+        }
+    );
+
+}
+
+
+function openEmployeeIdCard() {
+
+    const panel =
+        document.getElementById(
+            "employeeIdPanel"
+        );
+
+    const overlay =
+        document.getElementById(
+            "employeeCardOverlay"
+        );
+
+
+    if (!panel || !overlay) {
+
+        return;
+
+    }
+
+
+    const select =
+        document.getElementById(
+            "employeeName"
+        );
+
+
+    const selectedId =
+        select?.value || "";
+
+
+    let employee =
+        employees.find(
+            item =>
+                String(
+                    item._id
+                )
+                ===
+                String(
+                    selectedId
+                )
+        );
+
+
+    /*
+       If employee is not selected,
+       use logged-in employee.
+    */
+
+    if (!employee) {
+
+        const loggedUser =
+            JSON.parse(
+                localStorage.getItem(
+                    "loggedUser"
+                ) ||
+                "null"
+            );
+
+
+        if (
+            loggedUser
+        ) {
+
+            employee =
+                employees.find(
+                    item => {
+
+                        const emailMatch =
+                            String(
+                                item.email ||
+                                ""
+                            )
+                            .trim()
+                            .toLowerCase()
+                            ===
+                            String(
+                                loggedUser.email ||
+                                ""
+                            )
+                            .trim()
+                            .toLowerCase();
+
+
+                        const nameMatch =
+                            String(
+                                item.name ||
+                                ""
+                            )
+                            .trim()
+                            .toLowerCase()
+                            ===
+                            String(
+                                loggedUser.name ||
+                                ""
+                            )
+                            .trim()
+                            .toLowerCase();
+
+
+                        return (
+                            emailMatch ||
+                            nameMatch
+                        );
+
+                    }
+                );
+
+        }
+
+    }
+
+
+    /*
+       Admin has not selected anyone.
+    */
+
+    if (!employee) {
+
+        showEmployeeCardEmpty();
+
+    }
+
+    else {
+
+        fillEmployeeCard(
+            employee
+        );
+
+    }
+
+
+    panel.classList.add(
+        "active"
+    );
+
+    overlay.classList.add(
+        "active"
+    );
+
+    document.body.style.overflow =
+        "hidden";
+
+}
+
+
+function closeEmployeeIdCard() {
+
+    const panel =
+        document.getElementById(
+            "employeeIdPanel"
+        );
+
+    const overlay =
+        document.getElementById(
+            "employeeCardOverlay"
+        );
+
+
+    if (panel) {
+
+        panel.classList.remove(
+            "active"
+        );
+
+    }
+
+
+    if (overlay) {
+
+        overlay.classList.remove(
+            "active"
+        );
+
+    }
+
+
+    document.body.style.overflow =
+        "";
+
+}
+
+
+function fillEmployeeCard(
+    employee
+) {
+
+    const photo =
+        document.getElementById(
+            "employeeCardPhoto"
+        );
+
+    const name =
+        document.getElementById(
+            "employeeCardName"
+        );
+
+    const role =
+        document.getElementById(
+            "employeeCardRole"
+        );
+
+    const employeeId =
+        document.getElementById(
+            "employeeCardId"
+        );
+
+    const email =
+        document.getElementById(
+            "employeeCardEmail"
+        );
+
+    const phone =
+        document.getElementById(
+            "employeeCardPhone"
+        );
+
+    const joined =
+        document.getElementById(
+            "employeeCardJoined"
+        );
+
+
+    /*
+       PHOTO
+    */
+
+    if (photo) {
+
+        photo.src =
+            employee.photo ||
+            employee.profilePhoto ||
+            employee.image ||
+            employee.avatar ||
+            "../assets/default-user.png";
+
+    }
+
+
+    /*
+       NAME
+    */
+
+    if (name) {
+
+        name.textContent =
+            employee.name ||
+            "Employee";
+
+    }
+
+
+    /*
+       ROLE
+    */
+
+    if (role) {
+
+        role.textContent =
+            employee.role ||
+            employee.designation ||
+            "Employee";
+
+    }
+
+
+    /*
+       FIXED EMPLOYEE ID
+
+       Naveen  = 01
+       Sathish = 02
+    */
+
+    if (employeeId) {
+
+        employeeId.textContent =
+            getFixedEmployeeId(
+                employee
+            ) ||
+            employee.employeeId ||
+            "--";
+
+    }
+
+
+    /*
+       EMAIL
+    */
+
+    if (email) {
+
+        email.textContent =
+            employee.email ||
+            "--";
+
+    }
+
+
+    /*
+       PHONE
+    */
+
+    if (phone) {
+
+        phone.textContent =
+            employee.phone ||
+            employee.mobile ||
+            employee.contact ||
+            "--";
+
+    }
+
+
+    /*
+       JOINED DATE
+    */
+
+    if (joined) {
+
+        const joinedValue =
+            employee.joinedDate ||
+            employee.createdAt;
+
+
+        if (joinedValue) {
+
+            const date =
+                new Date(
+                    joinedValue
+                );
+
+
+            if (
+                !Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+
+                joined.textContent =
+                    date.toLocaleDateString(
+                        "en-IN",
+                        {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric"
+                        }
+                    );
+
+            }
+
+            else {
+
+                joined.textContent =
+                    "--";
+
+            }
+
+        }
+
+        else {
+
+            joined.textContent =
+                "--";
+
+        }
+
+    }
+
+}
+
+
+function showEmployeeCardEmpty() {
+
+    const photo =
+        document.getElementById(
+            "employeeCardPhoto"
+        );
+
+    const name =
+        document.getElementById(
+            "employeeCardName"
+        );
+
+    const role =
+        document.getElementById(
+            "employeeCardRole"
+        );
+
+    const employeeId =
+        document.getElementById(
+            "employeeCardId"
+        );
+
+    const email =
+        document.getElementById(
+            "employeeCardEmail"
+        );
+
+    const phone =
+        document.getElementById(
+            "employeeCardPhone"
+        );
+
+    const joined =
+        document.getElementById(
+            "employeeCardJoined"
+        );
+
+
+    if (photo) {
+
+        photo.src =
+            "../assets/default-user.png";
+
+    }
+
+
+    if (name) {
+
+        name.textContent =
+            "Select Employee";
+
+    }
+
+
+    if (role) {
+
+        role.textContent =
+            "Employee Profile";
+
+    }
+
+
+    if (employeeId) {
+
+        employeeId.textContent =
+            "--";
+
+    }
+
+
+    if (email) {
+
+        email.textContent =
+            "--";
+
+    }
+
+
+    if (phone) {
+
+        phone.textContent =
+            "--";
+
+    }
+
+
+    if (joined) {
+
+        joined.textContent =
+            "--";
+
+    }
+
+}

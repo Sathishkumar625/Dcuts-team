@@ -1411,3 +1411,715 @@ tbody tr:hover {
     }
 
 }
+/* =====================================================
+   EMPLOYEE ID CARD BUTTON
+===================================================== */
+
+.employee-card-trigger {
+    position: fixed;
+
+    right: 28px;
+    bottom: 28px;
+
+    width: 58px;
+    height: 58px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.12),
+            rgba(255, 255, 255, 0.04)
+        );
+
+    color: #d9a441;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+    z-index: 1000;
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    backdrop-filter: blur(18px);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease;
+}
+
+
+.employee-card-trigger:hover {
+    transform:
+        translateY(-4px)
+        scale(1.04);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(217, 164, 65, 0.22),
+            rgba(255, 255, 255, 0.06)
+        );
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.45),
+        0 0 25px rgba(217, 164, 65, 0.18);
+}
+
+
+.employee-card-trigger:active {
+    transform:
+        scale(0.96);
+}
+
+
+/* =====================================================
+   OVERLAY
+===================================================== */
+
+.employee-card-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(0, 0, 0, 0.55);
+
+    backdrop-filter:
+        blur(4px);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    z-index: 1090;
+
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+}
+
+
+.employee-card-overlay.active {
+    opacity: 1;
+
+    visibility: visible;
+
+    pointer-events: auto;
+}
+
+
+/* =====================================================
+   SIDE PANEL
+===================================================== */
+
+.employee-id-panel {
+    position: fixed;
+
+    top: 0;
+    right: 0;
+
+    width: min(430px, 92vw);
+
+    height: 100vh;
+
+    padding: 26px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #111318,
+            #0b0c0f
+        );
+
+    border-left:
+        1px solid rgba(255, 255, 255, 0.1);
+
+    box-shadow:
+        -20px 0 60px rgba(0, 0, 0, 0.45);
+
+    transform:
+        translateX(110%);
+
+    visibility: hidden;
+
+    z-index: 1100;
+
+    overflow-y: auto;
+
+    transition:
+        transform 0.38s cubic-bezier(
+            0.22,
+            1,
+            0.36,
+            1
+        ),
+        visibility 0.38s ease;
+}
+
+
+.employee-id-panel.active {
+    transform:
+        translateX(0);
+
+    visibility: visible;
+}
+
+
+/* =====================================================
+   PANEL HEADER
+===================================================== */
+
+.employee-id-panel-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 24px;
+}
+
+
+.employee-id-small-title {
+    display: block;
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+
+    color: #d9a441;
+
+    font-weight: 700;
+
+    margin-bottom: 5px;
+}
+
+
+.employee-id-panel-header h2 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 26px;
+
+    font-weight: 700;
+}
+
+
+.employee-card-close {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 13px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.1);
+
+    background:
+        rgba(255, 255, 255, 0.05);
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 18px;
+
+    transition: 0.25s ease;
+}
+
+
+.employee-card-close:hover {
+    background:
+        rgba(255, 80, 80, 0.15);
+
+    color: #ff6b6b;
+
+    transform: rotate(90deg);
+}
+
+
+/* =====================================================
+   ID CARD
+===================================================== */
+
+.employee-id-card {
+    position: relative;
+
+    overflow: hidden;
+
+    border-radius: 28px;
+
+    padding: 24px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #191b21,
+            #0e1014
+        );
+
+    border:
+        1px solid rgba(217, 164, 65, 0.25);
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.45);
+}
+
+
+.employee-id-card::before {
+    content: "";
+
+    position: absolute;
+
+    width: 230px;
+    height: 230px;
+
+    top: -120px;
+    right: -100px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(217, 164, 65, 0.08);
+
+    filter: blur(3px);
+
+    pointer-events: none;
+}
+
+
+.employee-id-card::after {
+    content: "";
+
+    position: absolute;
+
+    width: 180px;
+    height: 180px;
+
+    bottom: -100px;
+    left: -90px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.025);
+
+    pointer-events: none;
+}
+
+
+/* =====================================================
+   CARD TOP
+===================================================== */
+
+.employee-card-top {
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding-bottom: 20px;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.employee-company-logo {
+    width: 46px;
+    height: 46px;
+
+    border-radius: 14px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #d9a441,
+            #8e6825
+        );
+
+    color: #111318;
+
+    font-weight: 900;
+
+    font-size: 15px;
+
+    box-shadow:
+        0 8px 25px rgba(
+            217,
+            164,
+            65,
+            0.2
+        );
+}
+
+
+.employee-card-top strong {
+    display: block;
+
+    color: #ffffff;
+
+    font-size: 15px;
+
+    letter-spacing: 1px;
+}
+
+
+.employee-card-top span {
+    display: block;
+
+    color: rgba(255, 255, 255, 0.45);
+
+    font-size: 10px;
+
+    letter-spacing: 1.5px;
+
+    margin-top: 3px;
+}
+
+
+/* =====================================================
+   PHOTO
+===================================================== */
+
+.employee-photo-wrap {
+    position: relative;
+
+    width: 118px;
+    height: 118px;
+
+    margin:
+        28px auto 15px;
+}
+
+
+.employee-photo-wrap img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border:
+        4px solid #d9a441;
+
+    background: #22252b;
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.45),
+        0 0 0 7px rgba(217, 164, 65, 0.08);
+}
+
+
+.employee-online-dot {
+    position: absolute;
+
+    right: 5px;
+    bottom: 8px;
+
+    width: 18px;
+    height: 18px;
+
+    border-radius: 50%;
+
+    background: #35d07f;
+
+    border:
+        4px solid #111318;
+
+    box-shadow:
+        0 0 12px rgba(53, 208, 127, 0.45);
+}
+
+
+/* =====================================================
+   NAME
+===================================================== */
+
+.employee-card-name {
+    position: relative;
+
+    z-index: 2;
+
+    text-align: center;
+
+    margin-bottom: 20px;
+}
+
+
+.employee-card-name h3 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 23px;
+
+    font-weight: 700;
+}
+
+
+.employee-card-name span {
+    display: inline-block;
+
+    margin-top: 7px;
+
+    padding: 5px 12px;
+
+    border-radius: 30px;
+
+    background:
+        rgba(217, 164, 65, 0.1);
+
+    border:
+        1px solid rgba(217, 164, 65, 0.2);
+
+    color: #d9a441;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* =====================================================
+   EMPLOYEE ID
+===================================================== */
+
+.employee-card-id {
+    position: relative;
+
+    z-index: 2;
+
+    text-align: center;
+
+    padding: 14px;
+
+    margin-bottom: 20px;
+
+    border-radius: 16px;
+
+    background:
+        rgba(255, 255, 255, 0.035);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.07);
+}
+
+
+.employee-card-id span {
+    display: block;
+
+    color:
+        rgba(255, 255, 255, 0.4);
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 5px;
+}
+
+
+.employee-card-id strong {
+    color: #d9a441;
+
+    font-size: 25px;
+
+    letter-spacing: 3px;
+}
+
+
+/* =====================================================
+   DETAILS
+===================================================== */
+
+.employee-card-details {
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+.employee-detail-row {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 13px;
+
+    border-radius: 15px;
+
+    background:
+        rgba(255, 255, 255, 0.035);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.06);
+}
+
+
+.employee-detail-icon {
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background:
+        rgba(217, 164, 65, 0.1);
+
+    color: #d9a441;
+
+    font-size: 14px;
+}
+
+
+.employee-detail-row small {
+    display: block;
+
+    color:
+        rgba(255, 255, 255, 0.38);
+
+    font-size: 9px;
+
+    margin-bottom: 3px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+}
+
+
+.employee-detail-row strong {
+    display: block;
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    word-break: break-word;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.employee-card-footer {
+    position: relative;
+
+    z-index: 2;
+
+    text-align: center;
+
+    margin-top: 22px;
+
+    padding-top: 17px;
+
+    border-top:
+        1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.employee-card-footer span {
+    color:
+        rgba(255, 255, 255, 0.28);
+
+    font-size: 8px;
+
+    letter-spacing: 2px;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+    .employee-card-trigger {
+        right: 18px;
+        bottom: 18px;
+
+        width: 52px;
+        height: 52px;
+
+        border-radius: 16px;
+    }
+
+
+    .employee-id-panel {
+        width: 94vw;
+
+        padding: 20px;
+    }
+
+
+    .employee-id-card {
+        padding: 20px;
+
+        border-radius: 23px;
+    }
+
+
+    .employee-photo-wrap {
+        width: 105px;
+        height: 105px;
+    }
+
+
+    .employee-card-name h3 {
+        font-size: 20px;
+    }
+
+}

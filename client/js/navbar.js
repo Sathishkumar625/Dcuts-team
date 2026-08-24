@@ -9,244 +9,286 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let user =
         JSON.parse(
-            localStorage.getItem("loggedUser")
+            localStorage.getItem("loggedUser") || "null"
         );
 
     let role =
         localStorage.getItem("role");
 
 
+    /* =====================================================
+       ADMIN NAVBAR
+    ===================================================== */
+
     let adminMenu = `
 
 <nav class="navbar">
 
-<div class="logo">
+    <div class="logo">
 
-<div class="logo-icon">
+        <div class="logo-icon">
 
-<i class="fa-regular fa-clock"></i>
+            <i class="fa-regular fa-clock"></i>
 
-</div>
+        </div>
 
-<h2>DCUTS.TS</h2>
+        <h2>DCUTS.TS</h2>
 
-</div>
+    </div>
 
 
-<ul class="menu">
+    <ul class="menu">
 
 
-<li>
+        <li>
 
-<a href="../index.html">
+            <a href="../index.html">
 
-<i class="fa-solid fa-house"></i>
+                <i class="fa-solid fa-house"></i>
 
-Home
+                Home
 
-</a>
+            </a>
 
-</li>
+        </li>
 
 
-<li>
+        <li>
 
-<a href="dashboard.html">
+            <a href="dashboard.html">
 
-<i class="fa-solid fa-table-columns"></i>
+                <i class="fa-solid fa-table-columns"></i>
 
-Dashboard
+                Dashboard
 
-</a>
+            </a>
 
-</li>
+        </li>
 
 
-<li>
+        <li>
 
-<a href="timesheet.html">
+            <a href="timesheet.html">
 
-<i class="fa-regular fa-clock"></i>
+                <i class="fa-regular fa-clock"></i>
 
-Timesheet
+                Timesheet
 
-</a>
+            </a>
 
-</li>
+        </li>
 
 
-<li>
+        <li>
 
-<a href="reports.html">
+            <a href="reports.html">
 
-<i class="fa-solid fa-file-lines"></i>
+                <i class="fa-solid fa-file-lines"></i>
 
-Reports
+                Reports
 
-</a>
+            </a>
 
-</li>
+        </li>
 
 
-<li>
+        <li>
 
-<a href="calendar.html">
+            <a href="calendar.html">
 
-<i class="fa-solid fa-calendar"></i>
+                <i class="fa-solid fa-calendar"></i>
 
-Calendar
+                Calendar
 
-</a>
+            </a>
 
-</li>
+        </li>
 
 
-<li>
+        <li>
 
-<a href="employees.html">
+            <a href="employees.html">
 
-<i class="fa-solid fa-users"></i>
+                <i class="fa-solid fa-users"></i>
 
-Employees
+                Employees
 
-</a>
+            </a>
 
-</li>
+        </li>
 
 
-<li>
+        <li>
 
-<a href="clients.html">
+            <a href="clients.html">
 
-<i class="fa-solid fa-user-tie"></i>
+                <i class="fa-solid fa-user-tie"></i>
 
-Clients
+                Clients
 
-</a>
+            </a>
 
-</li>
+        </li>
 
 
-<li>
+        <li>
 
-<a href="settings.html">
+            <a href="settings.html">
 
-<i class="fa-solid fa-gear"></i>
+                <i class="fa-solid fa-gear"></i>
 
-Settings
+                Settings
 
-</a>
+            </a>
 
-</li>
+        </li>
 
 
-</ul>
+    </ul>
 
 
-<div class="profile">
+    <div class="profile">
 
-<p>
+        <p>
 
-${user ? user.name : "Admin"}
+            ${user ? user.name : "Admin"}
 
-</p>
+        </p>
 
 
-<span>
+        <span>
 
-<i class="fa-solid fa-shield"></i>
+            <i class="fa-solid fa-shield"></i>
 
-Admin
+            Admin
 
-</span>
+        </span>
 
-
-</div>
+    </div>
 
 
 </nav>
 
 `;
 
+
+    /* =====================================================
+       EMPLOYEE NAVBAR
+    ===================================================== */
 
     let employeeMenu = `
 
 <nav class="navbar">
 
-<div class="logo">
+    <div class="logo">
 
-<div class="logo-icon">
+        <div class="logo-icon">
 
-<i class="fa-regular fa-clock"></i>
+            <i class="fa-regular fa-clock"></i>
 
-</div>
-
-
-<h2>DCUTS.TS</h2>
+        </div>
 
 
-</div>
+        <h2>DCUTS.TS</h2>
+
+    </div>
 
 
-<ul class="menu">
+    <ul class="menu">
 
 
-<li>
+        <li>
 
-<a href="timesheet.html">
+            <a href="timesheet.html">
 
-<i class="fa-regular fa-clock"></i>
+                <i class="fa-regular fa-clock"></i>
 
-Timesheet
+                Timesheet
 
-</a>
+            </a>
 
-</li>
-
-
-<li>
-
-<a
-    href="#"
-    onclick="logout(); return false;"
->
-
-<i class="fa-solid fa-right-from-bracket"></i>
-
-Logout
-
-</a>
-
-</li>
+        </li>
 
 
-</ul>
+        <!-- ==========================================
+             EMPLOYEE ID CARD
+        =========================================== -->
+
+        <li>
+
+            <a
+                href="#"
+                class="employee-navbar-card"
+                id="employeeNavbarCard"
+                title="Employee ID Card"
+                onclick="
+                    openEmployeeIdCard();
+                    return false;
+                "
+            >
+
+                <i class="fa-solid fa-id-card"></i>
+
+                ID Card
+
+            </a>
+
+        </li>
 
 
-<div class="profile">
+        <!-- ==========================================
+             LOGOUT
+        =========================================== -->
+
+        <li>
+
+            <a
+                href="#"
+                onclick="logout(); return false;"
+            >
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                Logout
+
+            </a>
+
+        </li>
 
 
-<p>
-
-${user ? user.name : "Employee"}
-
-</p>
+    </ul>
 
 
-<span>
-
-Employee
-
-</span>
+    <div class="profile">
 
 
-</div>
+        <p>
+
+            ${user ? user.name : "Employee"}
+
+        </p>
+
+
+        <span>
+
+            <i class="fa-solid fa-user"></i>
+
+            Employee
+
+        </span>
+
+
+    </div>
 
 
 </nav>
 
 `;
 
+
+    /* =====================================================
+       ROLE CHECK
+    ===================================================== */
 
     if (role === "admin") {
 
@@ -265,27 +307,36 @@ Employee
 });
 
 
+/* =====================================================
+   LOGOUT
+===================================================== */
+
 function logout() {
 
     localStorage.removeItem(
         "token"
     );
 
+
     localStorage.removeItem(
         "user"
     );
+
 
     localStorage.removeItem(
         "loggedUser"
     );
 
+
     localStorage.removeItem(
         "role"
     );
 
+
     localStorage.removeItem(
         "userName"
     );
+
 
     localStorage.removeItem(
         "userEmail"
@@ -297,3 +348,49 @@ function logout() {
     );
 
 }
+
+
+/* =====================================================
+   EMPLOYEE ID CARD NAVBAR ICON STYLE
+===================================================== */
+
+const employeeNavbarStyle =
+    document.createElement("style");
+
+
+employeeNavbarStyle.textContent = `
+
+.employee-navbar-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+}
+
+
+.employee-navbar-card i {
+
+    color: #d9a441;
+
+}
+
+
+.employee-navbar-card:hover i {
+
+    color: #f0c35c;
+
+}
+
+`;
+
+
+document.head.appendChild(
+    employeeNavbarStyle
+);
+
+
+
+

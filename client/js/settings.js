@@ -2,30 +2,84 @@
    THE D CUTS SETTINGS SYSTEM
 ========================================== */
 
-document.addEventListener("DOMContentLoaded", () => {
+const API = "/api";
 
-    const role = localStorage.getItem("role");
 
-    if (!role) {
-        window.location.href = "../login.html";
-        return;
+/* ==========================================
+   TOKEN
+========================================== */
+
+function getToken() {
+
+    return localStorage.getItem("token") || "";
+
+}
+
+
+/* ==========================================
+   AUTH HEADERS
+========================================== */
+
+function authHeaders() {
+
+    return {
+
+        "Content-Type": "application/json",
+
+        "Authorization":
+            `Bearer ${getToken()}`
+
+    };
+
+}
+
+
+/* ==========================================
+   PAGE LOAD
+========================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+        const role =
+            localStorage.getItem("role");
+
+
+        if (!role) {
+
+            window.location.href =
+                "../login.html";
+
+            return;
+
+        }
+
+
+        if (role !== "admin") {
+
+            window.location.href =
+                "timesheet.html";
+
+            return;
+
+        }
+
+
+        await loadSettings();
+
     }
-
-    if (role !== "admin") {
-        window.location.href = "timesheet.html";
-        return;
-    }
-
-    loadSettings();
-
-});
+);
 
 
 /* ==========================================
    SECTION NAVIGATION
 ========================================== */
 
-function showSection(sectionId, clickedItem = null) {
+function showSection(
+    sectionId,
+    clickedItem = null
+) {
 
     document
         .querySelectorAll(".settings-card")
@@ -37,28 +91,38 @@ function showSection(sectionId, clickedItem = null) {
 
 
     const selected =
-        document.getElementById(sectionId);
+        document.getElementById(
+            sectionId
+        );
 
 
     if (selected) {
 
-        selected.classList.remove("hidden");
+        selected.classList.remove(
+            "hidden"
+        );
 
     }
 
 
     document
-        .querySelectorAll(".settings-sidebar li")
+        .querySelectorAll(
+            ".settings-sidebar li"
+        )
         .forEach(li => {
 
-            li.classList.remove("active");
+            li.classList.remove(
+                "active"
+            );
 
         });
 
 
     if (clickedItem) {
 
-        clickedItem.classList.add("active");
+        clickedItem.classList.add(
+            "active"
+        );
 
     }
 
@@ -66,93 +130,352 @@ function showSection(sectionId, clickedItem = null) {
 
 
 /* ==========================================
-   LOAD SETTINGS
+   LOAD SETTINGS FROM MONGODB
 ========================================== */
 
-function loadSettings() {
+async function loadSettings() {
 
-    const adminName =
-        document.getElementById("adminName");
+    try {
 
-    const adminEmail =
-        document.getElementById("adminEmail");
+        const response =
+            await fetch(
+                `${API}/settings`,
+                {
 
-    const companyName =
-        document.getElementById("companyName");
+                    method: "GET",
 
-    const companyPhone =
-        document.getElementById("companyPhone");
+                    headers:
+                        authHeaders()
 
-    const companyEmail =
-        document.getElementById("companyEmail");
-
-    const companyAddress =
-        document.getElementById("companyAddress");
+                }
+            );
 
 
-    if (adminName) {
+        if (
+            response.status === 401
+        ) {
 
-        adminName.value =
-            localStorage.getItem("adminName")
-            || "Sathish Kumar";
+            window.location.href =
+                "../login.html";
+
+            return;
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            throw new Error(
+                data.message ||
+                "Unable to load settings"
+            );
+
+        }
+
+
+        const setting =
+            data.setting || {};
+
+
+        /* ============================
+           PROFILE
+        ============================ */
+
+        const adminName =
+            document.getElementById(
+                "adminName"
+            );
+
+
+        const adminEmail =
+            document.getElementById(
+                "adminEmail"
+            );
+
+
+        if (adminName) {
+
+            adminName.value =
+                setting.adminName || "";
+
+        }
+
+
+        if (adminEmail) {
+
+            adminEmail.value =
+                setting.adminEmail || "";
+
+        }
+
+
+        /* ============================
+           COMPANY
+        ============================ */
+
+        const companyName =
+            document.getElementById(
+                "companyName"
+            );
+
+
+        const companyPhone =
+            document.getElementById(
+                "companyPhone"
+            );
+
+
+        const companyEmail =
+            document.getElementById(
+                "companyEmail"
+            );
+
+
+        const companyAddress =
+            document.getElementById(
+                "companyAddress"
+            );
+
+
+        if (companyName) {
+
+            companyName.value =
+                setting.companyName ||
+                "THE D CUTS";
+
+        }
+
+
+        if (companyPhone) {
+
+            companyPhone.value =
+                setting.companyPhone || "";
+
+        }
+
+
+        if (companyEmail) {
+
+            companyEmail.value =
+                setting.companyEmail || "";
+
+        }
+
+
+        if (companyAddress) {
+
+            companyAddress.value =
+                setting.companyAddress || "";
+
+        }
+
+
+        /* ============================
+           THEME
+        ============================ */
+
+        const themeSelect =
+            document.getElementById(
+                "themeSelect"
+            );
+
+
+        const theme =
+            setting.theme || "dark";
+
+
+        if (themeSelect) {
+
+            themeSelect.value =
+                theme;
+
+        }
+
+
+        applyTheme(theme);
+
+
+        /* ============================
+           KEEP EXISTING FUNCTIONS
+        ============================ */
+
+        loadEmployees();
+
+        loadProjects();
+
+        loadClients();
+
+        loadNotifications();
+
+
+        /* ============================
+           LOCAL STORAGE BACKUP
+           FOR EXISTING UI
+        ============================ */
+
+        if (
+            setting.adminName
+        ) {
+
+            localStorage.setItem(
+                "adminName",
+                setting.adminName
+            );
+
+        }
+
+
+        if (
+            setting.adminEmail
+        ) {
+
+            localStorage.setItem(
+                "adminEmail",
+                setting.adminEmail
+            );
+
+        }
+
+
+        if (
+            setting.companyName
+        ) {
+
+            localStorage.setItem(
+                "companyName",
+                setting.companyName
+            );
+
+        }
+
+
+        if (
+            setting.companyPhone !== undefined
+        ) {
+
+            localStorage.setItem(
+                "companyPhone",
+                setting.companyPhone || ""
+            );
+
+        }
+
+
+        if (
+            setting.companyEmail !== undefined
+        ) {
+
+            localStorage.setItem(
+                "companyEmail",
+                setting.companyEmail || ""
+            );
+
+        }
+
+
+        if (
+            setting.companyAddress !== undefined
+        ) {
+
+            localStorage.setItem(
+                "companyAddress",
+                setting.companyAddress || ""
+            );
+
+        }
+
+
+        if (setting.theme) {
+
+            localStorage.setItem(
+                "theme",
+                setting.theme
+            );
+
+        }
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "LOAD SETTINGS ERROR:",
+            error
+        );
+
+
+        alert(
+            "Unable to load Settings from server."
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   SAVE SETTINGS TO MONGODB
+========================================== */
+
+async function updateSettingsOnServer(
+    settings
+) {
+
+    const response =
+        await fetch(
+            `${API}/settings`,
+            {
+
+                method: "PUT",
+
+                headers:
+                    authHeaders(),
+
+                body:
+                    JSON.stringify(settings)
+
+            }
+        );
+
+
+    if (
+        response.status === 401
+    ) {
+
+        window.location.href =
+            "../login.html";
+
+        return null;
 
     }
 
 
-    if (adminEmail) {
-
-        adminEmail.value =
-            localStorage.getItem("adminEmail")
-            || "dcutsdigitalsolutions@gmail.com";
-
-    }
+    const data =
+        await response.json();
 
 
-    if (companyName) {
+    if (
+        !response.ok ||
+        !data.success
+    ) {
 
-        companyName.value =
-            localStorage.getItem("companyName")
-            || "THE D CUTS";
-
-    }
-
-
-    if (companyPhone) {
-
-        companyPhone.value =
-            localStorage.getItem("companyPhone")
-            || "";
+        throw new Error(
+            data.message ||
+            "Unable to save settings"
+        );
 
     }
 
 
-    if (companyEmail) {
-
-        companyEmail.value =
-            localStorage.getItem("companyEmail")
-            || "";
-
-    }
-
-
-    if (companyAddress) {
-
-        companyAddress.value =
-            localStorage.getItem("companyAddress")
-            || "";
-
-    }
-
-
-    loadEmployees();
-
-    loadProjects();
-
-    loadClients();
-
-    loadNotifications();
-
-    loadAppearance();
+    return data;
 
 }
 
@@ -161,57 +484,119 @@ function loadSettings() {
    PROFILE
 ========================================== */
 
-function saveProfile() {
+async function saveProfile() {
 
     const name =
-        document.getElementById("adminName").value.trim();
+        document
+            .getElementById(
+                "adminName"
+            )
+            .value
+            .trim();
+
 
     const email =
-        document.getElementById("adminEmail").value.trim();
+        document
+            .getElementById(
+                "adminEmail"
+            )
+            .value
+            .trim();
 
 
     if (!name || !email) {
 
-        alert("Please enter Name and Email");
+        alert(
+            "Please enter Name and Email"
+        );
 
         return;
 
     }
 
 
-    localStorage.setItem(
-        "adminName",
-        name
-    );
+    try {
+
+        const data =
+            await updateSettingsOnServer({
+
+                adminName: name,
+
+                adminEmail: email
+
+            });
 
 
-    localStorage.setItem(
-        "adminEmail",
-        email
-    );
+        if (!data) return;
 
 
-    const loggedUser =
-        JSON.parse(
-            localStorage.getItem("loggedUser")
+        /* ============================
+           LOCAL STORAGE
+        ============================ */
+
+        localStorage.setItem(
+            "adminName",
+            name
         );
 
 
-    if (loggedUser) {
-
-        loggedUser.name = name;
-
-        loggedUser.email = email;
-
         localStorage.setItem(
-            "loggedUser",
-            JSON.stringify(loggedUser)
+            "adminEmail",
+            email
+        );
+
+
+        /* ============================
+           LOGGED USER
+        ============================ */
+
+        const loggedUser =
+            JSON.parse(
+                localStorage.getItem(
+                    "loggedUser"
+                )
+            );
+
+
+        if (loggedUser) {
+
+            loggedUser.name =
+                name;
+
+            loggedUser.email =
+                email;
+
+
+            localStorage.setItem(
+                "loggedUser",
+                JSON.stringify(
+                    loggedUser
+                )
+            );
+
+        }
+
+
+        alert(
+            "Profile Saved Successfully ✅"
         );
 
     }
 
+    catch (error) {
 
-    alert("Profile Updated Successfully ✅");
+        console.error(
+            "PROFILE SAVE ERROR:",
+            error
+        );
+
+
+        alert(
+            "Profile Save Failed ❌\n" +
+            error.message
+        );
+
+    }
 
 }
 
@@ -220,52 +605,122 @@ function saveProfile() {
    COMPANY
 ========================================== */
 
-function saveCompany() {
+async function saveCompany() {
 
     const name =
-        document.getElementById("companyName").value.trim();
+        document
+            .getElementById(
+                "companyName"
+            )
+            .value
+            .trim();
+
 
     const phone =
-        document.getElementById("companyPhone").value.trim();
+        document
+            .getElementById(
+                "companyPhone"
+            )
+            .value
+            .trim();
+
 
     const email =
-        document.getElementById("companyEmail").value.trim();
+        document
+            .getElementById(
+                "companyEmail"
+            )
+            .value
+            .trim();
+
 
     const address =
-        document.getElementById("companyAddress").value.trim();
+        document
+            .getElementById(
+                "companyAddress"
+            )
+            .value
+            .trim();
 
 
     if (!name) {
 
-        alert("Company Name is required");
+        alert(
+            "Company Name is required"
+        );
 
         return;
 
     }
 
 
-    localStorage.setItem(
-        "companyName",
-        name
-    );
+    try {
 
-    localStorage.setItem(
-        "companyPhone",
-        phone
-    );
+        const data =
+            await updateSettingsOnServer({
 
-    localStorage.setItem(
-        "companyEmail",
-        email
-    );
+                companyName: name,
 
-    localStorage.setItem(
-        "companyAddress",
-        address
-    );
+                companyPhone: phone,
+
+                companyEmail: email,
+
+                companyAddress: address
+
+            });
 
 
-    alert("Company Settings Saved ✅");
+        if (!data) return;
+
+
+        /* ============================
+           LOCAL STORAGE
+        ============================ */
+
+        localStorage.setItem(
+            "companyName",
+            name
+        );
+
+
+        localStorage.setItem(
+            "companyPhone",
+            phone
+        );
+
+
+        localStorage.setItem(
+            "companyEmail",
+            email
+        );
+
+
+        localStorage.setItem(
+            "companyAddress",
+            address
+        );
+
+
+        alert(
+            "Company Settings Saved Successfully ✅"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "COMPANY SAVE ERROR:",
+            error
+        );
+
+
+        alert(
+            "Company Save Failed ❌\n" +
+            error.message
+        );
+
+    }
 
 }
 
@@ -277,10 +732,15 @@ function saveCompany() {
 function addEmployee() {
 
     const nameInput =
-        document.getElementById("newEmployeeName");
+        document.getElementById(
+            "newEmployeeName"
+        );
+
 
     const emailInput =
-        document.getElementById("newEmployeeEmail");
+        document.getElementById(
+            "newEmployeeEmail"
+        );
 
 
     if (!nameInput || !emailInput) {
@@ -297,13 +757,16 @@ function addEmployee() {
     const name =
         nameInput.value.trim();
 
+
     const email =
         emailInput.value.trim();
 
 
     if (!name || !email) {
 
-        alert("Enter Employee Name and Email");
+        alert(
+            "Enter Employee Name and Email"
+        );
 
         return;
 
@@ -312,21 +775,27 @@ function addEmployee() {
 
     let employees =
         JSON.parse(
-            localStorage.getItem("employees")
+            localStorage.getItem(
+                "employees"
+            )
         ) || [];
 
 
     const exists =
         employees.some(
             employee =>
-                employee.email.toLowerCase()
-                === email.toLowerCase()
+                employee.email
+                    .toLowerCase()
+                ===
+                email.toLowerCase()
         );
 
 
     if (exists) {
 
-        alert("Employee already exists");
+        alert(
+            "Employee already exists"
+        );
 
         return;
 
@@ -341,14 +810,17 @@ function addEmployee() {
 
         email: email,
 
-        createdAt: new Date().toISOString()
+        createdAt:
+            new Date().toISOString()
 
     });
 
 
     localStorage.setItem(
         "employees",
-        JSON.stringify(employees)
+        JSON.stringify(
+            employees
+        )
     );
 
 
@@ -360,7 +832,9 @@ function addEmployee() {
     loadEmployees();
 
 
-    alert("Employee Added Successfully ✅");
+    alert(
+        "Employee Added Successfully ✅"
+    );
 
 }
 
@@ -368,7 +842,9 @@ function addEmployee() {
 function loadEmployees() {
 
     const container =
-        document.getElementById("employeeList");
+        document.getElementById(
+            "employeeList"
+        );
 
 
     if (!container) return;
@@ -376,7 +852,9 @@ function loadEmployees() {
 
     const employees =
         JSON.parse(
-            localStorage.getItem("employees")
+            localStorage.getItem(
+                "employees"
+            )
         ) || [];
 
 
@@ -393,51 +871,61 @@ function loadEmployees() {
     }
 
 
-    employees.forEach(employee => {
+    employees.forEach(
+        employee => {
 
-        container.innerHTML += `
+            container.innerHTML += `
 
-            <div class="settings-list-item">
+                <div class="settings-list-item">
 
-                <div>
+                    <div>
 
-                    <strong>
-                        ${employee.name}
-                    </strong>
+                        <strong>
+                            ${employee.name}
+                        </strong>
 
-                    <small>
-                        ${employee.email}
-                    </small>
+                        <small>
+                            ${employee.email}
+                        </small>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        onclick="deleteEmployee(${employee.id})">
+
+                        🗑️
+
+                    </button>
 
                 </div>
 
-                <button
-                    type="button"
-                    onclick="deleteEmployee(${employee.id})">
+            `;
 
-                    🗑️
-
-                </button>
-
-            </div>
-
-        `;
-
-    });
+        }
+    );
 
 }
 
 
 function deleteEmployee(id) {
 
-    if (!confirm("Delete this employee?")) {
+    if (
+        !confirm(
+            "Delete this employee?"
+        )
+    ) {
+
         return;
+
     }
 
 
     let employees =
         JSON.parse(
-            localStorage.getItem("employees")
+            localStorage.getItem(
+                "employees"
+            )
         ) || [];
 
 
@@ -450,7 +938,9 @@ function deleteEmployee(id) {
 
     localStorage.setItem(
         "employees",
-        JSON.stringify(employees)
+        JSON.stringify(
+            employees
+        )
     );
 
 
@@ -466,11 +956,15 @@ function deleteEmployee(id) {
 function addProject() {
 
     const nameInput =
-        document.getElementById("newProjectName");
+        document.getElementById(
+            "newProjectName"
+        );
 
 
     const codeInput =
-        document.getElementById("newProjectCode");
+        document.getElementById(
+            "newProjectCode"
+        );
 
 
     if (!nameInput || !codeInput) {
@@ -487,13 +981,18 @@ function addProject() {
     const name =
         nameInput.value.trim();
 
+
     const code =
-        codeInput.value.trim().toUpperCase();
+        codeInput.value
+            .trim()
+            .toUpperCase();
 
 
     if (!name || !code) {
 
-        alert("Enter Project Name and Code");
+        alert(
+            "Enter Project Name and Code"
+        );
 
         return;
 
@@ -502,7 +1001,9 @@ function addProject() {
 
     let projects =
         JSON.parse(
-            localStorage.getItem("projects")
+            localStorage.getItem(
+                "projects"
+            )
         ) || [];
 
 
@@ -515,7 +1016,9 @@ function addProject() {
 
     if (exists) {
 
-        alert("Project code already exists");
+        alert(
+            "Project code already exists"
+        );
 
         return;
 
@@ -530,14 +1033,17 @@ function addProject() {
 
         code: code,
 
-        createdAt: new Date().toISOString()
+        createdAt:
+            new Date().toISOString()
 
     });
 
 
     localStorage.setItem(
         "projects",
-        JSON.stringify(projects)
+        JSON.stringify(
+            projects
+        )
     );
 
 
@@ -549,7 +1055,9 @@ function addProject() {
     loadProjects();
 
 
-    alert("Project Added Successfully ✅");
+    alert(
+        "Project Added Successfully ✅"
+    );
 
 }
 
@@ -557,7 +1065,9 @@ function addProject() {
 function loadProjects() {
 
     const container =
-        document.getElementById("projectList");
+        document.getElementById(
+            "projectList"
+        );
 
 
     if (!container) return;
@@ -565,7 +1075,9 @@ function loadProjects() {
 
     const projects =
         JSON.parse(
-            localStorage.getItem("projects")
+            localStorage.getItem(
+                "projects"
+            )
         ) || [];
 
 
@@ -582,51 +1094,61 @@ function loadProjects() {
     }
 
 
-    projects.forEach(project => {
+    projects.forEach(
+        project => {
 
-        container.innerHTML += `
+            container.innerHTML += `
 
-            <div class="settings-list-item">
+                <div class="settings-list-item">
 
-                <div>
+                    <div>
 
-                    <strong>
-                        ${project.name}
-                    </strong>
+                        <strong>
+                            ${project.name}
+                        </strong>
 
-                    <small>
-                        Code: ${project.code}
-                    </small>
+                        <small>
+                            Code: ${project.code}
+                        </small>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        onclick="deleteProject(${project.id})">
+
+                        🗑️
+
+                    </button>
 
                 </div>
 
-                <button
-                    type="button"
-                    onclick="deleteProject(${project.id})">
+            `;
 
-                    🗑️
-
-                </button>
-
-            </div>
-
-        `;
-
-    });
+        }
+    );
 
 }
 
 
 function deleteProject(id) {
 
-    if (!confirm("Delete this project?")) {
+    if (
+        !confirm(
+            "Delete this project?"
+        )
+    ) {
+
         return;
+
     }
 
 
     let projects =
         JSON.parse(
-            localStorage.getItem("projects")
+            localStorage.getItem(
+                "projects"
+            )
         ) || [];
 
 
@@ -639,7 +1161,9 @@ function deleteProject(id) {
 
     localStorage.setItem(
         "projects",
-        JSON.stringify(projects)
+        JSON.stringify(
+            projects
+        )
     );
 
 
@@ -655,15 +1179,21 @@ function deleteProject(id) {
 function addClient() {
 
     const nameInput =
-        document.getElementById("newClientName");
+        document.getElementById(
+            "newClientName"
+        );
 
 
     const codeInput =
-        document.getElementById("newClientCode");
+        document.getElementById(
+            "newClientCode"
+        );
 
 
     const locationInput =
-        document.getElementById("newClientLocation");
+        document.getElementById(
+            "newClientLocation"
+        );
 
 
     if (!nameInput || !codeInput) {
@@ -680,18 +1210,24 @@ function addClient() {
     const name =
         nameInput.value.trim();
 
+
     const code =
-        codeInput.value.trim().toUpperCase();
+        codeInput.value
+            .trim()
+            .toUpperCase();
+
 
     const location =
         locationInput
-        ? locationInput.value.trim()
-        : "";
+            ? locationInput.value.trim()
+            : "";
 
 
     if (!name || !code) {
 
-        alert("Enter Client Name and Code");
+        alert(
+            "Enter Client Name and Code"
+        );
 
         return;
 
@@ -700,7 +1236,9 @@ function addClient() {
 
     let clients =
         JSON.parse(
-            localStorage.getItem("clients")
+            localStorage.getItem(
+                "clients"
+            )
         ) || [];
 
 
@@ -713,7 +1251,9 @@ function addClient() {
 
     if (exists) {
 
-        alert("Client code already exists");
+        alert(
+            "Client code already exists"
+        );
 
         return;
 
@@ -730,14 +1270,17 @@ function addClient() {
 
         location: location,
 
-        createdAt: new Date().toISOString()
+        createdAt:
+            new Date().toISOString()
 
     });
 
 
     localStorage.setItem(
         "clients",
-        JSON.stringify(clients)
+        JSON.stringify(
+            clients
+        )
     );
 
 
@@ -746,14 +1289,18 @@ function addClient() {
     codeInput.value = "";
 
     if (locationInput) {
+
         locationInput.value = "";
+
     }
 
 
     loadClients();
 
 
-    alert("Client Added Successfully ✅");
+    alert(
+        "Client Added Successfully ✅"
+    );
 
 }
 
@@ -761,7 +1308,9 @@ function addClient() {
 function loadClients() {
 
     const container =
-        document.getElementById("clientList");
+        document.getElementById(
+            "clientList"
+        );
 
 
     if (!container) return;
@@ -769,7 +1318,9 @@ function loadClients() {
 
     const clients =
         JSON.parse(
-            localStorage.getItem("clients")
+            localStorage.getItem(
+                "clients"
+            )
         ) || [];
 
 
@@ -786,54 +1337,67 @@ function loadClients() {
     }
 
 
-    clients.forEach(client => {
+    clients.forEach(
+        client => {
 
-        container.innerHTML += `
+            container.innerHTML += `
 
-            <div class="settings-list-item">
+                <div class="settings-list-item">
 
-                <div>
+                    <div>
 
-                    <strong>
-                        ${client.name}
-                    </strong>
+                        <strong>
+                            ${client.name}
+                        </strong>
 
-                    <small>
-                        ${client.code}
-                        ${client.location
-                            ? " - " + client.location
-                            : ""}
-                    </small>
+                        <small>
+                            ${client.code}
+                            ${
+                                client.location
+                                    ? " - " +
+                                      client.location
+                                    : ""
+                            }
+                        </small>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        onclick="deleteClient(${client.id})">
+
+                        🗑️
+
+                    </button>
 
                 </div>
 
-                <button
-                    type="button"
-                    onclick="deleteClient(${client.id})">
+            `;
 
-                    🗑️
-
-                </button>
-
-            </div>
-
-        `;
-
-    });
+        }
+    );
 
 }
 
 
 function deleteClient(id) {
 
-    if (!confirm("Delete this client?")) {
+    if (
+        !confirm(
+            "Delete this client?"
+        )
+    ) {
+
         return;
+
     }
 
 
     let clients =
         JSON.parse(
-            localStorage.getItem("clients")
+            localStorage.getItem(
+                "clients"
+            )
         ) || [];
 
 
@@ -846,7 +1410,9 @@ function deleteClient(id) {
 
     localStorage.setItem(
         "clients",
-        JSON.stringify(clients)
+        JSON.stringify(
+            clients
+        )
     );
 
 
@@ -862,15 +1428,21 @@ function deleteClient(id) {
 function changePassword() {
 
     const currentPassword =
-        document.getElementById("currentPassword");
+        document.getElementById(
+            "currentPassword"
+        );
 
 
     const newPassword =
-        document.getElementById("newPassword");
+        document.getElementById(
+            "newPassword"
+        );
 
 
     const confirmPassword =
-        document.getElementById("confirmPassword");
+        document.getElementById(
+            "confirmPassword"
+        );
 
 
     if (
@@ -891,28 +1463,37 @@ function changePassword() {
     const current =
         currentPassword.value;
 
+
     const newPass =
         newPassword.value;
+
 
     const confirmPass =
         confirmPassword.value;
 
 
     const savedPassword =
-        localStorage.getItem("adminPassword")
-        || "admin123";
+        localStorage.getItem(
+            "adminPassword"
+        ) || "admin123";
 
 
-    if (current !== savedPassword) {
+    if (
+        current !== savedPassword
+    ) {
 
-        alert("Current password is incorrect");
+        alert(
+            "Current password is incorrect"
+        );
 
         return;
 
     }
 
 
-    if (newPass.length < 6) {
+    if (
+        newPass.length < 6
+    ) {
 
         alert(
             "New password must contain at least 6 characters"
@@ -923,9 +1504,13 @@ function changePassword() {
     }
 
 
-    if (newPass !== confirmPass) {
+    if (
+        newPass !== confirmPass
+    ) {
 
-        alert("New passwords do not match");
+        alert(
+            "New passwords do not match"
+        );
 
         return;
 
@@ -945,7 +1530,9 @@ function changePassword() {
     confirmPassword.value = "";
 
 
-    alert("Password Changed Successfully ✅");
+    alert(
+        "Password Changed Successfully ✅"
+    );
 
 }
 
@@ -957,34 +1544,50 @@ function changePassword() {
 function saveNotifications() {
 
     const email =
-        document.getElementById("emailNotifications");
+        document.getElementById(
+            "emailNotifications"
+        );
+
 
     const report =
-        document.getElementById("reportNotifications");
+        document.getElementById(
+            "reportNotifications"
+        );
+
 
     const reminder =
-        document.getElementById("reminderNotifications");
+        document.getElementById(
+            "reminderNotifications"
+        );
 
 
     localStorage.setItem(
         "emailNotifications",
-        email ? email.checked : false
+        email
+            ? email.checked
+            : false
     );
 
 
     localStorage.setItem(
         "reportNotifications",
-        report ? report.checked : false
+        report
+            ? report.checked
+            : false
     );
 
 
     localStorage.setItem(
         "reminderNotifications",
-        reminder ? reminder.checked : false
+        reminder
+            ? reminder.checked
+            : false
     );
 
 
-    alert("Notification Settings Saved ✅");
+    alert(
+        "Notification Settings Saved ✅"
+    );
 
 }
 
@@ -992,13 +1595,21 @@ function saveNotifications() {
 function loadNotifications() {
 
     const email =
-        document.getElementById("emailNotifications");
+        document.getElementById(
+            "emailNotifications"
+        );
+
 
     const report =
-        document.getElementById("reportNotifications");
+        document.getElementById(
+            "reportNotifications"
+        );
+
 
     const reminder =
-        document.getElementById("reminderNotifications");
+        document.getElementById(
+            "reminderNotifications"
+        );
 
 
     if (email) {
@@ -1037,48 +1648,65 @@ function loadNotifications() {
    APPEARANCE
 ========================================== */
 
-function saveAppearance() {
+async function saveAppearance() {
 
     const theme =
-        document.getElementById("themeSelect");
+        document.getElementById(
+            "themeSelect"
+        );
 
 
     if (!theme) return;
 
 
-    localStorage.setItem(
-        "theme",
-        theme.value
-    );
+    const selectedTheme =
+        theme.value;
 
 
-    applyTheme(theme.value);
+    try {
+
+        const data =
+            await updateSettingsOnServer({
+
+                theme: selectedTheme
+
+            });
 
 
-    alert("Appearance Saved ✅");
-
-}
+        if (!data) return;
 
 
-function loadAppearance() {
-
-    const theme =
-        localStorage.getItem("theme")
-        || "dark";
-
-
-    const select =
-        document.getElementById("themeSelect");
+        localStorage.setItem(
+            "theme",
+            selectedTheme
+        );
 
 
-    if (select) {
+        applyTheme(
+            selectedTheme
+        );
 
-        select.value = theme;
+
+        alert(
+            "Appearance Saved Successfully ✅"
+        );
 
     }
 
+    catch (error) {
 
-    applyTheme(theme);
+        console.error(
+            "APPEARANCE SAVE ERROR:",
+            error
+        );
+
+
+        alert(
+            "Appearance Save Failed ❌\n" +
+            error.message
+        );
+
+    }
 
 }
 
@@ -1091,13 +1719,17 @@ function applyTheme(theme) {
     );
 
 
-    if (theme === "light") {
+    if (
+        theme === "light"
+    ) {
 
         document.body.classList.add(
             "theme-light"
         );
 
-    } else {
+    }
+
+    else {
 
         document.body.classList.add(
             "theme-dark"
@@ -1125,43 +1757,63 @@ function backupData() {
 
             employees:
                 JSON.parse(
-                    localStorage.getItem("employees")
+                    localStorage.getItem(
+                        "employees"
+                    )
                 ) || [],
 
             clients:
                 JSON.parse(
-                    localStorage.getItem("clients")
+                    localStorage.getItem(
+                        "clients"
+                    )
                 ) || [],
 
             projects:
                 JSON.parse(
-                    localStorage.getItem("projects")
+                    localStorage.getItem(
+                        "projects"
+                    )
                 ) || [],
 
             timesheets:
                 JSON.parse(
-                    localStorage.getItem("timesheets")
+                    localStorage.getItem(
+                        "timesheets"
+                    )
                 ) || [],
 
             settings: {
 
                 adminName:
-                    localStorage.getItem("adminName") || "",
+                    localStorage.getItem(
+                        "adminName"
+                    ) || "",
 
                 adminEmail:
-                    localStorage.getItem("adminEmail") || "",
+                    localStorage.getItem(
+                        "adminEmail"
+                    ) || "",
 
                 companyName:
-                    localStorage.getItem("companyName") || "",
+                    localStorage.getItem(
+                        "companyName"
+                    ) || "",
 
                 companyPhone:
-                    localStorage.getItem("companyPhone") || "",
+                    localStorage.getItem(
+                        "companyPhone"
+                    ) || "",
 
                 companyEmail:
-                    localStorage.getItem("companyEmail") || "",
+                    localStorage.getItem(
+                        "companyEmail"
+                    ) || "",
 
                 companyAddress:
-                    localStorage.getItem("companyAddress") || ""
+                    localStorage.getItem(
+                        "companyAddress"
+                    ) || ""
 
             }
 
@@ -1172,40 +1824,60 @@ function backupData() {
 
     const blob =
         new Blob(
-            [JSON.stringify(backup, null, 2)],
+            [
+                JSON.stringify(
+                    backup,
+                    null,
+                    2
+                )
+            ],
             {
-                type: "application/json"
+                type:
+                    "application/json"
             }
         );
 
 
     const url =
-        URL.createObjectURL(blob);
+        URL.createObjectURL(
+            blob
+        );
 
 
     const link =
-        document.createElement("a");
+        document.createElement(
+            "a"
+        );
 
 
     link.href = url;
 
+
     link.download =
         `dcuts-backup-${new Date()
             .toISOString()
-            .slice(0,10)}.json`;
+            .slice(0, 10)}.json`;
 
 
-    document.body.appendChild(link);
+    document.body.appendChild(
+        link
+    );
+
 
     link.click();
+
 
     link.remove();
 
 
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(
+        url
+    );
 
 
-    alert("Backup Downloaded Successfully ✅");
+    alert(
+        "Backup Downloaded Successfully ✅"
+    );
 
 }
 
@@ -1217,7 +1889,9 @@ function backupData() {
 function restoreData() {
 
     const input =
-        document.getElementById("restoreFile");
+        document.getElementById(
+            "restoreFile"
+        );
 
 
     if (!input) {
@@ -1237,7 +1911,9 @@ function restoreData() {
 
     if (!file) {
 
-        alert("Please select a backup file");
+        alert(
+            "Please select a backup file"
+        );
 
         return;
 
@@ -1248,116 +1924,142 @@ function restoreData() {
         new FileReader();
 
 
-    reader.onload = function(event) {
+    reader.onload =
+        function(event) {
 
-        try {
+            try {
 
-            const backup =
-                JSON.parse(
-                    event.target.result
-                );
-
-
-            if (
-                !backup.data
-            ) {
-
-                throw new Error(
-                    "Invalid backup file"
-                );
-
-            }
-
-
-            if (!confirm(
-                "Restore backup? Existing data may be replaced."
-            )) {
-
-                return;
-
-            }
-
-
-            const data =
-                backup.data;
-
-
-            if (data.employees) {
-
-                localStorage.setItem(
-                    "employees",
-                    JSON.stringify(data.employees)
-                );
-
-            }
-
-
-            if (data.clients) {
-
-                localStorage.setItem(
-                    "clients",
-                    JSON.stringify(data.clients)
-                );
-
-            }
-
-
-            if (data.projects) {
-
-                localStorage.setItem(
-                    "projects",
-                    JSON.stringify(data.projects)
-                );
-
-            }
-
-
-            if (data.timesheets) {
-
-                localStorage.setItem(
-                    "timesheets",
-                    JSON.stringify(data.timesheets)
-                );
-
-            }
-
-
-            if (data.settings) {
-
-                Object.keys(
-                    data.settings
-                ).forEach(key => {
-
-                    localStorage.setItem(
-                        key,
-                        data.settings[key]
+                const backup =
+                    JSON.parse(
+                        event.target.result
                     );
 
-                });
+
+                if (
+                    !backup.data
+                ) {
+
+                    throw new Error(
+                        "Invalid backup file"
+                    );
+
+                }
+
+
+                if (
+                    !confirm(
+                        "Restore backup? Existing data may be replaced."
+                    )
+                ) {
+
+                    return;
+
+                }
+
+
+                const data =
+                    backup.data;
+
+
+                if (
+                    data.employees
+                ) {
+
+                    localStorage.setItem(
+                        "employees",
+                        JSON.stringify(
+                            data.employees
+                        )
+                    );
+
+                }
+
+
+                if (
+                    data.clients
+                ) {
+
+                    localStorage.setItem(
+                        "clients",
+                        JSON.stringify(
+                            data.clients
+                        )
+                    );
+
+                }
+
+
+                if (
+                    data.projects
+                ) {
+
+                    localStorage.setItem(
+                        "projects",
+                        JSON.stringify(
+                            data.projects
+                        )
+                    );
+
+                }
+
+
+                if (
+                    data.timesheets
+                ) {
+
+                    localStorage.setItem(
+                        "timesheets",
+                        JSON.stringify(
+                            data.timesheets
+                        )
+                    );
+
+                }
+
+
+                if (
+                    data.settings
+                ) {
+
+                    Object.keys(
+                        data.settings
+                    ).forEach(
+                        key => {
+
+                            localStorage.setItem(
+                                key,
+                                data.settings[key]
+                            );
+
+                        }
+                    );
+
+                }
+
+
+                alert(
+                    "Backup Restored Successfully ✅"
+                );
+
+
+                location.reload();
 
             }
 
+            catch (error) {
 
-            alert(
-                "Backup Restored Successfully ✅"
-            );
+                alert(
+                    "Invalid backup file ❌"
+                );
 
+            }
 
-            location.reload();
-
-
-        } catch(error) {
-
-            alert(
-                "Invalid backup file ❌"
-            );
-
-        }
-
-    };
+        };
 
 
-    reader.readAsText(file);
+    reader.readAsText(
+        file
+    );
 
 }
 
@@ -1368,16 +2070,28 @@ function restoreData() {
 
 function logoutSettings() {
 
-    if (!confirm("Logout?")) {
+    if (
+        !confirm(
+            "Logout?"
+        )
+    ) {
+
         return;
+
     }
 
 
-    localStorage.removeItem("loggedUser");
+    localStorage.removeItem(
+        "loggedUser"
+    );
 
-    localStorage.removeItem("role");
+    localStorage.removeItem(
+        "role"
+    );
 
-    localStorage.removeItem("userName");
+    localStorage.removeItem(
+        "userName"
+    );
 
 
     window.location.href =
@@ -1390,32 +2104,47 @@ function logoutSettings() {
    GLOBAL FUNCTIONS
 ========================================== */
 
-window.showSection = showSection;
+window.showSection =
+    showSection;
 
-window.saveProfile = saveProfile;
+window.saveProfile =
+    saveProfile;
 
-window.saveCompany = saveCompany;
+window.saveCompany =
+    saveCompany;
 
-window.addEmployee = addEmployee;
+window.addEmployee =
+    addEmployee;
 
-window.deleteEmployee = deleteEmployee;
+window.deleteEmployee =
+    deleteEmployee;
 
-window.addProject = addProject;
+window.addProject =
+    addProject;
 
-window.deleteProject = deleteProject;
+window.deleteProject =
+    deleteProject;
 
-window.addClient = addClient;
+window.addClient =
+    addClient;
 
-window.deleteClient = deleteClient;
+window.deleteClient =
+    deleteClient;
 
-window.changePassword = changePassword;
+window.changePassword =
+    changePassword;
 
-window.saveNotifications = saveNotifications;
+window.saveNotifications =
+    saveNotifications;
 
-window.saveAppearance = saveAppearance;
+window.saveAppearance =
+    saveAppearance;
 
-window.backupData = backupData;
+window.backupData =
+    backupData;
 
-window.restoreData = restoreData;
+window.restoreData =
+    restoreData;
 
-window.logoutSettings = logoutSettings;
+window.logoutSettings =
+    logoutSettings;

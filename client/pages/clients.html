@@ -6,18 +6,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Clients | THE D CUTS</title>
+    <title>Employees | DCUTS.TS</title>
 
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/clients.css">
+    <link rel="stylesheet" href="../css/employees.css">
+    <link rel="stylesheet" href="../css/responsive.css">
 
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
 
 </head>
 
 <body>
+
 <script src="../js/auth.js"></script>
+
 <!-- ================= NAVBAR ================= -->
 
 <nav class="navbar">
@@ -57,7 +62,7 @@
 
         <li>
             <a href="reports.html">
-                <i class="fa-regular fa-file-lines"></i>
+                <i class="fa-solid fa-file-lines"></i>
                 Reports
             </a>
         </li>
@@ -69,14 +74,14 @@
             </a>
         </li>
 
-        <li>
+        <li class="active">
             <a href="employees.html">
                 <i class="fa-solid fa-users"></i>
                 Employees
             </a>
         </li>
 
-        <li class="active">
+        <li>
             <a href="clients.html">
                 <i class="fa-solid fa-user-tie"></i>
                 Clients
@@ -93,61 +98,746 @@
     </ul>
 
     <div class="profile">
+
         <p>Dcuts</p>
+
         <span>
             <i class="fa-solid fa-shield-halved"></i>
             Admin
         </span>
+
     </div>
 
 </nav>
 
-<div class="client-page">
 
-    <div class="client-header">
+<!-- ================= MAIN ================= -->
+
+<main class="employee-page">
+
+    <!-- HEADER -->
+
+    <section class="employee-header">
 
         <div>
 
-            <h1>Client Management</h1>
+            <div class="page-title-row">
 
-            <p>Manage your project clients and locations</p>
+                <div class="title-icon">
+                    <i class="fa-solid fa-users"></i>
+                </div>
 
-        </div>
+                <div>
 
-        <div class="client-total">
+                    <h1>Employee Directory</h1>
 
-            <i class="fa-solid fa-building"></i>
+                    <p>
+                        Manage your employees, roles and workforce information
+                    </p>
 
-            <div>
-
-                <h2 id="clientCount">6</h2>
-
-                <span>Total Clients</span>
+                </div>
 
             </div>
 
         </div>
 
+
+        <div class="header-actions">
+
+            <div class="total-employees">
+
+                <strong id="totalEmployeeCount">0</strong>
+
+                <span>Total Employees</span>
+
+            </div>
+
+            <button
+                class="add-employee-btn"
+                id="openAddEmployee">
+
+                <i class="fa-solid fa-plus"></i>
+
+                Add Employee
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- TOOLBAR -->
+
+    <section class="employee-toolbar">
+
+        <div class="search-box">
+
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input
+                type="text"
+                id="searchEmployee"
+                placeholder="Search employee..."
+            >
+
+        </div>
+
+
+        <select id="departmentFilter">
+
+            <option value="all">
+                All Departments
+            </option>
+
+        </select>
+
+
+        <select id="designationFilter">
+
+            <option value="all">
+                All Designations
+            </option>
+
+        </select>
+
+
+        <select id="statusFilter">
+
+            <option value="all">
+                All Status
+            </option>
+
+            <option value="Active">
+                Active
+            </option>
+
+            <option value="Inactive">
+                Inactive
+            </option>
+
+        </select>
+
+
+        <select id="sortEmployee">
+
+            <option value="name">
+                Sort: Name
+            </option>
+
+            <option value="newest">
+                Newest
+            </option>
+
+            <option value="oldest">
+                Oldest
+            </option>
+
+        </select>
+
+    </section>
+
+
+    <!-- EMPLOYEE GRID -->
+
+    <section
+        id="employeeGrid"
+        class="employee-grid">
+
+    </section>
+
+</main>
+
+
+<!-- ================= ADD / EDIT MODAL ================= -->
+
+<div
+    class="modal-overlay"
+    id="employeeModal">
+
+    <div class="employee-modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="modalTitle">
+                    Add Employee
+                </h2>
+
+                <p>
+                    Enter employee information
+                </p>
+
+            </div>
+
+            <button
+                class="close-modal"
+                id="closeEmployeeModal">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+        <form id="employeeForm">
+
+            <input
+                type="hidden"
+                id="employeeIndex"
+            >
+
+
+            <div class="photo-section">
+
+                <div class="photo-preview">
+
+                    <img
+                        id="photoPreview"
+                        src=""
+                        alt="Employee"
+                    >
+
+                    <div
+                        id="photoInitials"
+                        class="photo-initials">
+
+                        E
+
+                    </div>
+
+                </div>
+
+                <div class="photo-controls">
+
+                    <label>
+                        Profile Photo URL
+                    </label>
+
+                    <input
+                        type="url"
+                        id="empPhoto"
+                        placeholder="https://..."
+                    >
+
+                    <small>
+                        You can paste an employee image URL
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>
+                        Employee Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="empName"
+                        required
+                        placeholder="Employee name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Email *
+                    </label>
+
+                    <input
+                        type="email"
+                        id="empEmail"
+                        required
+                        placeholder="employee@dcuts.team"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Phone
+                    </label>
+
+                    <input
+                        type="text"
+                        id="empPhone"
+                        placeholder="+91 XXXXX XXXXX"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Department
+                    </label>
+
+                    <input
+                        type="text"
+                        id="empDepartment"
+                        placeholder="Editing Department"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Designation
+                    </label>
+
+                    <input
+                        type="text"
+                        id="empDesignation"
+                        placeholder="Video Editor"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Date of Joining
+                    </label>
+
+                    <input
+                        type="date"
+                        id="empJoining"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Location
+                    </label>
+
+                    <input
+                        type="text"
+                        id="empLocation"
+                        placeholder="Salem, India"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Status
+                    </label>
+
+                    <select id="empStatus">
+
+                        <option value="Active">
+                            Active
+                        </option>
+
+                        <option value="Inactive">
+                            Inactive
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Projects
+                    </label>
+
+                    <input
+                        type="number"
+                        id="empProjects"
+                        min="0"
+                        value="0"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Completed
+                    </label>
+
+                    <input
+                        type="number"
+                        id="empCompleted"
+                        min="0"
+                        value="0"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Pending
+                    </label>
+
+                    <input
+                        type="number"
+                        id="empPending"
+                        min="0"
+                        value="0"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Leaves
+                    </label>
+
+                    <input
+                        type="number"
+                        id="empLeaves"
+                        min="0"
+                        value="0"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    id="cancelEmployee">
+
+                    Cancel
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="save-btn">
+
+                    <i class="fa-solid fa-floppy-disk"></i>
+
+                    Save Employee
+
+                </button>
+
+            </div>
+
+        </form>
+
     </div>
-
-    <div class="client-search">
-
-        <i class="fa-solid fa-search"></i>
-
-        <input
-            type="text"
-            id="searchClient"
-            placeholder="Search Client...">
-
-    </div>
-
-    <div id="clientList" class="client-grid"></div>
 
 </div>
 
-<script src="../js/auth.js"></script>
-<script src="../js/sidebar.js"></script>
-<script src="../js/clients.js"></script>
+
+<!-- ================= DETAILS PANEL ================= -->
+
+<div
+    class="details-overlay"
+    id="detailsOverlay">
+
+    <aside class="employee-details">
+
+        <button
+            class="details-close"
+            id="closeDetails">
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+
+        <div class="details-profile">
+
+            <div class="details-photo">
+
+                <img
+                    id="detailsPhoto"
+                    src=""
+                    alt="Employee"
+                >
+
+                <span id="detailsStatusDot"></span>
+
+            </div>
+
+            <h2 id="detailsName">
+                Employee
+            </h2>
+
+            <p id="detailsDesignation">
+                Designation
+            </p>
+
+            <span
+                class="details-status"
+                id="detailsStatus">
+
+                Active
+
+            </span>
+
+        </div>
+
+
+        <div class="details-actions">
+
+            <button title="Call">
+
+                <i class="fa-solid fa-phone"></i>
+
+            </button>
+
+            <button title="Email">
+
+                <i class="fa-solid fa-envelope"></i>
+
+            </button>
+
+            <button title="Message">
+
+                <i class="fa-solid fa-message"></i>
+
+            </button>
+
+            <button title="Calendar">
+
+                <i class="fa-solid fa-calendar-days"></i>
+
+            </button>
+
+        </div>
+
+
+        <div class="details-info">
+
+            <div class="info-row">
+
+                <i class="fa-solid fa-id-card"></i>
+
+                <span>
+                    Employee ID
+                </span>
+
+                <strong id="detailsId">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <i class="fa-solid fa-building"></i>
+
+                <span>
+                    Department
+                </span>
+
+                <strong id="detailsDepartment">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <i class="fa-solid fa-briefcase"></i>
+
+                <span>
+                    Designation
+                </span>
+
+                <strong id="detailsJob">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <i class="fa-solid fa-calendar-plus"></i>
+
+                <span>
+                    Date of Joining
+                </span>
+
+                <strong id="detailsJoining">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <i class="fa-solid fa-envelope"></i>
+
+                <span>
+                    Email
+                </span>
+
+                <strong id="detailsEmail">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <i class="fa-solid fa-phone"></i>
+
+                <span>
+                    Phone
+                </span>
+
+                <strong id="detailsPhone">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <span>
+                    Location
+                </span>
+
+                <strong id="detailsLocation">
+                    -
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="stats-box">
+
+            <div>
+
+                <i class="fa-solid fa-folder"></i>
+
+                <span>
+                    Projects
+                </span>
+
+                <strong id="detailsProjects">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                <span>
+                    Completed
+                </span>
+
+                <strong id="detailsCompleted">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <i class="fa-solid fa-clock"></i>
+
+                <span>
+                    Pending
+                </span>
+
+                <strong id="detailsPending">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <i class="fa-solid fa-calendar-xmark"></i>
+
+                <span>
+                    Leaves
+                </span>
+
+                <strong id="detailsLeaves">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="details-bottom-actions">
+
+            <button
+                id="detailsEdit"
+                class="details-edit">
+
+                <i class="fa-solid fa-pen"></i>
+
+                Edit Employee
+
+            </button>
+
+
+            <button
+                id="detailsDelete"
+                class="details-delete">
+
+                <i class="fa-solid fa-trash"></i>
+
+            </button>
+
+        </div>
+
+    </aside>
+
+</div>
+
+
+<script src="../js/employees.js"></script>
 
 </body>
+
 </html>
