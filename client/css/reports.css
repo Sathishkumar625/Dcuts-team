@@ -1,494 +1,1705 @@
-/* =====================================================
+/* =========================================================
    THE D CUTS
-   TIMESHEET REPORTS
-   COMPACT ADMIN REPORT UI
-===================================================== */
+   PROFESSIONAL REPORTS PAGE
+   EXCEL STYLE / DATA TABLE
+========================================================= */
 
-.report-page {
-    width: 100%;
-    max-width: 1180px;
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.reports-page {
+
+    width: calc(100% - 60px);
+
+    max-width: 1800px;
+
     margin: 0 auto;
-    padding: 24px 20px 40px;
-    box-sizing: border-box;
+
+    padding: 35px 0 60px;
+
+    color: #e5e7eb;
+
 }
 
 
-/* =====================================================
+/* =========================================================
    HEADER
-===================================================== */
+========================================================= */
 
-.report-header {
+.reports-header {
+
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 20px;
-}
 
-.report-header h1 {
-    margin: 0;
-    font-size: 26px;
-    line-height: 1.2;
-}
+    gap: 25px;
 
-.report-header p {
-    margin: 6px 0 0;
-    font-size: 13px;
-    opacity: 0.7;
+    margin-bottom: 28px;
+
 }
 
 
-/* =====================================================
-   REFRESH BUTTON
-===================================================== */
+.reports-title {
 
-.refresh-btn {
-    display: inline-flex;
+    display: flex;
+
     align-items: center;
+
+    gap: 18px;
+
+}
+
+
+.reports-title-icon {
+
+    width: 58px;
+
+    height: 58px;
+
+    border-radius: 16px;
+
+    display: flex;
+
+    align-items: center;
+
     justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #4f46e5
+        );
+
+    box-shadow:
+        0 12px 30px
+        rgba(37,99,235,.25);
+
+}
+
+
+.reports-title-icon i {
+
+    font-size: 25px;
+
+    color: white;
+
+}
+
+
+.reports-title h1 {
+
+    margin: 0;
+
+    font-size: 32px;
+
+    font-weight: 700;
+
+    letter-spacing: -.5px;
+
+}
+
+
+.reports-title p {
+
+    margin: 5px 0 0;
+
+    color: #94a3b8;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.report-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+}
+
+
+.report-btn {
+
+    height: 44px;
+
+    padding: 0 17px;
+
+    border-radius: 11px;
+
+    border: 1px solid
+        rgba(255,255,255,.10);
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
     gap: 8px;
 
-    min-height: 38px;
-    padding: 0 14px;
-
-    border: 0;
-    border-radius: 9px;
+    color: white;
 
     cursor: pointer;
 
-    font-size: 13px;
+    font-size: 14px;
+
     font-weight: 600;
 
-    transition:
-        transform 0.2s ease,
-        opacity 0.2s ease;
-}
+    transition: .2s ease;
 
-.refresh-btn:hover {
-    transform: translateY(-1px);
-    opacity: 0.9;
 }
 
 
-/* =====================================================
+.report-btn:hover {
+
+    transform: translateY(-2px);
+
+}
+
+
+.primary-btn {
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #4f46e5
+        );
+
+    border-color:
+        rgba(96,165,250,.3);
+
+}
+
+
+.secondary-btn {
+
+    background:
+        rgba(255,255,255,.06);
+
+}
+
+
+.dark-btn {
+
+    background:
+        #0f172a;
+
+}
+
+
+/* =========================================================
    SUMMARY
-===================================================== */
+========================================================= */
 
 .report-summary {
+
     display: grid;
 
     grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+        repeat(5, 1fr);
 
-    gap: 12px;
+    gap: 15px;
 
-    margin-bottom: 18px;
+    margin-bottom: 22px;
+
 }
+
 
 .summary-card {
+
+    min-height: 92px;
+
+    padding: 18px;
+
+    border-radius: 16px;
+
     display: flex;
+
     align-items: center;
 
-    gap: 11px;
+    gap: 15px;
 
-    min-height: 70px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.07),
+            rgba(255,255,255,.025)
+        );
 
-    padding: 12px 14px;
+    border:
+        1px solid
+        rgba(255,255,255,.09);
 
-    border-radius: 12px;
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.10);
 
-    box-sizing: border-box;
 }
+
 
 .summary-icon {
-    width: 38px;
-    height: 38px;
 
-    min-width: 38px;
+    width: 48px;
+
+    height: 48px;
+
+    flex-shrink: 0;
+
+    border-radius: 13px;
 
     display: flex;
+
     align-items: center;
+
     justify-content: center;
 
-    border-radius: 10px;
-
-    font-size: 15px;
 }
 
-.summary-card span {
-    display: block;
 
-    font-size: 11px;
-    line-height: 1.2;
-
-    opacity: 0.7;
-}
-
-.summary-card strong {
-    display: block;
-
-    margin-top: 3px;
+.summary-icon i {
 
     font-size: 20px;
-    line-height: 1;
+
 }
 
 
-/* =====================================================
-   MAIN REPORT BOX
-===================================================== */
+.summary-card span {
 
-.report-card {
-    width: 100%;
+    display: block;
 
-    border-radius: 14px;
+    color: #94a3b8;
 
-    overflow: hidden;
+    font-size: 12px;
 
-    box-sizing: border-box;
+    margin-bottom: 4px;
+
 }
 
 
-/* =====================================================
-   TABLE HEADER
-===================================================== */
+.summary-card strong {
 
-.table-header {
+    display: block;
+
+    color: #f8fafc;
+
+    font-size: 24px;
+
+}
+
+
+.summary-card.blue
+.summary-icon {
+
+    background:
+        rgba(37,99,235,.15);
+
+    color: #60a5fa;
+
+}
+
+
+.summary-card.purple
+.summary-icon {
+
+    background:
+        rgba(124,58,237,.15);
+
+    color: #a78bfa;
+
+}
+
+
+.summary-card.green
+.summary-icon {
+
+    background:
+        rgba(22,163,74,.15);
+
+    color: #4ade80;
+
+}
+
+
+.summary-card.orange
+.summary-icon {
+
+    background:
+        rgba(234,88,12,.15);
+
+    color: #fb923c;
+
+}
+
+
+.summary-card.cyan
+.summary-icon {
+
+    background:
+        rgba(8,145,178,.15);
+
+    color: #22d3ee;
+
+}
+
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.report-toolbar {
+
+    padding: 16px;
+
+    margin-bottom: 18px;
+
+    border-radius: 16px;
+
+    background:
+        rgba(15,23,42,.72);
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
     gap: 15px;
 
-    padding: 15px 18px;
-
-    box-sizing: border-box;
 }
 
-.table-header h2 {
-    margin: 0;
 
-    font-size: 17px;
-    line-height: 1.2;
+.search-box {
+
+    width: 330px;
+
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 0 14px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid
+        rgba(255,255,255,.09);
+
 }
 
-.table-header span {
+
+.search-box i {
+
+    color: #64748b;
+
+}
+
+
+.search-box input {
+
+    width: 100%;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: #f8fafc;
+
+    font-size: 13px;
+
+}
+
+
+.search-box input::placeholder {
+
+    color: #64748b;
+
+}
+
+
+.filter-group {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    flex-wrap: wrap;
+
+}
+
+
+.filter-group select,
+.filter-group input {
+
+    height: 42px;
+
+    min-width: 145px;
+
+    padding: 0 12px;
+
+    border-radius: 9px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.09);
+
+    background:
+        #111827;
+
+    color: #cbd5e1;
+
+    outline: none;
+
+    font-size: 12px;
+
+}
+
+
+.filter-group select:focus,
+.filter-group input:focus {
+
+    border-color:
+        #3b82f6;
+
+}
+
+
+.clear-filter-btn {
+
+    height: 42px;
+
+    padding: 0 14px;
+
+    border-radius: 9px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.10);
+
+    background:
+        rgba(239,68,68,.08);
+
+    color: #fca5a5;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    font-size: 12px;
+
+}
+
+
+.clear-filter-btn:hover {
+
+    background:
+        rgba(239,68,68,.15);
+
+    color: #fecaca;
+
+}
+
+
+/* =========================================================
+   TABLE CARD
+========================================================= */
+
+.report-table-card {
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    background:
+        #0b1220;
+
+    border:
+        1px solid
+        rgba(255,255,255,.09);
+
+    box-shadow:
+        0 18px 45px
+        rgba(0,0,0,.18);
+
+}
+
+
+/* =========================================================
+   TABLE TOP
+========================================================= */
+
+.table-topbar {
+
+    min-height: 72px;
+
+    padding: 16px 20px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.08);
+
+}
+
+
+.table-topbar h2 {
+
+    margin: 0 0 4px;
+
+    font-size: 16px;
+
+    color: #f8fafc;
+
+}
+
+
+.table-topbar h2 i {
+
+    color: #60a5fa;
+
+    margin-right: 8px;
+
+}
+
+
+.table-topbar span {
+
+    color: #64748b;
+
     font-size: 11px;
-    opacity: 0.65;
+
 }
 
 
-/* =====================================================
+.table-status {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: #86efac;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+.live-dot {
+
+    width: 7px;
+
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+
+    box-shadow:
+        0 0 10px
+        rgba(34,197,94,.8);
+
+}
+
+
+/* =========================================================
    TABLE WRAPPER
-===================================================== */
+========================================================= */
 
 .table-wrapper {
+
     width: 100%;
 
     overflow-x: auto;
 
-    -webkit-overflow-scrolling: touch;
+    overflow-y: visible;
+
 }
 
 
-/* =====================================================
-   REPORT TABLE
-===================================================== */
+/* =========================================================
+   TABLE
+========================================================= */
 
-.report-table {
+.reports-table {
+
     width: 100%;
 
-    border-collapse: collapse;
+    min-width: 1500px;
 
-    table-layout: auto;
+    border-collapse: separate;
+
+    border-spacing: 0;
 
     font-size: 12px;
+
 }
 
 
-/* =====================================================
-   TABLE HEADER
-===================================================== */
+.reports-table thead {
 
-.report-table thead th {
-    padding: 10px 11px;
+    background:
+        #111c30;
 
-    font-size: 10px;
+}
 
-    font-weight: 700;
+
+.reports-table th {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 5;
+
+    padding: 15px 12px;
 
     text-align: left;
 
     white-space: nowrap;
 
-    letter-spacing: 0.2px;
-}
-
-
-/* =====================================================
-   TABLE BODY
-===================================================== */
-
-.report-table tbody td {
-    padding: 10px 11px;
-
-    vertical-align: middle;
-
-    line-height: 1.35;
-}
-
-
-/* =====================================================
-   EMPLOYEE
-===================================================== */
-
-.report-table tbody td:nth-child(2) {
-    min-width: 115px;
-}
-
-.report-table tbody td:nth-child(2) strong {
-    font-size: 12px;
-}
-
-
-/* =====================================================
-   DATE
-===================================================== */
-
-.report-table tbody td:nth-child(3) {
-    white-space: nowrap;
-}
-
-
-/* =====================================================
-   PROJECT
-===================================================== */
-
-.report-table tbody td:nth-child(4) {
-    min-width: 90px;
-}
-
-.project-badge {
-    display: inline-flex;
-
-    align-items: center;
-
-    max-width: 130px;
-
-    padding: 4px 8px;
-
-    border-radius: 6px;
-
-    font-size: 10px;
-
-    font-weight: 700;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-}
-
-
-/* =====================================================
-   VIDEO NUMBERS
-===================================================== */
-
-.report-table tbody td:nth-child(5),
-.report-table tbody td:nth-child(6),
-.report-table tbody td:nth-child(7) {
-    text-align: center;
-
-    white-space: nowrap;
-
-    min-width: 65px;
-}
-
-
-/* =====================================================
-   COMPLETED BADGE
-===================================================== */
-
-.completed-badge,
-.balance-badge {
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    min-width: 28px;
-    height: 24px;
-
-    padding: 0 7px;
-
-    border-radius: 6px;
-
-    font-size: 10px;
-
-    font-weight: 700;
-}
-
-
-/* =====================================================
-   COMMENTS
-===================================================== */
-
-.report-table tbody td:nth-child(8) {
-    min-width: 160px;
-
-    max-width: 240px;
-}
-
-.comment-text {
-    display: block;
-
-    max-width: 220px;
+    color: #94a3b8;
 
     font-size: 11px;
 
-    line-height: 1.4;
+    font-weight: 700;
+
+    letter-spacing: .5px;
+
+    text-transform: uppercase;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.10);
+
+}
+
+
+.reports-table th:first-child {
+
+    padding-left: 20px;
+
+}
+
+
+.reports-table tbody tr {
+
+    background:
+        rgba(15,23,42,.65);
+
+    transition:
+        background .18s ease;
+
+}
+
+
+.reports-table tbody tr:nth-child(even) {
+
+    background:
+        rgba(30,41,59,.35);
+
+}
+
+
+.reports-table tbody tr:hover {
+
+    background:
+        rgba(37,99,235,.10);
+
+}
+
+
+.reports-table td {
+
+    padding: 13px 12px;
+
+    color: #cbd5e1;
 
     white-space: nowrap;
 
-    overflow: hidden;
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.055);
 
-    text-overflow: ellipsis;
+    vertical-align: middle;
+
 }
 
 
-/* =====================================================
-   LOADING / EMPTY / ERROR
-===================================================== */
+.reports-table td:first-child {
 
-.loading-cell,
-.empty-cell,
-.error-cell {
-    text-align: center;
+    padding-left: 20px;
 
-    padding: 35px 15px !important;
+}
+
+
+.col-number {
+
+    width: 45px;
+
+}
+
+
+.task-column {
+
+    min-width: 300px;
+
+    width: 300px;
+
+}
+
+
+.action-column {
+
+    width: 115px;
+
+}
+
+
+/* =========================================================
+   EMPLOYEE
+========================================================= */
+
+.employee-cell {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.employee-avatar {
+
+    width: 32px;
+
+    height: 32px;
+
+    border-radius: 9px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #7c3aed
+        );
+
+    color: white;
 
     font-size: 12px;
+
+    font-weight: 700;
+
 }
 
-.empty-cell i,
-.error-cell i {
+
+.employee-info strong {
+
+    display: block;
+
+    color: #f8fafc;
+
+    font-size: 12px;
+
+}
+
+
+.employee-info small {
+
+    color: #64748b;
+
+    font-size: 10px;
+
+}
+
+
+/* =========================================================
+   ID
+========================================================= */
+
+.employee-id {
+
+    color: #60a5fa !important;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   CLIENT
+========================================================= */
+
+.client-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 5px 9px;
+
+    border-radius: 7px;
+
+    background:
+        rgba(37,99,235,.10);
+
+    border:
+        1px solid
+        rgba(59,130,246,.18);
+
+    color: #93c5fd;
+
+    font-weight: 700;
+
+    font-size: 10px;
+
+}
+
+
+/* =========================================================
+   PROJECT
+========================================================= */
+
+.project-name {
+
+    color: #f1f5f9;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   TASK
+========================================================= */
+
+.task-details {
+
+    max-width: 300px;
+
+    white-space: normal;
+
+    line-height: 1.55;
+
+    color: #94a3b8;
+
+}
+
+
+/* =========================================================
+   VIDEO COUNTERS
+========================================================= */
+
+.number-cell {
+
+    text-align: center;
+
+    font-weight: 700;
+
+}
+
+
+.total-number {
+
+    color: #93c5fd;
+
+}
+
+
+.completed-number {
+
+    color: #4ade80;
+
+}
+
+
+.balance-number {
+
+    color: #fb923c;
+
+}
+
+
+.balance-zero {
+
+    color: #4ade80;
+
+}
+
+
+/* =========================================================
+   HOURS
+========================================================= */
+
+.hours-cell {
+
+    color: #cbd5e1;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 5px 10px;
+
+    border-radius: 30px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+}
+
+
+.status-badge::before {
+
+    content: "";
+
+    width: 6px;
+
+    height: 6px;
+
+    border-radius: 50%;
+
+}
+
+
+.status-completed {
+
+    color: #86efac;
+
+    background:
+        rgba(34,197,94,.10);
+
+}
+
+
+.status-completed::before {
+
+    background: #22c55e;
+
+}
+
+
+.status-pending {
+
+    color: #fdba74;
+
+    background:
+        rgba(249,115,22,.10);
+
+}
+
+
+.status-pending::before {
+
+    background: #f97316;
+
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.row-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+}
+
+
+.row-action {
+
+    width: 32px;
+
+    height: 32px;
+
+    border-radius: 8px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    cursor: pointer;
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+    background:
+        rgba(255,255,255,.04);
+
+    color: #94a3b8;
+
+    transition: .2s ease;
+
+}
+
+
+.row-action:hover {
+
+    transform: translateY(-2px);
+
+}
+
+
+.view-action:hover {
+
+    color: #60a5fa;
+
+    border-color:
+        rgba(59,130,246,.3);
+
+    background:
+        rgba(37,99,235,.10);
+
+}
+
+
+.edit-action:hover {
+
+    color: #4ade80;
+
+    border-color:
+        rgba(34,197,94,.3);
+
+    background:
+        rgba(34,197,94,.10);
+
+}
+
+
+.delete-action:hover {
+
+    color: #f87171;
+
+    border-color:
+        rgba(239,68,68,.3);
+
+    background:
+        rgba(239,68,68,.10);
+
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.loading-row {
+
+    height: 180px;
+
+    text-align: center !important;
+
+}
+
+
+.table-loader {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    color: #64748b;
+
+}
+
+
+.table-loader i {
+
+    color: #60a5fa;
+
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty-state {
+
+    padding: 70px 20px;
+
+    text-align: center;
+
+}
+
+
+.empty-state.hidden {
+
+    display: none;
+
+}
+
+
+.empty-icon {
+
+    width: 65px;
+
+    height: 65px;
+
+    margin: 0 auto 15px;
+
+    border-radius: 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        rgba(255,255,255,.05);
+
+    color: #64748b;
+
+    font-size: 25px;
+
+}
+
+
+.empty-state h3 {
+
+    margin: 0 0 7px;
+
+    color: #e2e8f0;
+
+}
+
+
+.empty-state p {
+
+    margin: 0 0 20px;
+
+    color: #64748b;
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.report-modal {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+}
+
+
+.report-modal.hidden {
+
+    display: none;
+
+}
+
+
+.modal-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        rgba(2,6,23,.75);
+
+    backdrop-filter:
+        blur(8px);
+
+}
+
+
+.report-modal-box {
+
+    position: relative;
+
+    z-index: 2;
+
+    width: min(760px, calc(100% - 30px));
+
+    max-height: 85vh;
+
+    overflow-y: auto;
+
+    margin: 7vh auto;
+
+    border-radius: 20px;
+
+    background:
+        #0f172a;
+
+    border:
+        1px solid
+        rgba(255,255,255,.10);
+
+    box-shadow:
+        0 30px 80px
+        rgba(0,0,0,.5);
+
+}
+
+
+.modal-header {
+
+    padding: 22px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.08);
+
+}
+
+
+.modal-header span {
+
+    color: #60a5fa;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+}
+
+
+.modal-header h2 {
+
+    margin: 5px 0 0;
+
+    color: white;
+
     font-size: 22px;
 
-    opacity: 0.6;
 }
 
 
-/* =====================================================
-   TABLE ROW
-===================================================== */
+.modal-close {
 
-.report-table tbody tr {
-    transition:
-        background 0.18s ease;
-}
+    width: 38px;
 
-.report-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.03);
-}
+    height: 38px;
 
+    border-radius: 10px;
 
-/* =====================================================
-   RESPONSIVE
-===================================================== */
+    border: none;
 
-@media (max-width: 1000px) {
+    background:
+        rgba(255,255,255,.06);
 
-    .report-page {
-        max-width: 100%;
-        padding: 20px 14px 30px;
-    }
+    color: #94a3b8;
 
-    .report-summary {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
+    cursor: pointer;
 
-    .report-table {
-        min-width: 850px;
-    }
+    font-size: 17px;
 
 }
 
 
-/* =====================================================
-   MOBILE
-===================================================== */
+.modal-close:hover {
 
-@media (max-width: 600px) {
+    color: white;
 
-    .report-page {
-        padding: 16px 10px 25px;
+    background:
+        rgba(239,68,68,.15);
+
+}
+
+
+.modal-content {
+
+    padding: 22px;
+
+}
+
+
+.modal-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 12px;
+
+}
+
+
+.modal-item {
+
+    padding: 14px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255,255,255,.04);
+
+    border:
+        1px solid
+        rgba(255,255,255,.06);
+
+}
+
+
+.modal-item.full {
+
+    grid-column:
+        1 / -1;
+
+}
+
+
+.modal-item span {
+
+    display: block;
+
+    color: #64748b;
+
+    font-size: 10px;
+
+    margin-bottom: 5px;
+
+    text-transform: uppercase;
+
+}
+
+
+.modal-item strong {
+
+    color: #e2e8f0;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+
+
+    body {
+
+        background: white !important;
+
+        color: black !important;
+
     }
 
-    .report-header {
-        align-items: flex-start;
-        flex-direction: column;
-    }
 
-    .report-header h1 {
-        font-size: 22px;
-    }
+    .reports-page {
 
-    .refresh-btn {
         width: 100%;
+
+        max-width: none;
+
+        padding: 0;
+
     }
+
+
+    .reports-header,
+    .report-toolbar,
+    .report-actions,
+    .table-status,
+    .row-actions {
+
+        display: none !important;
+
+    }
+
 
     .report-summary {
-        grid-template-columns: 1fr 1fr;
 
-        gap: 8px;
+        grid-template-columns:
+            repeat(5,1fr);
+
+        margin-bottom: 15px;
+
     }
+
 
     .summary-card {
-        min-height: 62px;
 
-        padding: 9px 10px;
+        color: black;
 
-        gap: 8px;
+        background: white;
+
+        border: 1px solid #ddd;
+
+        box-shadow: none;
+
     }
 
-    .summary-icon {
-        width: 32px;
-        height: 32px;
-
-        min-width: 32px;
-
-        font-size: 13px;
-    }
 
     .summary-card span {
-        font-size: 9px;
+
+        color: #555;
+
     }
+
 
     .summary-card strong {
-        font-size: 17px;
+
+        color: black;
+
     }
 
-    .table-header {
-        padding: 12px 13px;
+
+    .report-table-card {
+
+        background: white;
+
+        border: 1px solid #ddd;
+
+        box-shadow: none;
+
     }
 
-    .table-header h2 {
-        font-size: 14px;
+
+    .table-topbar {
+
+        color: black;
+
+    }
+
+
+    .reports-table {
+
+        color: black;
+
+    }
+
+
+    .reports-table th {
+
+        color: black;
+
+        background: #e5e7eb;
+
+    }
+
+
+    .reports-table td {
+
+        color: #222;
+
+        border-color: #ddd;
+
+    }
+
+
+    .reports-table tbody tr:nth-child(even) {
+
+        background: #f8fafc;
+
     }
 
 }
 
 
-/* =====================================================
-   SMALL MOBILE
-===================================================== */
+/* =========================================================
+   RESPONSIVE
+========================================================= */
 
-@media (max-width: 400px) {
+@media(max-width:1200px) {
 
     .report-summary {
+
+        grid-template-columns:
+            repeat(3,1fr);
+
+    }
+
+
+    .report-toolbar {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .search-box {
+
+        width: 100%;
+
+    }
+
+}
+
+
+@media(max-width:700px) {
+
+    .reports-page {
+
+        width: calc(100% - 30px);
+
+        padding-top: 20px;
+
+    }
+
+
+    .reports-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+
+    .reports-title h1 {
+
+        font-size: 26px;
+
+    }
+
+
+    .report-actions {
+
+        width: 100%;
+
+    }
+
+
+    .report-btn {
+
+        flex: 1;
+
+    }
+
+
+    .report-summary {
+
+        grid-template-columns:
+            repeat(2,1fr);
+
+    }
+
+
+    .filter-group {
+
+        display: grid;
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
+
+    .filter-group select,
+    .filter-group input,
+    .clear-filter-btn {
+
+        width: 100%;
+
+        min-width: 0;
+
+    }
+
+
+    .modal-grid {
+
         grid-template-columns: 1fr;
+
+    }
+
+
+    .modal-item.full {
+
+        grid-column: auto;
+
     }
 
 }

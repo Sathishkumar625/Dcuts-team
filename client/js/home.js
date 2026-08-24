@@ -164,3 +164,24 @@ function logout(){
     window.location.href="login.html";
 
 }
+/* ================================
+   ADMIN LOGOUT
+================================ */
+
+function adminLogout() {
+
+    const confirmLogout = confirm(
+        "Are you sure you want to logout?"
+    );
+
+    if (!confirmLogout) return;
+
+    // Clear login/session data
+    localStorage.removeItem("loggedUser");
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("authToken");
+    sessionStorage.clear();
+
+    // Go back to login/home page
+    window.location.href = "../index.html";
+}

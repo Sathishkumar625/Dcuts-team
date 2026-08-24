@@ -7,165 +7,30 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0">
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Reports | THE D CUTS</title>
 
     <link
         rel="stylesheet"
-        href="../css/style.css">
+        href="../css/style.css"
+    >
 
     <link
         rel="stylesheet"
-        href="../css/reports.css">
+        href="../css/reports.css"
+    >
 
     <link
         rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-
-    <style>
-
-        /* =========================================
-           TASK REPORT BOX
-        ========================================= */
-
-        .report-task-box {
-
-            width: 100%;
-
-            min-height: 150px;
-
-            padding: 28px 30px;
-
-            box-sizing: border-box;
-
-            border: 1px solid rgba(255,255,255,0.16);
-
-            border-radius: 18px;
-
-            background: #101a2b;
-
-            color: #ffffff;
-
-            font-size: 17px;
-
-            line-height: 1.9;
-
-            white-space: pre-wrap;
-
-            word-break: break-word;
-
-            text-align: left;
-
-            box-shadow:
-                inset 0 0 0 1px rgba(255,255,255,0.02);
-
-        }
-
-
-        /* =========================================
-           TASK CONTENT
-        ========================================= */
-
-        .report-task-content {
-
-            margin: 0;
-
-            padding: 0;
-
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-
-            white-space: pre-wrap;
-
-            word-break: break-word;
-
-        }
-
-
-        /* =========================================
-           TASK COLUMN
-        ========================================= */
-
-        .task-report-cell {
-
-            min-width: 420px;
-
-            vertical-align: top;
-
-            padding: 18px !important;
-
-        }
-
-
-        /* =========================================
-           EMPTY TASK
-        ========================================= */
-
-        .empty-task-box {
-
-            width: 100%;
-
-            min-height: 100px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border: 1px solid rgba(255,255,255,0.12);
-
-            border-radius: 16px;
-
-            color: #8994a8;
-
-            background: #101a2b;
-
-        }
-
-
-        /* =========================================
-           EMPLOYEE DISPLAY
-        ========================================= */
-
-        .employee-report-name {
-
-            font-weight: 700;
-
-            color: #ffffff;
-
-            white-space: nowrap;
-
-        }
-
-
-        /* =========================================
-           MOBILE
-        ========================================= */
-
-        @media (max-width: 900px) {
-
-            .task-report-cell {
-
-                min-width: 300px;
-
-            }
-
-            .report-task-box {
-
-                padding: 22px;
-
-                font-size: 15px;
-
-            }
-
-        }
-
-    </style>
+        href="../css/responsive.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
 
 </head>
 
@@ -173,232 +38,98 @@
 <body>
 
 
-<script src="../js/auth.js"></script>
-
-
-<!-- =========================================
-     ADMIN AUTH
-========================================= -->
-
-<script>
-
-const role =
-    String(
-        localStorage.getItem("role") || ""
-    )
-    .toLowerCase()
-    .trim();
-
-
-if (!role) {
-
-    window.location.href =
-        "../login.html";
-
-}
-
-
-if (role !== "admin") {
-
-    window.location.href =
-        "timesheet.html";
-
-}
-
-</script>
-
-
-
-<!-- =========================================
+<!-- ==========================================
      NAVBAR
-========================================= -->
+========================================== -->
 
-<nav class="navbar">
+<div id="navbar-container"></div>
 
-    <div class="logo">
 
-        <div class="logo-icon">
-
-            <i class="fa-regular fa-clock"></i>
-
-        </div>
-
-        <h2>DCUTS.TS</h2>
-
-    </div>
-
-
-    <ul class="menu">
-
-        <li>
-
-            <a href="../index.html">
-
-                <i class="fa-solid fa-house"></i>
-
-                Home
-
-            </a>
-
-        </li>
-
-
-        <li>
-
-            <a href="dashboard.html">
-
-                <i class="fa-solid fa-table-columns"></i>
-
-                Dashboard
-
-            </a>
-
-        </li>
-
-
-        <li>
-
-            <a href="timesheet.html">
-
-                <i class="fa-regular fa-clock"></i>
-
-                Timesheet
-
-            </a>
-
-        </li>
-
-
-        <li class="active">
-
-            <a href="reports.html">
-
-                <i class="fa-regular fa-file-lines"></i>
-
-                Reports
-
-            </a>
-
-        </li>
-
-
-        <li>
-
-            <a href="calendar.html">
-
-                <i class="fa-solid fa-calendar-days"></i>
-
-                Calendar
-
-            </a>
-
-        </li>
-
-
-        <li>
-
-            <a href="employees.html">
-
-                <i class="fa-solid fa-users"></i>
-
-                Employees
-
-            </a>
-
-        </li>
-
-
-        <li>
-
-            <a href="clients.html">
-
-                <i class="fa-solid fa-user-tie"></i>
-
-                Clients
-
-            </a>
-
-        </li>
-
-
-        <li>
-
-            <a href="settings.html">
-
-                <i class="fa-solid fa-gear"></i>
-
-                Settings
-
-            </a>
-
-        </li>
-
-    </ul>
-
-
-    <div class="profile">
-
-        <p>Dcuts</p>
-
-        <span>
-
-            <i class="fa-solid fa-shield-halved"></i>
-
-            Admin
-
-        </span>
-
-    </div>
-
-</nav>
-
-
-
-<!-- =========================================
+<!-- ==========================================
      REPORT PAGE
-========================================= -->
+========================================== -->
 
-<main class="report-page">
+<main class="reports-page">
 
 
-    <div class="report-header">
+    <!-- ======================================
+         PAGE HEADER
+    ======================================= -->
 
-        <div>
+    <section class="reports-header">
 
-            <h1>
-                Timesheet Reports
-            </h1>
+        <div class="reports-title">
 
-            <p>
-                All saved employee timesheet entries
-            </p>
+            <div class="reports-title-icon">
+
+                <i class="fa-solid fa-chart-column"></i>
+
+            </div>
+
+            <div>
+
+                <h1>Reports</h1>
+
+                <p>
+                    Employee timesheet and project performance report
+                </p>
+
+            </div>
 
         </div>
 
 
-        <button
-            type="button"
-            id="refreshReportsBtn"
-            class="refresh-btn">
+        <div class="report-actions">
 
-            <i class="fa-solid fa-rotate"></i>
+            <button
+                id="refreshReports"
+                class="report-btn secondary-btn"
+            >
 
-            Refresh
+                <i class="fa-solid fa-rotate"></i>
 
-        </button>
+                Refresh
 
-    </div>
-
-
-
-    <!-- =========================================
-         SUMMARY
-    ========================================== -->
-
-    <div class="report-summary">
+            </button>
 
 
-        <div class="summary-card">
+            <button
+                id="exportCSV"
+                class="report-btn primary-btn"
+            >
+
+                <i class="fa-solid fa-file-csv"></i>
+
+                Export CSV
+
+            </button>
+
+
+            <button
+                id="printReport"
+                class="report-btn dark-btn"
+            >
+
+                <i class="fa-solid fa-print"></i>
+
+                Print
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================
+         SUMMARY CARDS
+    =========================================== -->
+
+    <section class="report-summary">
+
+
+        <div class="summary-card blue">
 
             <div class="summary-icon">
 
@@ -406,14 +137,11 @@ if (role !== "admin") {
 
             </div>
 
-
             <div>
 
-                <span>
-                    Total Entries
-                </span>
+                <span>Total Records</span>
 
-                <strong id="totalEntries">
+                <strong id="totalRecords">
                     0
                 </strong>
 
@@ -423,7 +151,7 @@ if (role !== "admin") {
 
 
 
-        <div class="summary-card">
+        <div class="summary-card purple">
 
             <div class="summary-icon">
 
@@ -431,12 +159,9 @@ if (role !== "admin") {
 
             </div>
 
-
             <div>
 
-                <span>
-                    Total Videos
-                </span>
+                <span>Total Videos</span>
 
                 <strong id="totalVideos">
                     0
@@ -448,7 +173,7 @@ if (role !== "admin") {
 
 
 
-        <div class="summary-card">
+        <div class="summary-card green">
 
             <div class="summary-icon">
 
@@ -456,12 +181,9 @@ if (role !== "admin") {
 
             </div>
 
-
             <div>
 
-                <span>
-                    Completed Videos
-                </span>
+                <span>Completed</span>
 
                 <strong id="completedVideos">
                     0
@@ -473,7 +195,7 @@ if (role !== "admin") {
 
 
 
-        <div class="summary-card">
+        <div class="summary-card orange">
 
             <div class="summary-icon">
 
@@ -481,12 +203,9 @@ if (role !== "admin") {
 
             </div>
 
-
             <div>
 
-                <span>
-                    Balance Videos
-                </span>
+                <span>Balance</span>
 
                 <strong id="balanceVideos">
                     0
@@ -496,27 +215,151 @@ if (role !== "admin") {
 
         </div>
 
-    </div>
+
+
+        <div class="summary-card cyan">
+
+            <div class="summary-icon">
+
+                <i class="fa-regular fa-clock"></i>
+
+            </div>
+
+            <div>
+
+                <span>Working Hours</span>
+
+                <strong id="workingHours">
+                    0h 0m
+                </strong>
+
+            </div>
+
+        </div>
+
+
+    </section>
 
 
 
-    <!-- =========================================
-         SAVED REPORTS
-    ========================================== -->
+    <!-- ==========================================
+         FILTER BAR
+    =========================================== -->
 
-    <div class="report-card">
-
-
-        <div class="table-header">
-
-            <h2>
-                Saved Timesheet Entries
-            </h2>
+    <section class="report-toolbar">
 
 
-            <span id="reportStatus">
-                Loading...
-            </span>
+        <div class="search-box">
+
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input
+                type="text"
+                id="reportSearch"
+                placeholder="Search employee, project, task..."
+            >
+
+        </div>
+
+
+
+        <div class="filter-group">
+
+
+            <select id="employeeFilter">
+
+                <option value="">
+                    All Employees
+                </option>
+
+            </select>
+
+
+
+            <select id="clientFilter">
+
+                <option value="">
+                    All Clients
+                </option>
+
+            </select>
+
+
+
+            <select id="statusFilter">
+
+                <option value="">
+                    All Status
+                </option>
+
+                <option value="Completed">
+                    Completed
+                </option>
+
+                <option value="Pending">
+                    Pending
+                </option>
+
+            </select>
+
+
+
+            <input
+                type="date"
+                id="dateFilter"
+            >
+
+
+            <button
+                id="clearFilters"
+                class="clear-filter-btn"
+            >
+
+                <i class="fa-solid fa-filter-circle-xmark"></i>
+
+                Clear
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================
+         TABLE
+    =========================================== -->
+
+    <section class="report-table-card">
+
+
+        <div class="table-topbar">
+
+            <div>
+
+                <h2>
+
+                    <i class="fa-solid fa-table"></i>
+
+                    Timesheet Report
+
+                </h2>
+
+                <span id="recordInfo">
+                    Showing 0 records
+                </span>
+
+            </div>
+
+
+            <div class="table-status">
+
+                <span class="live-dot"></span>
+
+                Live Data
+
+            </div>
 
         </div>
 
@@ -524,12 +367,23 @@ if (role !== "admin") {
 
         <div class="table-wrapper">
 
-            <table class="report-table">
 
+            <table
+                id="reportsTable"
+                class="reports-table"
+            >
 
                 <thead>
 
                     <tr>
+
+                        <th class="col-number">
+                            #
+                        </th>
+
+                        <th>
+                            Employee ID
+                        </th>
 
                         <th>
                             Employee
@@ -540,23 +394,47 @@ if (role !== "admin") {
                         </th>
 
                         <th>
-                            Total Task
+                            Client
                         </th>
 
                         <th>
-                            Office Hours
+                            Project
+                        </th>
+
+                        <th class="task-column">
+                            Task Details
                         </th>
 
                         <th>
-                            Working Hours
+                            Total
                         </th>
 
                         <th>
-                            Lunch Break
+                            Completed
                         </th>
 
                         <th>
-                            Comments
+                            Balance
+                        </th>
+
+                        <th>
+                            Office
+                        </th>
+
+                        <th>
+                            Lunch
+                        </th>
+
+                        <th>
+                            Working
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th class="action-column">
+                            Action
                         </th>
 
                     </tr>
@@ -564,16 +442,22 @@ if (role !== "admin") {
                 </thead>
 
 
-
                 <tbody id="reportTableBody">
 
                     <tr>
 
                         <td
-                            colspan="7"
-                            class="loading-cell">
+                            colspan="15"
+                            class="loading-row"
+                        >
 
-                            Loading Timesheet Records...
+                            <div class="table-loader">
+
+                                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                                Loading reports...
+
+                            </div>
 
                         </td>
 
@@ -584,17 +468,115 @@ if (role !== "admin") {
 
             </table>
 
+
         </div>
 
 
-    </div>
+
+        <!-- ======================================
+             EMPTY STATE
+        ======================================= -->
+
+        <div
+            id="emptyState"
+            class="empty-state hidden"
+        >
+
+            <div class="empty-icon">
+
+                <i class="fa-solid fa-folder-open"></i>
+
+            </div>
+
+            <h3>
+                No Reports Found
+            </h3>
+
+            <p>
+                No records match your current filters.
+            </p>
+
+            <button
+                id="emptyClearFilters"
+                class="clear-filter-btn"
+            >
+
+                Clear Filters
+
+            </button>
+
+        </div>
+
+
+    </section>
 
 
 </main>
 
 
 
-<script src="../js/sidebar.js"></script>
+<!-- ==========================================
+     VIEW MODAL
+========================================== -->
+
+<div
+    id="reportModal"
+    class="report-modal hidden"
+>
+
+    <div class="modal-overlay"></div>
+
+
+    <div class="report-modal-box">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <span>
+                    TIMESHEET DETAILS
+                </span>
+
+                <h2 id="modalTitle">
+                    Report Details
+                </h2>
+
+            </div>
+
+
+            <button
+                id="closeModal"
+                class="modal-close"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+
+        <div
+            id="modalContent"
+            class="modal-content"
+        ></div>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- ==========================================
+     SCRIPTS
+========================================== -->
+
+<script src="../js/auth.js"></script>
+
+<script src="../js/navbar.js"></script>
 
 <script src="../js/reports.js"></script>
 
