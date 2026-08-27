@@ -317,10 +317,6 @@ async function loadReports() {
                         "Content-Type":
                             "application/json",
 
-                        /* =================================
-                           JWT AUTHORIZATION
-                        ================================= */
-
                         "Authorization":
                             `Bearer ${
                                 localStorage.getItem(
@@ -549,6 +545,43 @@ function normalizeReport(
         );
 
 
+    /* =====================================================
+       TASK FORMAT
+       IMPORTANT:
+       Keep each employee-entered task on its own line.
+       Do NOT join tasks with comma.
+    ===================================================== */
+
+    const taskText =
+        tasks
+            .map(
+                task => {
+
+                    if (
+                        typeof task === "string"
+                    ) {
+
+                        return task;
+
+                    }
+
+
+                    return (
+                        task?.taskName ||
+                        task?.task ||
+                        task?.description ||
+                        task?.text ||
+                        ""
+                    );
+
+                }
+            )
+            .filter(
+                Boolean
+            )
+            .join("\n");
+
+
     return {
 
         ...report,
@@ -599,16 +632,12 @@ function normalizeReport(
             ) ||
             "",
 
-        taskText:
-            tasks
-                .map(
-                    task =>
-                        task?.taskName ||
-                        task?.task ||
-                        ""
-                )
-                .filter(Boolean)
-                .join(", "),
+        /* =================================================
+           TASKS
+           Original line-by-line format preserved
+        ================================================= */
+
+        taskText,
 
         totalVideos,
 
@@ -1321,11 +1350,21 @@ function createReportRow(
         );
 
 
+    /* =====================================================
+       TASK DISPLAY
+       Preserve line breaks.
+       New lines are converted into <br>.
+    ===================================================== */
+
     const taskText =
         escapeHTML(
             report.taskText ||
             "-"
-        );
+        )
+            .replace(
+                /\r?\n/g,
+                "<br>"
+            );
 
 
     const officeHours =
@@ -1437,7 +1476,10 @@ function createReportRow(
 
         <td>
 
-            <div class="task-details">
+            <div
+                class="task-details"
+                style="white-space: normal; line-height: 1.8;"
+            >
                 ${taskText}
             </div>
 
@@ -1883,15 +1925,17 @@ function openReportModal(
 
 
     /* =====================================================
-       TASK FORMAT
-       KEEP EACH EMPLOYEE TIMESHEET TASK ON ITS OWN LINE
+       TASKS
+       Preserve every task on separate line.
     ===================================================== */
 
     let tasks = "-";
 
 
     if (
-        Array.isArray(report.tasks) &&
+        Array.isArray(
+            report.tasks
+        ) &&
         report.tasks.length
     ) {
 
@@ -1911,14 +1955,12 @@ function openReportModal(
                         }
 
 
-                        const taskName =
+                        return escapeHTML(
                             task?.taskName ||
                             task?.task ||
-                            "";
-
-
-                        return escapeHTML(
-                            taskName
+                            task?.description ||
+                            task?.text ||
+                            ""
                         );
 
                     }
@@ -1939,7 +1981,7 @@ function openReportModal(
                 report.taskText
             )
                 .replace(
-                    /,\s*/g,
+                    /\r?\n/g,
                     "<br>"
                 );
 
@@ -2235,11 +2277,6 @@ function openReportModal(
             </div>
 
 
-            <!-- =================================================
-                 TASKS
-                 SAME TIMESHEET FORMAT
-            ================================================= -->
-
             <div class="modal-item full">
 
                 <span>
@@ -2247,13 +2284,9 @@ function openReportModal(
                 </span>
 
                 <strong
-                    style="
-                        display: block;
-                        white-space: normal;
-                        line-height: 1.8;
-                    "
+                    style="white-space: normal; line-height: 1.8;"
                 >
-                    ${tasks}
+                    ${tasks || "-"}
                 </strong>
 
             </div>
