@@ -315,7 +315,18 @@ async function loadReports() {
                     headers: {
 
                         "Content-Type":
-                            "application/json"
+                            "application/json",
+
+                        /* =================================
+                           JWT AUTHORIZATION
+                        ================================= */
+
+                        "Authorization":
+                            `Bearer ${
+                                localStorage.getItem(
+                                    "token"
+                                ) || ""
+                            }`
 
                     }
 
@@ -1758,7 +1769,14 @@ async function approveReport(
                     headers: {
 
                         "Content-Type":
-                            "application/json"
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${
+                                localStorage.getItem(
+                                    "token"
+                                ) || ""
+                            }`
 
                     },
 
@@ -2334,7 +2352,14 @@ async function deleteReport(
                     headers: {
 
                         "Content-Type":
-                            "application/json"
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${
+                                localStorage.getItem(
+                                    "token"
+                                ) || ""
+                            }`
 
                     }
 
