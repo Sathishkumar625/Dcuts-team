@@ -152,17 +152,17 @@ const timesheetSchema = new mongoose.Schema(
         // ==========================================
         // STATUS
         // ==========================================
-
-        status: {
-            type: String,
-            enum: [
-                "Pending",
-                "In Progress",
-                "Completed",
-                "Rejected"
-            ],
-            default: "Pending"
-        }
+status: {
+    type: String,
+    enum: [
+        "Pending",
+        "Approved",
+        "In Progress",
+        "Completed",
+        "Rejected"
+    ],
+    default: "Pending"
+}
     },
 
 

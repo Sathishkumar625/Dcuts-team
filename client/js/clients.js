@@ -1,12 +1,12 @@
-/* =====================================================
-   THE D CUTS - CLIENT MANAGEMENT
-   Premium Client Cards + Same Page Side Drawer
-===================================================== */
+/* =========================================================
+   THE D CUTS — PREMIUM CLIENT MANAGEMENT
+   clients.js
+========================================================= */
 
 
-/* =====================================================
+/* =========================================================
    DEFAULT CLIENT DATA
-===================================================== */
+========================================================= */
 
 const defaultClients = [
 
@@ -18,10 +18,21 @@ const defaultClients = [
         phone: "",
         email: "",
         status: "Active",
+
         projects: 0,
         completed: 0,
+        pending: 0,
+
         videos: 0,
-        notes: ""
+        weeklyVideos: 0,
+        monthlyVideos: 0,
+
+        weeklyTarget: 0,
+        monthlyTarget: 0,
+
+        notes: "",
+
+        createdAt: new Date().toISOString()
     },
 
     {
@@ -32,10 +43,21 @@ const defaultClients = [
         phone: "",
         email: "",
         status: "Active",
+
         projects: 0,
         completed: 0,
+        pending: 0,
+
         videos: 0,
-        notes: ""
+        weeklyVideos: 0,
+        monthlyVideos: 0,
+
+        weeklyTarget: 0,
+        monthlyTarget: 0,
+
+        notes: "",
+
+        createdAt: new Date().toISOString()
     },
 
     {
@@ -46,10 +68,21 @@ const defaultClients = [
         phone: "",
         email: "",
         status: "Active",
+
         projects: 0,
         completed: 0,
+        pending: 0,
+
         videos: 0,
-        notes: ""
+        weeklyVideos: 0,
+        monthlyVideos: 0,
+
+        weeklyTarget: 0,
+        monthlyTarget: 0,
+
+        notes: "",
+
+        createdAt: new Date().toISOString()
     },
 
     {
@@ -60,10 +93,21 @@ const defaultClients = [
         phone: "",
         email: "",
         status: "Active",
+
         projects: 0,
         completed: 0,
+        pending: 0,
+
         videos: 0,
-        notes: ""
+        weeklyVideos: 0,
+        monthlyVideos: 0,
+
+        weeklyTarget: 0,
+        monthlyTarget: 0,
+
+        notes: "",
+
+        createdAt: new Date().toISOString()
     },
 
     {
@@ -74,10 +118,21 @@ const defaultClients = [
         phone: "",
         email: "",
         status: "Active",
+
         projects: 0,
         completed: 0,
+        pending: 0,
+
         videos: 0,
-        notes: ""
+        weeklyVideos: 0,
+        monthlyVideos: 0,
+
+        weeklyTarget: 0,
+        monthlyTarget: 0,
+
+        notes: "",
+
+        createdAt: new Date().toISOString()
     },
 
     {
@@ -88,50 +143,83 @@ const defaultClients = [
         phone: "",
         email: "",
         status: "Active",
+
         projects: 0,
         completed: 0,
+        pending: 0,
+
         videos: 0,
-        notes: ""
+        weeklyVideos: 0,
+        monthlyVideos: 0,
+
+        weeklyTarget: 0,
+        monthlyTarget: 0,
+
+        notes: "",
+
+        createdAt: new Date().toISOString()
     }
 
 ];
 
 
-/* =====================================================
+/* =========================================================
    LOAD CLIENTS
-===================================================== */
+========================================================= */
 
-let clients =
-    JSON.parse(
-        localStorage.getItem("clients")
-    );
+let clients = [];
 
-
-if (
-    !Array.isArray(clients) ||
-    clients.length === 0
-) {
+try {
 
     clients =
-        defaultClients;
+        JSON.parse(
+            localStorage.getItem("clients")
+        );
+
+} catch (error) {
+
+    clients = [];
+
+}
+
+
+if (!Array.isArray(clients) || clients.length === 0) {
+
+    clients =
+        defaultClients.map(client => ({
+            ...client
+        }));
 
     saveClients();
 
 }
 
 
-/* =====================================================
-   GLOBAL
-===================================================== */
+/* =========================================================
+   NORMALIZE OLD CLIENT DATA
+========================================================= */
+
+clients =
+    clients.map(
+        client => normalizeClient(client)
+    );
+
+
+saveClients();
+
+
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
 
 let selectedClientIndex = -1;
 
 let drawerMode = "view";
 
 
-/* =====================================================
+/* =========================================================
    DOM READY
-===================================================== */
+========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -143,9 +231,9 @@ document.addEventListener(
 );
 
 
-/* =====================================================
+/* =========================================================
    INITIALIZE
-===================================================== */
+========================================================= */
 
 function initializeClients() {
 
@@ -158,9 +246,115 @@ function initializeClients() {
 }
 
 
-/* =====================================================
-   SAVE LOCAL STORAGE
-===================================================== */
+/* =========================================================
+   NORMALIZE CLIENT
+========================================================= */
+
+function normalizeClient(client) {
+
+    const safeClient =
+        client || {};
+
+
+    const projects =
+        toNumber(
+            safeClient.projects
+        );
+
+
+    const completed =
+        Math.min(
+            toNumber(
+                safeClient.completed
+            ),
+            projects
+        );
+
+
+    const pending =
+        Math.max(
+            projects - completed,
+            0
+        );
+
+
+    return {
+
+        code:
+            safeClient.code ||
+            "",
+
+        name:
+            safeClient.name ||
+            "",
+
+        location:
+            safeClient.location ||
+            "",
+
+        contact:
+            safeClient.contact ||
+            "",
+
+        phone:
+            safeClient.phone ||
+            "",
+
+        email:
+            safeClient.email ||
+            "",
+
+        status:
+            safeClient.status ||
+            "Active",
+
+        projects,
+
+        completed,
+
+        pending,
+
+        videos:
+            toNumber(
+                safeClient.videos
+            ),
+
+        weeklyVideos:
+            toNumber(
+                safeClient.weeklyVideos
+            ),
+
+        monthlyVideos:
+            toNumber(
+                safeClient.monthlyVideos
+            ),
+
+        weeklyTarget:
+            toNumber(
+                safeClient.weeklyTarget
+            ),
+
+        monthlyTarget:
+            toNumber(
+                safeClient.monthlyTarget
+            ),
+
+        notes:
+            safeClient.notes ||
+            "",
+
+        createdAt:
+            safeClient.createdAt ||
+            new Date().toISOString()
+
+    };
+
+}
+
+
+/* =========================================================
+   SAVE CLIENTS
+========================================================= */
 
 function saveClients() {
 
@@ -174,12 +368,14 @@ function saveClients() {
 }
 
 
-/* =====================================================
+/* =========================================================
    EVENTS
-===================================================== */
+========================================================= */
 
 function setupEvents() {
 
+
+    /* SEARCH */
 
     const search =
         document.getElementById(
@@ -203,6 +399,8 @@ function setupEvents() {
     }
 
 
+    /* ADD CLIENT */
+
     const addButton =
         document.getElementById(
             "addClientBtn"
@@ -218,6 +416,8 @@ function setupEvents() {
 
     }
 
+
+    /* CLOSE DRAWER */
 
     const closeButton =
         document.getElementById(
@@ -235,6 +435,8 @@ function setupEvents() {
     }
 
 
+    /* CANCEL */
+
     const cancelButton =
         document.getElementById(
             "cancelDrawerBtn"
@@ -250,6 +452,8 @@ function setupEvents() {
 
     }
 
+
+    /* OVERLAY */
 
     const overlay =
         document.getElementById(
@@ -267,6 +471,8 @@ function setupEvents() {
     }
 
 
+    /* SAVE */
+
     const saveButton =
         document.getElementById(
             "saveClientBtn"
@@ -283,6 +489,8 @@ function setupEvents() {
     }
 
 
+    /* DELETE */
+
     const deleteButton =
         document.getElementById(
             "deleteClientBtn"
@@ -298,6 +506,8 @@ function setupEvents() {
 
     }
 
+
+    /* ESCAPE */
 
     document.addEventListener(
         "keydown",
@@ -317,9 +527,9 @@ function setupEvents() {
 }
 
 
-/* =====================================================
+/* =========================================================
    LOAD CLIENTS
-===================================================== */
+========================================================= */
 
 function loadClients(
     keyword = ""
@@ -331,46 +541,48 @@ function loadClients(
         );
 
 
-    if (!clientBox) return;
+    if (!clientBox) {
+
+        return;
+
+    }
 
 
     const search =
-        String(keyword)
-            .trim()
-            .toLowerCase();
+        String(
+            keyword
+        )
+        .trim()
+        .toLowerCase();
 
 
     const filtered =
         clients.filter(
             client => {
 
-                return (
+                const text = [
 
-                    String(
-                        client.code ||
-                        ""
-                    )
-                    .toLowerCase()
-                    .includes(search)
+                    client.code,
 
-                    ||
+                    client.name,
 
-                    String(
-                        client.name ||
-                        ""
-                    )
-                    .toLowerCase()
-                    .includes(search)
+                    client.location,
 
-                    ||
+                    client.contact,
 
-                    String(
-                        client.location ||
-                        ""
-                    )
-                    .toLowerCase()
-                    .includes(search)
+                    client.phone,
 
+                    client.email,
+
+                    client.status
+
+                ]
+                .join(" ")
+                .toLowerCase();
+
+
+                return text.includes(
+                    search
                 );
 
             }
@@ -407,7 +619,11 @@ function loadClients(
 
         `;
 
-        updateResultCount(0);
+
+        updateResultCount(
+            0
+        );
+
 
         return;
 
@@ -423,11 +639,13 @@ function loadClients(
                 );
 
 
-            clientBox.innerHTML +=
+            clientBox.insertAdjacentHTML(
+                "beforeend",
                 createClientCard(
                     client,
                     realIndex
-                );
+                )
+            );
 
         }
     );
@@ -440,9 +658,9 @@ function loadClients(
 }
 
 
-/* =====================================================
+/* =========================================================
    CREATE CLIENT CARD
-===================================================== */
+========================================================= */
 
 function createClientCard(
     client,
@@ -455,21 +673,21 @@ function createClientCard(
 
 
     const projects =
-        Number(
+        toNumber(
             client.projects
-        ) || 0;
+        );
 
 
     const completed =
-        Number(
+        toNumber(
             client.completed
-        ) || 0;
+        );
 
 
     const videos =
-        Number(
+        toNumber(
             client.videos
-        ) || 0;
+        );
 
 
     return `
@@ -479,12 +697,10 @@ function createClientCard(
             onclick="openViewDrawer(${index})"
         >
 
-
             <div class="client-card-glow"></div>
 
 
             <div class="client-card-top">
-
 
                 <div class="client-icon">
 
@@ -496,9 +712,11 @@ function createClientCard(
                 <span
                     class="
                         client-status
-                        ${status === "Active"
-                            ? "status-active"
-                            : "status-inactive"}
+                        ${
+                            status === "Active"
+                                ? "status-active"
+                                : "status-inactive"
+                        }
                     "
                 >
 
@@ -508,9 +726,7 @@ function createClientCard(
 
                 </span>
 
-
             </div>
-
 
 
             <div class="client-code">
@@ -523,7 +739,6 @@ function createClientCard(
             </div>
 
 
-
             <h2 class="client-name">
 
                 ${escapeHtml(
@@ -532,7 +747,6 @@ function createClientCard(
                 )}
 
             </h2>
-
 
 
             <div class="client-location">
@@ -551,9 +765,7 @@ function createClientCard(
             </div>
 
 
-
             <div class="client-mini-stats">
-
 
                 <div>
 
@@ -593,21 +805,18 @@ function createClientCard(
 
                 </div>
 
-
             </div>
-
 
 
             <div class="client-card-footer">
 
                 <span>
-                    View Details
+                    View Complete Details
                 </span>
 
                 <i class="fa-solid fa-arrow-right"></i>
 
             </div>
-
 
         </article>
 
@@ -616,12 +825,11 @@ function createClientCard(
 }
 
 
-/* =====================================================
-   UPDATE SUMMARY
-===================================================== */
+/* =========================================================
+   SUMMARY
+========================================================= */
 
 function updateSummary() {
-
 
     const total =
         clients.length;
@@ -644,16 +852,14 @@ function updateSummary() {
     const projects =
         clients.reduce(
             (
-                total,
+                sum,
                 client
             ) => {
 
                 return (
-                    total +
-                    (
-                        Number(
-                            client.projects
-                        ) || 0
+                    sum +
+                    toNumber(
+                        client.projects
                     )
                 );
 
@@ -685,13 +891,12 @@ function updateSummary() {
         projects
     );
 
-
 }
 
 
-/* =====================================================
+/* =========================================================
    RESULT COUNT
-===================================================== */
+========================================================= */
 
 function updateResultCount(
     count
@@ -709,9 +914,9 @@ function updateResultCount(
 }
 
 
-/* =====================================================
-   VIEW DRAWER
-===================================================== */
+/* =========================================================
+   OPEN VIEW DRAWER
+========================================================= */
 
 function openViewDrawer(
     index
@@ -748,17 +953,29 @@ function openViewDrawer(
     );
 
 
+    setText(
+        "drawerMode",
+        "Client Details"
+    );
+
+
+    setText(
+        "drawerTitle",
+        client.name ||
+        "Client Details"
+    );
+
+
     openDrawer();
 
 }
 
 
-/* =====================================================
-   ADD DRAWER
-===================================================== */
+/* =========================================================
+   OPEN ADD DRAWER
+========================================================= */
 
 function openAddDrawer() {
-
 
     selectedClientIndex =
         -1;
@@ -788,7 +1005,17 @@ function openAddDrawer() {
 
         completed: 0,
 
+        pending: 0,
+
         videos: 0,
+
+        weeklyVideos: 0,
+
+        monthlyVideos: 0,
+
+        weeklyTarget: 0,
+
+        monthlyTarget: 0,
 
         notes: ""
 
@@ -822,114 +1049,162 @@ function openAddDrawer() {
 }
 
 
-/* =====================================================
-   FILL DRAWER
-===================================================== */
+/* =========================================================
+   FILL DRAWER DETAILS
+========================================================= */
 
 function fillDrawerDetails(
     client
 ) {
 
+    client =
+        normalizeClient(
+            client
+        );
+
+
+    /* PROFILE */
 
     setText(
         "drawerClientCode",
-        client.code || "--"
+        client.code ||
+        "--"
     );
 
 
     setText(
         "drawerClientName",
-        client.name || "New Client"
+        client.name ||
+        "New Client"
     );
 
 
     setText(
         "drawerStatus",
-        client.status || "Active"
+        client.status ||
+        "Active"
     );
 
 
+    /* BASIC DETAILS */
+
     setText(
         "detailCode",
-        client.code || "--"
+        client.code ||
+        "--"
     );
 
 
     setText(
         "detailName",
-        client.name || "--"
+        client.name ||
+        "--"
     );
 
 
     setText(
         "detailLocation",
-        client.location || "--"
+        client.location ||
+        "--"
     );
 
 
     setText(
         "detailPhone",
-        client.phone || "--"
+        client.phone ||
+        "--"
     );
 
 
     setText(
         "detailEmail",
-        client.email || "--"
+        client.email ||
+        "--"
     );
 
 
     setText(
         "detailContact",
-        client.contact || "--"
+        client.contact ||
+        "--"
     );
 
 
+    /* PROJECT */
+
     setText(
         "detailProjects",
-        Number(
-            client.projects
-        ) || 0
+        client.projects
     );
 
 
     setText(
         "detailCompleted",
-        Number(
-            client.completed
-        ) || 0
+        client.completed
     );
-
-
-    const pending =
-        Math.max(
-            (
-                Number(
-                    client.projects
-                ) || 0
-            ) -
-            (
-                Number(
-                    client.completed
-                ) || 0
-            ),
-            0
-        );
 
 
     setText(
         "detailPending",
-        pending
+        client.pending
     );
 
 
     setText(
         "detailVideos",
-        Number(
-            client.videos
-        ) || 0
+        client.videos
     );
 
+
+    /* WEEKLY */
+
+    setText(
+        "detailWeeklyVideos",
+        client.weeklyVideos
+    );
+
+
+    setText(
+        "detailWeeklyTarget",
+        client.weeklyTarget
+    );
+
+
+    setText(
+        "detailWeeklyBalance",
+        Math.max(
+            client.weeklyTarget -
+            client.weeklyVideos,
+            0
+        )
+    );
+
+
+    /* MONTHLY */
+
+    setText(
+        "detailMonthlyVideos",
+        client.monthlyVideos
+    );
+
+
+    setText(
+        "detailMonthlyTarget",
+        client.monthlyTarget
+    );
+
+
+    setText(
+        "detailMonthlyBalance",
+        Math.max(
+            client.monthlyTarget -
+            client.monthlyVideos,
+            0
+        )
+    );
+
+
+    /* NOTES */
 
     setText(
         "detailNotes",
@@ -937,6 +1212,8 @@ function fillDrawerDetails(
         "No notes available."
     );
 
+
+    /* STATUS */
 
     const statusElement =
         document.getElementById(
@@ -963,14 +1240,13 @@ function fillDrawerDetails(
 }
 
 
-/* =====================================================
+/* =========================================================
    FILL EDIT FIELDS
-===================================================== */
+========================================================= */
 
 function fillEditFields(
     client
 ) {
-
 
     setInput(
         "editCode",
@@ -1010,25 +1286,43 @@ function fillEditFields(
 
     setInput(
         "editProjects",
-        Number(
-            client.projects
-        ) || 0
+        client.projects
     );
 
 
     setInput(
         "editCompleted",
-        Number(
-            client.completed
-        ) || 0
+        client.completed
     );
 
 
     setInput(
         "editVideos",
-        Number(
-            client.videos
-        ) || 0
+        client.videos
+    );
+
+
+    setInput(
+        "editWeeklyVideos",
+        client.weeklyVideos
+    );
+
+
+    setInput(
+        "editWeeklyTarget",
+        client.weeklyTarget
+    );
+
+
+    setInput(
+        "editMonthlyVideos",
+        client.monthlyVideos
+    );
+
+
+    setInput(
+        "editMonthlyTarget",
+        client.monthlyTarget
     );
 
 
@@ -1055,14 +1349,13 @@ function fillEditFields(
 }
 
 
-/* =====================================================
+/* =========================================================
    EDIT MODE
-===================================================== */
+========================================================= */
 
 function setEditMode(
     editing
 ) {
-
 
     const form =
         document.getElementById(
@@ -1131,21 +1424,16 @@ function setEditMode(
     }
 
 
-    if (!editing) {
-
-        createEditButtonIfNeeded();
-
-    }
+    createEditButtonIfNeeded();
 
 }
 
 
-/* =====================================================
-   EDIT BUTTON
-===================================================== */
+/* =========================================================
+   CREATE EDIT BUTTON
+========================================================= */
 
 function createEditButtonIfNeeded() {
-
 
     const actions =
         document.querySelector(
@@ -1153,7 +1441,11 @@ function createEditButtonIfNeeded() {
         );
 
 
-    if (!actions) return;
+    if (!actions) {
+
+        return;
+
+    }
 
 
     let editButton =
@@ -1182,16 +1474,27 @@ function createEditButtonIfNeeded() {
             "drawer-edit-btn";
 
 
-        editButton.innerHTML =
-            `
-                <i class="fa-solid fa-pen"></i>
-                Edit
-            `;
+        editButton.innerHTML = `
+
+            <i class="fa-solid fa-pen"></i>
+
+            Edit
+
+        `;
 
 
         editButton.addEventListener(
             "click",
             () => {
+
+                if (
+                    selectedClientIndex < 0
+                ) {
+
+                    return;
+
+                }
+
 
                 drawerMode =
                     "edit";
@@ -1217,12 +1520,28 @@ function createEditButtonIfNeeded() {
         );
 
 
-        actions.insertBefore(
-            editButton,
-            actions.children[
-                actions.children.length - 1
-            ]
-        );
+        const saveButton =
+            document.getElementById(
+                "saveClientBtn"
+            );
+
+
+        if (
+            saveButton
+        ) {
+
+            actions.insertBefore(
+                editButton,
+                saveButton
+            );
+
+        } else {
+
+            actions.appendChild(
+                editButton
+            );
+
+        }
 
     }
 
@@ -1235,12 +1554,11 @@ function createEditButtonIfNeeded() {
 }
 
 
-/* =====================================================
+/* =========================================================
    SAVE CLIENT
-===================================================== */
+========================================================= */
 
 function saveClientFromDrawer() {
-
 
     const code =
         getInputValue(
@@ -1286,27 +1604,62 @@ function saveClientFromDrawer() {
 
 
     const projects =
-        Number(
+        toNumber(
             getInputValue(
                 "editProjects"
             )
-        ) || 0;
+        );
 
 
     const completed =
-        Number(
-            getInputValue(
-                "editCompleted"
-            )
-        ) || 0;
+        Math.min(
+            toNumber(
+                getInputValue(
+                    "editCompleted"
+                )
+            ),
+            projects
+        );
 
 
     const videos =
-        Number(
+        toNumber(
             getInputValue(
                 "editVideos"
             )
-        ) || 0;
+        );
+
+
+    const weeklyVideos =
+        toNumber(
+            getInputValue(
+                "editWeeklyVideos"
+            )
+        );
+
+
+    const weeklyTarget =
+        toNumber(
+            getInputValue(
+                "editWeeklyTarget"
+            )
+        );
+
+
+    const monthlyVideos =
+        toNumber(
+            getInputValue(
+                "editMonthlyVideos"
+            )
+        );
+
+
+    const monthlyTarget =
+        toNumber(
+            getInputValue(
+                "editMonthlyTarget"
+            )
+        );
 
 
     const notes =
@@ -1314,6 +1667,8 @@ function saveClientFromDrawer() {
             "editNotes"
         );
 
+
+    /* VALIDATION */
 
     if (!code) {
 
@@ -1347,6 +1702,8 @@ function saveClientFromDrawer() {
 
     }
 
+
+    /* DUPLICATE CODE */
 
     const duplicate =
         clients.some(
@@ -1388,6 +1745,8 @@ function saveClientFromDrawer() {
     }
 
 
+    /* CLIENT OBJECT */
+
     const clientData = {
 
         code,
@@ -1406,28 +1765,58 @@ function saveClientFromDrawer() {
 
         projects,
 
-        completed:
-            Math.min(
+        completed,
+
+        pending:
+            Math.max(
+                projects -
                 completed,
-                projects
+                0
             ),
 
         videos,
 
-        notes
+        weeklyVideos,
+
+        monthlyVideos,
+
+        weeklyTarget,
+
+        monthlyTarget,
+
+        notes,
+
+        createdAt:
+            selectedClientIndex >= 0
+                ? (
+                    clients[
+                        selectedClientIndex
+                    ]?.createdAt ||
+                    new Date().toISOString()
+                )
+                : new Date().toISOString()
 
     };
 
 
-    if (
-        selectedClientIndex === -1
-    ) {
+    /* ADD */
+
+    const isAdding =
+        selectedClientIndex === -1;
+
+
+    if (isAdding) {
 
         clients.push(
             clientData
         );
 
+        selectedClientIndex =
+            clients.length - 1;
+
     }
+
+    /* UPDATE */
 
     else {
 
@@ -1438,6 +1827,8 @@ function saveClientFromDrawer() {
 
     }
 
+
+    /* SAVE */
 
     saveClients();
 
@@ -1475,7 +1866,7 @@ function saveClientFromDrawer() {
 
 
     alert(
-        selectedClientIndex === -1
+        isAdding
             ? "Client added successfully."
             : "Client updated successfully."
     );
@@ -1483,12 +1874,11 @@ function saveClientFromDrawer() {
 }
 
 
-/* =====================================================
+/* =========================================================
    DELETE CLIENT
-===================================================== */
+========================================================= */
 
 function deleteSelectedClient() {
-
 
     if (
         selectedClientIndex < 0
@@ -1503,6 +1893,13 @@ function deleteSelectedClient() {
         clients[
             selectedClientIndex
         ];
+
+
+    if (!client) {
+
+        return;
+
+    }
 
 
     const confirmDelete =
@@ -1540,12 +1937,11 @@ function deleteSelectedClient() {
 }
 
 
-/* =====================================================
+/* =========================================================
    OPEN DRAWER
-===================================================== */
+========================================================= */
 
 function openDrawer() {
-
 
     const drawer =
         document.getElementById(
@@ -1559,7 +1955,11 @@ function openDrawer() {
         );
 
 
-    if (!drawer) return;
+    if (!drawer) {
+
+        return;
+
+    }
 
 
     drawer.classList.add(
@@ -1586,12 +1986,11 @@ function openDrawer() {
 }
 
 
-/* =====================================================
+/* =========================================================
    CLOSE DRAWER
-===================================================== */
+========================================================= */
 
 function closeDrawer() {
-
 
     const drawer =
         document.getElementById(
@@ -1631,12 +2030,49 @@ function closeDrawer() {
     selectedClientIndex =
         -1;
 
+
+    drawerMode =
+        "view";
+
 }
 
 
-/* =====================================================
-   HELPERS
-===================================================== */
+/* =========================================================
+   NUMBER HELPER
+========================================================= */
+
+function toNumber(
+    value
+) {
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        Number.isFinite(
+            number
+        )
+    ) {
+
+        return Math.max(
+            number,
+            0
+        );
+
+    }
+
+
+    return 0;
+
+}
+
+
+/* =========================================================
+   SET TEXT
+========================================================= */
 
 function setText(
     id,
@@ -1652,12 +2088,16 @@ function setText(
     if (element) {
 
         element.textContent =
-            value;
+            value ?? "";
 
     }
 
 }
 
+
+/* =========================================================
+   SET INPUT
+========================================================= */
 
 function setInput(
     id,
@@ -1680,6 +2120,10 @@ function setInput(
 }
 
 
+/* =========================================================
+   GET INPUT
+========================================================= */
+
 function getInputValue(
     id
 ) {
@@ -1694,6 +2138,10 @@ function getInputValue(
 
 }
 
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
 
 function escapeHtml(
     value
@@ -1731,9 +2179,9 @@ function escapeHtml(
 }
 
 
-/* =====================================================
-   GLOBAL
-===================================================== */
+/* =========================================================
+   GLOBAL FUNCTIONS
+========================================================= */
 
 window.openViewDrawer =
     openViewDrawer;
@@ -1749,3 +2197,6 @@ window.saveClientFromDrawer =
 
 window.deleteSelectedClient =
     deleteSelectedClient;
+
+window.loadClients =
+    loadClients;

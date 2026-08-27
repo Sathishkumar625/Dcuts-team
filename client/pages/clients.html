@@ -4,13 +4,28 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Employees | DCUTS.TS</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/employees.css">
-    <link rel="stylesheet" href="../css/responsive.css">
+    <title>Clients | THE D CUTS</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/clients.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
 
     <link
         rel="stylesheet"
@@ -19,824 +34,982 @@
 
 </head>
 
+
 <body>
+
+
+<!-- =====================================================
+     AUTH
+===================================================== -->
 
 <script src="../js/auth.js"></script>
 
-<!-- ================= NAVBAR ================= -->
 
-<nav class="navbar">
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
 
-    <div class="logo">
+<div id="navbar-container"></div>
 
-        <div class="logo-icon">
-            <i class="fa-regular fa-clock"></i>
-        </div>
 
-        <h2>DCUTS.TS</h2>
+<!-- =====================================================
+     CLIENT PAGE
+===================================================== -->
 
-    </div>
+<main class="client-page">
 
-    <ul class="menu">
 
-        <li>
-            <a href="../index.html">
-                <i class="fa-solid fa-house"></i>
-                Home
-            </a>
-        </li>
+    <!-- =================================================
+         HEADER
+    ================================================== -->
 
-        <li>
-            <a href="dashboard.html">
-                <i class="fa-solid fa-table-columns"></i>
-                Dashboard
-            </a>
-        </li>
+    <section class="client-header">
 
-        <li>
-            <a href="timesheet.html">
-                <i class="fa-regular fa-clock"></i>
-                Timesheet
-            </a>
-        </li>
 
-        <li>
-            <a href="reports.html">
-                <i class="fa-solid fa-file-lines"></i>
-                Reports
-            </a>
-        </li>
+        <div class="client-title-area">
 
-        <li>
-            <a href="calendar.html">
-                <i class="fa-solid fa-calendar-days"></i>
-                Calendar
-            </a>
-        </li>
+            <div class="client-title-icon">
 
-        <li class="active">
-            <a href="employees.html">
-                <i class="fa-solid fa-users"></i>
-                Employees
-            </a>
-        </li>
-
-        <li>
-            <a href="clients.html">
                 <i class="fa-solid fa-user-tie"></i>
-                Clients
-            </a>
-        </li>
 
-        <li>
-            <a href="settings.html">
-                <i class="fa-solid fa-gear"></i>
-                Settings
-            </a>
-        </li>
-
-    </ul>
-
-    <div class="profile">
-
-        <p>Dcuts</p>
-
-        <span>
-            <i class="fa-solid fa-shield-halved"></i>
-            Admin
-        </span>
-
-    </div>
-
-</nav>
+            </div>
 
 
-<!-- ================= MAIN ================= -->
+            <div>
 
-<main class="employee-page">
+                <h1>
+                    Client Management
+                </h1>
 
-    <!-- HEADER -->
-
-    <section class="employee-header">
-
-        <div>
-
-            <div class="page-title-row">
-
-                <div class="title-icon">
-                    <i class="fa-solid fa-users"></i>
-                </div>
-
-                <div>
-
-                    <h1>Employee Directory</h1>
-
-                    <p>
-                        Manage your employees, roles and workforce information
-                    </p>
-
-                </div>
+                <p>
+                    Manage clients, projects and business performance
+                </p>
 
             </div>
 
         </div>
 
 
-        <div class="header-actions">
+        <button
+            type="button"
+            class="add-client-btn"
+            id="addClientBtn"
+        >
 
-            <div class="total-employees">
+            <i class="fa-solid fa-plus"></i>
 
-                <strong id="totalEmployeeCount">0</strong>
+            Add Client
 
-                <span>Total Employees</span>
+        </button>
 
-            </div>
-
-            <button
-                class="add-employee-btn"
-                id="openAddEmployee">
-
-                <i class="fa-solid fa-plus"></i>
-
-                Add Employee
-
-            </button>
-
-        </div>
 
     </section>
 
 
-    <!-- TOOLBAR -->
 
-    <section class="employee-toolbar">
+    <!-- =================================================
+         SUMMARY
+    ================================================== -->
 
-        <div class="search-box">
+    <section class="client-summary-grid">
+
+
+        <!-- TOTAL -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon blue">
+
+                <i class="fa-solid fa-users"></i>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Total Clients
+                </span>
+
+                <strong id="clientCount">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ACTIVE -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon green">
+
+                <i class="fa-solid fa-circle-check"></i>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Active Clients
+                </span>
+
+                <strong id="activeClientCount">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- INACTIVE -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon red">
+
+                <i class="fa-solid fa-circle-xmark"></i>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Inactive Clients
+                </span>
+
+                <strong id="inactiveClientCount">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- PROJECTS -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon purple">
+
+                <i class="fa-solid fa-folder-open"></i>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Total Projects
+                </span>
+
+                <strong id="projectCount">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =================================================
+         SEARCH
+    ================================================== -->
+
+    <section class="client-toolbar">
+
+
+        <div class="client-search">
 
             <i class="fa-solid fa-magnifying-glass"></i>
 
             <input
                 type="text"
-                id="searchEmployee"
-                placeholder="Search employee..."
+                id="searchClient"
+                placeholder="Search client, code or location..."
+                autocomplete="off"
             >
 
         </div>
 
 
-        <select id="departmentFilter">
+        <div class="client-result-count">
 
-            <option value="all">
-                All Departments
-            </option>
+            <i class="fa-solid fa-list"></i>
 
-        </select>
+            <span id="resultCount">
+                0 Clients
+            </span>
 
+        </div>
 
-        <select id="designationFilter">
-
-            <option value="all">
-                All Designations
-            </option>
-
-        </select>
-
-
-        <select id="statusFilter">
-
-            <option value="all">
-                All Status
-            </option>
-
-            <option value="Active">
-                Active
-            </option>
-
-            <option value="Inactive">
-                Inactive
-            </option>
-
-        </select>
-
-
-        <select id="sortEmployee">
-
-            <option value="name">
-                Sort: Name
-            </option>
-
-            <option value="newest">
-                Newest
-            </option>
-
-            <option value="oldest">
-                Oldest
-            </option>
-
-        </select>
 
     </section>
 
 
-    <!-- EMPLOYEE GRID -->
+
+    <!-- =================================================
+         CLIENT GRID
+    ================================================== -->
 
     <section
-        id="employeeGrid"
-        class="employee-grid">
+        id="clientList"
+        class="client-grid"
+    >
+
+        <!-- JS LOADS CLIENT CARDS -->
 
     </section>
+
 
 </main>
 
 
-<!-- ================= ADD / EDIT MODAL ================= -->
+
+<!-- =====================================================
+     CLIENT OVERLAY
+===================================================== -->
 
 <div
-    class="modal-overlay"
-    id="employeeModal">
+    id="clientOverlay"
+    class="client-overlay"
+></div>
 
-    <div class="employee-modal">
 
-        <div class="modal-header">
 
-            <div>
+<!-- =====================================================
+     CLIENT DRAWER
+===================================================== -->
 
-                <h2 id="modalTitle">
-                    Add Employee
-                </h2>
+<aside
+    id="clientDrawer"
+    class="client-drawer"
+>
 
-                <p>
-                    Enter employee information
-                </p>
 
-            </div>
+    <!-- =================================================
+         DRAWER HEADER
+    ================================================== -->
 
-            <button
-                class="close-modal"
-                id="closeEmployeeModal">
+    <header class="drawer-header">
 
-                <i class="fa-solid fa-xmark"></i>
 
-            </button>
+        <div>
+
+            <span
+                id="drawerMode"
+                class="drawer-small-title"
+            >
+                Client Details
+            </span>
+
+
+            <h2 id="drawerTitle">
+                Client
+            </h2>
 
         </div>
 
 
-        <form id="employeeForm">
-
-            <input
-                type="hidden"
-                id="employeeIndex"
-            >
-
-
-            <div class="photo-section">
-
-                <div class="photo-preview">
-
-                    <img
-                        id="photoPreview"
-                        src=""
-                        alt="Employee"
-                    >
-
-                    <div
-                        id="photoInitials"
-                        class="photo-initials">
-
-                        E
-
-                    </div>
-
-                </div>
-
-                <div class="photo-controls">
-
-                    <label>
-                        Profile Photo URL
-                    </label>
-
-                    <input
-                        type="url"
-                        id="empPhoto"
-                        placeholder="https://..."
-                    >
-
-                    <small>
-                        You can paste an employee image URL
-                    </small>
-
-                </div>
-
-            </div>
-
-
-            <div class="form-grid">
-
-                <div class="form-group">
-
-                    <label>
-                        Employee Name *
-                    </label>
-
-                    <input
-                        type="text"
-                        id="empName"
-                        required
-                        placeholder="Employee name"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Email *
-                    </label>
-
-                    <input
-                        type="email"
-                        id="empEmail"
-                        required
-                        placeholder="employee@dcuts.team"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Phone
-                    </label>
-
-                    <input
-                        type="text"
-                        id="empPhone"
-                        placeholder="+91 XXXXX XXXXX"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Department
-                    </label>
-
-                    <input
-                        type="text"
-                        id="empDepartment"
-                        placeholder="Editing Department"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Designation
-                    </label>
-
-                    <input
-                        type="text"
-                        id="empDesignation"
-                        placeholder="Video Editor"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Date of Joining
-                    </label>
-
-                    <input
-                        type="date"
-                        id="empJoining"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Location
-                    </label>
-
-                    <input
-                        type="text"
-                        id="empLocation"
-                        placeholder="Salem, India"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Status
-                    </label>
-
-                    <select id="empStatus">
-
-                        <option value="Active">
-                            Active
-                        </option>
-
-                        <option value="Inactive">
-                            Inactive
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Projects
-                    </label>
-
-                    <input
-                        type="number"
-                        id="empProjects"
-                        min="0"
-                        value="0"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Completed
-                    </label>
-
-                    <input
-                        type="number"
-                        id="empCompleted"
-                        min="0"
-                        value="0"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Pending
-                    </label>
-
-                    <input
-                        type="number"
-                        id="empPending"
-                        min="0"
-                        value="0"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Leaves
-                    </label>
-
-                    <input
-                        type="number"
-                        id="empLeaves"
-                        min="0"
-                        value="0"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <div class="modal-footer">
-
-                <button
-                    type="button"
-                    class="cancel-btn"
-                    id="cancelEmployee">
-
-                    Cancel
-
-                </button>
-
-                <button
-                    type="submit"
-                    class="save-btn">
-
-                    <i class="fa-solid fa-floppy-disk"></i>
-
-                    Save Employee
-
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
-
-<!-- ================= DETAILS PANEL ================= -->
-
-<div
-    class="details-overlay"
-    id="detailsOverlay">
-
-    <aside class="employee-details">
-
         <button
-            class="details-close"
-            id="closeDetails">
+            type="button"
+            id="closeDrawerBtn"
+            class="drawer-close"
+            title="Close"
+        >
 
             <i class="fa-solid fa-xmark"></i>
 
         </button>
 
 
-        <div class="details-profile">
+    </header>
 
-            <div class="details-photo">
 
-                <img
-                    id="detailsPhoto"
-                    src=""
-                    alt="Employee"
-                >
 
-                <span id="detailsStatusDot"></span>
+    <!-- =================================================
+         DRAWER CONTENT
+    ================================================== -->
+
+    <div class="drawer-content">
+
+
+        <!-- =================================================
+             PROFILE
+        ================================================== -->
+
+        <section class="drawer-profile">
+
+
+            <div class="drawer-client-icon">
+
+                <i class="fa-solid fa-store"></i>
 
             </div>
 
-            <h2 id="detailsName">
-                Employee
-            </h2>
 
-            <p id="detailsDesignation">
-                Designation
-            </p>
+            <div>
+
+                <strong id="drawerClientCode">
+                    --
+                </strong>
+
+                <span id="drawerClientName">
+                    Client
+                </span>
+
+            </div>
+
 
             <span
-                class="details-status"
-                id="detailsStatus">
-
+                id="drawerStatus"
+                class="drawer-status drawer-status-active"
+            >
                 Active
-
             </span>
 
-        </div>
+
+        </section>
 
 
-        <div class="details-actions">
 
-            <button title="Call">
+        <!-- =================================================
+             BASIC INFORMATION
+        ================================================== -->
 
-                <i class="fa-solid fa-phone"></i>
-
-            </button>
-
-            <button title="Email">
-
-                <i class="fa-solid fa-envelope"></i>
-
-            </button>
-
-            <button title="Message">
-
-                <i class="fa-solid fa-message"></i>
-
-            </button>
-
-            <button title="Calendar">
-
-                <i class="fa-solid fa-calendar-days"></i>
-
-            </button>
-
-        </div>
+        <section class="drawer-section">
 
 
-        <div class="details-info">
+            <div class="drawer-section-title">
 
-            <div class="info-row">
+                <i class="fa-solid fa-circle-info"></i>
 
-                <i class="fa-solid fa-id-card"></i>
-
-                <span>
-                    Employee ID
-                </span>
-
-                <strong id="detailsId">
-                    -
-                </strong>
+                Client Information
 
             </div>
 
 
-            <div class="info-row">
+            <div class="detail-list">
 
-                <i class="fa-solid fa-building"></i>
 
-                <span>
-                    Department
-                </span>
+                <div class="detail-row">
 
-                <strong id="detailsDepartment">
-                    -
-                </strong>
+                    <div class="detail-label">
+
+                        <i class="fa-solid fa-id-card"></i>
+
+                        Client Code
+
+                    </div>
+
+                    <strong id="detailCode">
+                        --
+                    </strong>
+
+                </div>
+
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+
+                        <i class="fa-solid fa-building"></i>
+
+                        Client Name
+
+                    </div>
+
+                    <strong id="detailName">
+                        --
+                    </strong>
+
+                </div>
+
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+
+                        <i class="fa-solid fa-location-dot"></i>
+
+                        Location
+
+                    </div>
+
+                    <strong id="detailLocation">
+                        --
+                    </strong>
+
+                </div>
+
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+
+                        <i class="fa-solid fa-user"></i>
+
+                        Contact Person
+
+                    </div>
+
+                    <strong id="detailContact">
+                        --
+                    </strong>
+
+                </div>
+
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+
+                        <i class="fa-solid fa-phone"></i>
+
+                        Phone
+
+                    </div>
+
+                    <strong id="detailPhone">
+                        --
+                    </strong>
+
+                </div>
+
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+
+                        <i class="fa-solid fa-envelope"></i>
+
+                        Email
+
+                    </div>
+
+                    <strong id="detailEmail">
+                        --
+                    </strong>
+
+                </div>
+
 
             </div>
 
 
-            <div class="info-row">
-
-                <i class="fa-solid fa-briefcase"></i>
-
-                <span>
-                    Designation
-                </span>
-
-                <strong id="detailsJob">
-                    -
-                </strong>
-
-            </div>
+        </section>
 
 
-            <div class="info-row">
 
-                <i class="fa-solid fa-calendar-plus"></i>
+        <!-- =================================================
+             PROJECT PERFORMANCE
+        ================================================== -->
 
-                <span>
-                    Date of Joining
-                </span>
+        <section class="drawer-section">
 
-                <strong id="detailsJoining">
-                    -
-                </strong>
+
+            <div class="drawer-section-title">
+
+                <i class="fa-solid fa-chart-line"></i>
+
+                Project Performance
 
             </div>
 
 
-            <div class="info-row">
+            <div class="project-stat-grid">
 
-                <i class="fa-solid fa-envelope"></i>
 
-                <span>
-                    Email
-                </span>
+                <div class="project-stat">
 
-                <strong id="detailsEmail">
-                    -
-                </strong>
+                    <span>
+                        Total Projects
+                    </span>
+
+                    <strong id="detailProjects">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <div class="project-stat">
+
+                    <span>
+                        Completed
+                    </span>
+
+                    <strong id="detailCompleted">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <div class="project-stat">
+
+                    <span>
+                        Pending
+                    </span>
+
+                    <strong id="detailPending">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <div class="project-stat">
+
+                    <span>
+                        Total Videos
+                    </span>
+
+                    <strong id="detailVideos">
+                        0
+                    </strong>
+
+                </div>
+
 
             </div>
 
 
-            <div class="info-row">
-
-                <i class="fa-solid fa-phone"></i>
-
-                <span>
-                    Phone
-                </span>
-
-                <strong id="detailsPhone">
-                    -
-                </strong>
-
-            </div>
+        </section>
 
 
-            <div class="info-row">
 
-                <i class="fa-solid fa-location-dot"></i>
+        <!-- =================================================
+             VIDEO PERFORMANCE
+        ================================================== -->
 
-                <span>
-                    Location
-                </span>
-
-                <strong id="detailsLocation">
-                    -
-                </strong>
-
-            </div>
-
-        </div>
+        <section class="drawer-section">
 
 
-        <div class="stats-box">
+            <div class="drawer-section-title">
 
-            <div>
+                <i class="fa-solid fa-video"></i>
 
-                <i class="fa-solid fa-folder"></i>
-
-                <span>
-                    Projects
-                </span>
-
-                <strong id="detailsProjects">
-                    0
-                </strong>
+                Video Performance
 
             </div>
 
 
-            <div>
+            <div class="project-stat-grid">
 
-                <i class="fa-solid fa-circle-check"></i>
 
-                <span>
-                    Completed
-                </span>
+                <div class="project-stat">
 
-                <strong id="detailsCompleted">
-                    0
-                </strong>
+                    <span>
+                        Weekly Videos
+                    </span>
+
+                    <strong id="weeklyVideos">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <div class="project-stat">
+
+                    <span>
+                        This Month
+                    </span>
+
+                    <strong id="monthlyVideos">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <div class="project-stat">
+
+                    <span>
+                        Completed Videos
+                    </span>
+
+                    <strong id="completedVideos">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <div class="project-stat">
+
+                    <span>
+                        Pending Videos
+                    </span>
+
+                    <strong id="pendingVideos">
+                        0
+                    </strong>
+
+                </div>
+
 
             </div>
 
 
-            <div>
+        </section>
 
-                <i class="fa-solid fa-clock"></i>
 
-                <span>
-                    Pending
-                </span>
 
-                <strong id="detailsPending">
-                    0
-                </strong>
+        <!-- =================================================
+             WEEKLY BREAKDOWN
+        ================================================== -->
+
+        <section class="drawer-section">
+
+
+            <div class="drawer-section-title">
+
+                <i class="fa-solid fa-calendar-week"></i>
+
+                Weekly Video Activity
+
+            </div>
+
+
+            <div class="detail-list">
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        Monday
+                    </div>
+
+                    <strong id="mondayVideos">
+                        0 Videos
+                    </strong>
+
+                </div>
+
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        Tuesday
+                    </div>
+
+                    <strong id="tuesdayVideos">
+                        0 Videos
+                    </strong>
+
+                </div>
+
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        Wednesday
+                    </div>
+
+                    <strong id="wednesdayVideos">
+                        0 Videos
+                    </strong>
+
+                </div>
+
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        Thursday
+                    </div>
+
+                    <strong id="thursdayVideos">
+                        0 Videos
+                    </strong>
+
+                </div>
+
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        Friday
+                    </div>
+
+                    <strong id="fridayVideos">
+                        0 Videos
+                    </strong>
+
+                </div>
+
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        Saturday
+                    </div>
+
+                    <strong id="saturdayVideos">
+                        0 Videos
+                    </strong>
+
+                </div>
+
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        Sunday
+                    </div>
+
+                    <strong id="sundayVideos">
+                        0 Videos
+                    </strong>
+
+                </div>
+
 
             </div>
 
 
-            <div>
+        </section>
 
-                <i class="fa-solid fa-calendar-xmark"></i>
 
-                <span>
-                    Leaves
-                </span>
 
-                <strong id="detailsLeaves">
-                    0
-                </strong>
+        <!-- =================================================
+             NOTES
+        ================================================== -->
+
+        <section class="drawer-section">
+
+
+            <div class="drawer-section-title">
+
+                <i class="fa-solid fa-note-sticky"></i>
+
+                Client Notes
 
             </div>
 
-        </div>
+
+            <div
+                id="detailNotes"
+                class="client-notes"
+            >
+                No notes available.
+            </div>
 
 
-        <div class="details-bottom-actions">
+        </section>
 
-            <button
-                id="detailsEdit"
-                class="details-edit">
+
+
+        <!-- =================================================
+             EDIT FORM
+        ================================================== -->
+
+        <section
+            id="drawerEditForm"
+            class="drawer-edit-form"
+        >
+
+
+            <div class="drawer-section-title">
 
                 <i class="fa-solid fa-pen"></i>
 
-                Edit Employee
+                Edit Client
 
-            </button>
-
-
-            <button
-                id="detailsDelete"
-                class="details-delete">
-
-                <i class="fa-solid fa-trash"></i>
-
-            </button>
-
-        </div>
-
-    </aside>
-
-</div>
+            </div>
 
 
-<script src="../js/employees.js"></script>
+            <input
+                type="text"
+                id="editCode"
+                placeholder="Client Code"
+            >
+
+
+            <input
+                type="text"
+                id="editName"
+                placeholder="Client Name"
+            >
+
+
+            <input
+                type="text"
+                id="editLocation"
+                placeholder="Location"
+            >
+
+
+            <input
+                type="text"
+                id="editContact"
+                placeholder="Contact Person"
+            >
+
+
+            <input
+                type="text"
+                id="editPhone"
+                placeholder="Phone Number"
+            >
+
+
+            <input
+                type="email"
+                id="editEmail"
+                placeholder="Email Address"
+            >
+
+
+            <select id="editStatus">
+
+                <option value="Active">
+                    Active
+                </option>
+
+                <option value="Inactive">
+                    Inactive
+                </option>
+
+            </select>
+
+
+            <input
+                type="number"
+                id="editProjects"
+                min="0"
+                placeholder="Projects"
+            >
+
+
+            <input
+                type="number"
+                id="editCompleted"
+                min="0"
+                placeholder="Completed"
+            >
+
+
+            <input
+                type="number"
+                id="editVideos"
+                min="0"
+                placeholder="Videos"
+            >
+
+
+            <textarea
+                id="editNotes"
+                rows="4"
+                placeholder="Client notes..."
+            ></textarea>
+
+
+        </section>
+
+
+    </div>
+
+
+
+    <!-- =================================================
+         DRAWER ACTIONS
+    ================================================== -->
+
+    <footer class="drawer-actions">
+
+
+        <button
+            type="button"
+            id="cancelDrawerBtn"
+            class="drawer-secondary-btn"
+        >
+
+            Close
+
+        </button>
+
+
+        <button
+            type="button"
+            id="deleteClientBtn"
+            class="drawer-delete-btn"
+            style="display:none;"
+        >
+
+            <i class="fa-solid fa-trash"></i>
+
+            Delete
+
+        </button>
+
+
+        <button
+            type="button"
+            id="saveClientBtn"
+            class="drawer-primary-btn"
+            style="display:none;"
+        >
+
+            <i class="fa-solid fa-floppy-disk"></i>
+
+            Save Client
+
+        </button>
+
+
+    </footer>
+
+
+</aside>
+
+
+
+<!-- =====================================================
+     CLIENT JS
+===================================================== -->
+
+<script src="../js/clients.js"></script>
+
 
 </body>
 
