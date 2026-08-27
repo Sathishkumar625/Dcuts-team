@@ -756,9 +756,8 @@ const createTimesheet =
                     employee:
                         employeeId,
 
-                    project:
-                        project ||
-                        "",
+                  project:
+    project || null,
 
                     projectName:
                         String(
@@ -1199,14 +1198,12 @@ const updateTimesheet =
                BASIC DATA
             ========================================== */
 
-            if (
-                project !== undefined
-            ) {
+        if (project !== undefined) {
 
-                record.project =
-                    project;
+    record.project =
+        project || null;
 
-            }
+}
 
 
             if (
