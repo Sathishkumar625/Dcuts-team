@@ -65,9 +65,6 @@ function initializeReportsPage() {
 
 function bindReportEvents() {
 
-
-    /* Refresh */
-
     const refreshButton =
         document.getElementById(
             "refreshReports"
@@ -82,8 +79,6 @@ function bindReportEvents() {
 
     }
 
-
-    /* Search */
 
     const searchInput =
         document.getElementById(
@@ -100,8 +95,6 @@ function bindReportEvents() {
     }
 
 
-    /* Employee */
-
     const employeeFilter =
         document.getElementById(
             "employeeFilter"
@@ -116,8 +109,6 @@ function bindReportEvents() {
 
     }
 
-
-    /* Client */
 
     const clientFilter =
         document.getElementById(
@@ -134,8 +125,6 @@ function bindReportEvents() {
     }
 
 
-    /* Status */
-
     const statusFilter =
         document.getElementById(
             "statusFilter"
@@ -150,8 +139,6 @@ function bindReportEvents() {
 
     }
 
-
-    /* Date */
 
     const dateFilter =
         document.getElementById(
@@ -168,8 +155,6 @@ function bindReportEvents() {
     }
 
 
-    /* Clear */
-
     const clearButton =
         document.getElementById(
             "clearFilters"
@@ -184,8 +169,6 @@ function bindReportEvents() {
 
     }
 
-
-    /* Empty clear */
 
     const emptyClearButton =
         document.getElementById(
@@ -202,8 +185,6 @@ function bindReportEvents() {
     }
 
 
-    /* CSV */
-
     const exportButton =
         document.getElementById(
             "exportCSV"
@@ -218,8 +199,6 @@ function bindReportEvents() {
 
     }
 
-
-    /* Print */
 
     const printButton =
         document.getElementById(
@@ -240,8 +219,6 @@ function bindReportEvents() {
     }
 
 
-    /* Modal close */
-
     const closeModal =
         document.getElementById(
             "closeModal"
@@ -257,8 +234,6 @@ function bindReportEvents() {
     }
 
 
-    /* Modal overlay */
-
     const overlay =
         document.querySelector(
             ".modal-overlay"
@@ -273,8 +248,6 @@ function bindReportEvents() {
 
     }
 
-
-    /* ESC */
 
     document.addEventListener(
         "keydown",
@@ -545,43 +518,6 @@ function normalizeReport(
         );
 
 
-    /* =====================================================
-       TASK FORMAT
-       IMPORTANT:
-       Keep each employee-entered task on its own line.
-       Do NOT join tasks with comma.
-    ===================================================== */
-
-    const taskText =
-        tasks
-            .map(
-                task => {
-
-                    if (
-                        typeof task === "string"
-                    ) {
-
-                        return task;
-
-                    }
-
-
-                    return (
-                        task?.taskName ||
-                        task?.task ||
-                        task?.description ||
-                        task?.text ||
-                        ""
-                    );
-
-                }
-            )
-            .filter(
-                Boolean
-            )
-            .join("\n");
-
-
     return {
 
         ...report,
@@ -632,12 +568,12 @@ function normalizeReport(
             ) ||
             "",
 
-        /* =================================================
-           TASKS
-           Original line-by-line format preserved
-        ================================================= */
+        tasks,
 
-        taskText,
+        taskText:
+            buildTaskText(
+                tasks
+            ),
 
         totalVideos,
 
@@ -665,6 +601,165 @@ function normalizeReport(
             ) || 0
 
     };
+
+}
+
+
+/* =========================================================
+   TASK FORMAT
+   EMPLOYEE TIMESHEET FORMAT
+========================================================= */
+
+function buildTaskText(
+    tasks
+) {
+
+    if (
+        !Array.isArray(tasks) ||
+        !tasks.length
+    ) {
+
+        return "";
+
+    }
+
+
+    return tasks
+        .map(
+            task => {
+
+                if (
+                    typeof task === "string"
+                ) {
+
+                    return task;
+
+                }
+
+
+                return (
+                    task?.taskName ||
+                    task?.task ||
+                    task?.name ||
+                    ""
+                );
+
+            }
+        )
+        .filter(Boolean)
+        .join(" | ");
+
+}
+
+
+/* =========================================================
+   TASK HTML
+   SAME FORMAT FOR TABLE + VIEW
+========================================================= */
+
+function buildTasksHTML(
+    report
+) {
+
+    const tasks =
+        Array.isArray(
+            report?.tasks
+        )
+            ? report.tasks
+            : [];
+
+
+    if (!tasks.length) {
+
+        return `
+            <div class="task-item">
+                -
+            </div>
+        `;
+
+    }
+
+
+    return tasks
+        .map(
+            (task, index) => {
+
+                let taskName = "";
+
+                let taskDetails = "";
+
+
+                if (
+                    typeof task === "string"
+                ) {
+
+                    taskName =
+                        task;
+
+                }
+
+                else {
+
+                    taskName =
+                        task?.taskName ||
+                        task?.task ||
+                        task?.name ||
+                        "";
+
+                    taskDetails =
+                        task?.description ||
+                        task?.details ||
+                        task?.comments ||
+                        "";
+
+                }
+
+
+                if (!taskName) {
+
+                    return "";
+
+                }
+
+
+                return `
+
+                    <div class="task-item">
+
+                        <div class="task-number">
+                            ${index + 1}.
+                        </div>
+
+                        <div class="task-content">
+
+                            <div class="task-name">
+                                ${escapeHTML(
+                                    taskName
+                                )}
+                            </div>
+
+                            ${
+                                taskDetails
+                                    ? `
+                                        <div class="task-description">
+                                            ${escapeHTML(
+                                                taskDetails
+                                            )}
+                                        </div>
+                                    `
+                                    : ""
+                            }
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        )
+        .filter(Boolean)
+        .join("");
 
 }
 
@@ -1000,8 +1095,6 @@ function applyFilters() {
             report => {
 
 
-                /* SEARCH */
-
                 if (search) {
 
                     const searchText = [
@@ -1044,8 +1137,6 @@ function applyFilters() {
                 }
 
 
-                /* EMPLOYEE */
-
                 if (employee) {
 
                     const employeeId =
@@ -1068,8 +1159,6 @@ function applyFilters() {
                 }
 
 
-                /* CLIENT */
-
                 if (client) {
 
                     if (
@@ -1083,8 +1172,6 @@ function applyFilters() {
 
                 }
 
-
-                /* STATUS */
 
                 if (status) {
 
@@ -1103,8 +1190,6 @@ function applyFilters() {
 
                 }
 
-
-                /* DATE */
 
                 if (selectedDate) {
 
@@ -1350,21 +1435,15 @@ function createReportRow(
         );
 
 
-    /* =====================================================
-       TASK DISPLAY
-       Preserve line breaks.
-       New lines are converted into <br>.
-    ===================================================== */
+    /*
+       IMPORTANT:
+       TASK FORMAT ONLY CHANGED HERE
+    */
 
-    const taskText =
-        escapeHTML(
-            report.taskText ||
-            "-"
-        )
-            .replace(
-                /\r?\n/g,
-                "<br>"
-            );
+    const taskHTML =
+        buildTasksHTML(
+            report
+        );
 
 
     const officeHours =
@@ -1476,11 +1555,10 @@ function createReportRow(
 
         <td>
 
-            <div
-                class="task-details"
-                style="white-space: normal; line-height: 1.8;"
-            >
-                ${taskText}
+            <div class="task-details">
+
+                ${taskHTML}
+
             </div>
 
         </td>
@@ -1529,8 +1607,6 @@ function createReportRow(
 
             <div class="row-actions">
 
-                <!-- VIEW -->
-
                 <button
                     type="button"
                     class="row-action view-action"
@@ -1546,8 +1622,6 @@ function createReportRow(
                 </button>
 
 
-                <!-- EDIT -->
-
                 <button
                     type="button"
                     class="row-action edit-action"
@@ -1562,8 +1636,6 @@ function createReportRow(
 
                 </button>
 
-
-                <!-- APPROVE -->
 
                 ${
                     isPending
@@ -1585,8 +1657,6 @@ function createReportRow(
                         : ""
                 }
 
-
-                <!-- DELETE -->
 
                 <button
                     type="button"
@@ -1671,8 +1741,6 @@ async function handleRowAction(
     }
 
 
-    /* VIEW */
-
     if (
         action === "view"
     ) {
@@ -1685,8 +1753,6 @@ async function handleRowAction(
 
     }
 
-
-    /* EDIT */
 
     if (
         action === "edit"
@@ -1701,8 +1767,6 @@ async function handleRowAction(
     }
 
 
-    /* APPROVE */
-
     if (
         action === "approve"
     ) {
@@ -1715,8 +1779,6 @@ async function handleRowAction(
 
     }
 
-
-    /* DELETE */
 
     if (
         action === "delete"
@@ -1924,68 +1986,15 @@ function openReportModal(
     }
 
 
-    /* =====================================================
-       TASKS
-       Preserve every task on separate line.
-    ===================================================== */
+    /*
+       IMPORTANT:
+       SAME TASK FORMAT AS REPORT TABLE
+    */
 
-    let tasks = "-";
-
-
-    if (
-        Array.isArray(
-            report.tasks
-        ) &&
-        report.tasks.length
-    ) {
-
-        tasks =
-            report.tasks
-                .map(
-                    task => {
-
-                        if (
-                            typeof task === "string"
-                        ) {
-
-                            return escapeHTML(
-                                task
-                            );
-
-                        }
-
-
-                        return escapeHTML(
-                            task?.taskName ||
-                            task?.task ||
-                            task?.description ||
-                            task?.text ||
-                            ""
-                        );
-
-                    }
-                )
-                .filter(
-                    Boolean
-                )
-                .join("<br>");
-
-    }
-
-    else if (
-        report.taskText
-    ) {
-
-        tasks =
-            escapeHTML(
-                report.taskText
-            )
-                .replace(
-                    /\r?\n/g,
-                    "<br>"
-                );
-
-    }
+    const tasks =
+        buildTasksHTML(
+            report
+        );
 
 
     content.innerHTML = `
@@ -2283,11 +2292,11 @@ function openReportModal(
                     Tasks
                 </span>
 
-                <strong
-                    style="white-space: normal; line-height: 1.8;"
-                >
-                    ${tasks || "-"}
-                </strong>
+                <div class="task-details modal-task-details">
+
+                    ${tasks}
+
+                </div>
 
             </div>
 
