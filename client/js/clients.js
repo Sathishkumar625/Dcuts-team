@@ -27,6 +27,17 @@ const defaultClients = [
         weeklyVideos: 0,
         monthlyVideos: 0,
 
+        completedVideos: 0,
+        pendingVideos: 0,
+
+        mondayVideos: 0,
+        tuesdayVideos: 0,
+        wednesdayVideos: 0,
+        thursdayVideos: 0,
+        fridayVideos: 0,
+        saturdayVideos: 0,
+        sundayVideos: 0,
+
         weeklyTarget: 0,
         monthlyTarget: 0,
 
@@ -51,6 +62,17 @@ const defaultClients = [
         videos: 0,
         weeklyVideos: 0,
         monthlyVideos: 0,
+
+        completedVideos: 0,
+        pendingVideos: 0,
+
+        mondayVideos: 0,
+        tuesdayVideos: 0,
+        wednesdayVideos: 0,
+        thursdayVideos: 0,
+        fridayVideos: 0,
+        saturdayVideos: 0,
+        sundayVideos: 0,
 
         weeklyTarget: 0,
         monthlyTarget: 0,
@@ -77,6 +99,17 @@ const defaultClients = [
         weeklyVideos: 0,
         monthlyVideos: 0,
 
+        completedVideos: 0,
+        pendingVideos: 0,
+
+        mondayVideos: 0,
+        tuesdayVideos: 0,
+        wednesdayVideos: 0,
+        thursdayVideos: 0,
+        fridayVideos: 0,
+        saturdayVideos: 0,
+        sundayVideos: 0,
+
         weeklyTarget: 0,
         monthlyTarget: 0,
 
@@ -101,6 +134,17 @@ const defaultClients = [
         videos: 0,
         weeklyVideos: 0,
         monthlyVideos: 0,
+
+        completedVideos: 0,
+        pendingVideos: 0,
+
+        mondayVideos: 0,
+        tuesdayVideos: 0,
+        wednesdayVideos: 0,
+        thursdayVideos: 0,
+        fridayVideos: 0,
+        saturdayVideos: 0,
+        sundayVideos: 0,
 
         weeklyTarget: 0,
         monthlyTarget: 0,
@@ -127,6 +171,17 @@ const defaultClients = [
         weeklyVideos: 0,
         monthlyVideos: 0,
 
+        completedVideos: 0,
+        pendingVideos: 0,
+
+        mondayVideos: 0,
+        tuesdayVideos: 0,
+        wednesdayVideos: 0,
+        thursdayVideos: 0,
+        fridayVideos: 0,
+        saturdayVideos: 0,
+        sundayVideos: 0,
+
         weeklyTarget: 0,
         monthlyTarget: 0,
 
@@ -152,6 +207,17 @@ const defaultClients = [
         weeklyVideos: 0,
         monthlyVideos: 0,
 
+        completedVideos: 0,
+        pendingVideos: 0,
+
+        mondayVideos: 0,
+        tuesdayVideos: 0,
+        wednesdayVideos: 0,
+        thursdayVideos: 0,
+        fridayVideos: 0,
+        saturdayVideos: 0,
+        sundayVideos: 0,
+
         weeklyTarget: 0,
         monthlyTarget: 0,
 
@@ -164,10 +230,19 @@ const defaultClients = [
 
 
 /* =========================================================
-   LOAD CLIENTS
+   GLOBAL STATE
 ========================================================= */
 
 let clients = [];
+
+let selectedClientIndex = -1;
+
+let drawerMode = "view";
+
+
+/* =========================================================
+   LOAD CLIENT DATA
+========================================================= */
 
 try {
 
@@ -183,38 +258,37 @@ try {
 }
 
 
-if (!Array.isArray(clients) || clients.length === 0) {
+if (
+    !Array.isArray(clients) ||
+    clients.length === 0
+) {
 
     clients =
-        defaultClients.map(client => ({
-            ...client
-        }));
-
-    saveClients();
+        defaultClients.map(
+            client => ({
+                ...client
+            })
+        );
 
 }
 
 
 /* =========================================================
-   NORMALIZE OLD CLIENT DATA
+   NORMALIZE EXISTING CLIENT DATA
 ========================================================= */
 
 clients =
     clients.map(
-        client => normalizeClient(client)
+        client =>
+            normalizeClient(client)
     );
 
 
-saveClients();
-
-
 /* =========================================================
-   GLOBAL STATE
+   SAVE
 ========================================================= */
 
-let selectedClientIndex = -1;
-
-let drawerMode = "view";
+saveClients();
 
 
 /* =========================================================
@@ -238,6 +312,8 @@ document.addEventListener(
 function initializeClients() {
 
     setupEvents();
+
+    syncClientStatistics();
 
     loadClients();
 
@@ -273,7 +349,31 @@ function normalizeClient(client) {
 
     const pending =
         Math.max(
-            projects - completed,
+            projects -
+            completed,
+            0
+        );
+
+
+    const videos =
+        toNumber(
+            safeClient.videos
+        );
+
+
+    const completedVideos =
+        Math.min(
+            toNumber(
+                safeClient.completedVideos
+            ),
+            videos
+        );
+
+
+    const pendingVideos =
+        Math.max(
+            videos -
+            completedVideos,
             0
         );
 
@@ -281,32 +381,45 @@ function normalizeClient(client) {
     return {
 
         code:
-            safeClient.code ||
-            "",
+            String(
+                safeClient.code ||
+                ""
+            ).trim(),
 
         name:
-            safeClient.name ||
-            "",
+            String(
+                safeClient.name ||
+                ""
+            ).trim(),
 
         location:
-            safeClient.location ||
-            "",
+            String(
+                safeClient.location ||
+                ""
+            ).trim(),
 
         contact:
-            safeClient.contact ||
-            "",
+            String(
+                safeClient.contact ||
+                ""
+            ).trim(),
 
         phone:
-            safeClient.phone ||
-            "",
+            String(
+                safeClient.phone ||
+                ""
+            ).trim(),
 
         email:
-            safeClient.email ||
-            "",
+            String(
+                safeClient.email ||
+                ""
+            ).trim(),
 
         status:
-            safeClient.status ||
-            "Active",
+            safeClient.status === "Inactive"
+                ? "Inactive"
+                : "Active",
 
         projects,
 
@@ -314,10 +427,11 @@ function normalizeClient(client) {
 
         pending,
 
-        videos:
-            toNumber(
-                safeClient.videos
-            ),
+        videos,
+
+        completedVideos,
+
+        pendingVideos,
 
         weeklyVideos:
             toNumber(
@@ -327,6 +441,41 @@ function normalizeClient(client) {
         monthlyVideos:
             toNumber(
                 safeClient.monthlyVideos
+            ),
+
+        mondayVideos:
+            toNumber(
+                safeClient.mondayVideos
+            ),
+
+        tuesdayVideos:
+            toNumber(
+                safeClient.tuesdayVideos
+            ),
+
+        wednesdayVideos:
+            toNumber(
+                safeClient.wednesdayVideos
+            ),
+
+        thursdayVideos:
+            toNumber(
+                safeClient.thursdayVideos
+            ),
+
+        fridayVideos:
+            toNumber(
+                safeClient.fridayVideos
+            ),
+
+        saturdayVideos:
+            toNumber(
+                safeClient.saturdayVideos
+            ),
+
+        sundayVideos:
+            toNumber(
+                safeClient.sundayVideos
             ),
 
         weeklyTarget:
@@ -340,8 +489,10 @@ function normalizeClient(client) {
             ),
 
         notes:
-            safeClient.notes ||
-            "",
+            String(
+                safeClient.notes ||
+                ""
+            ).trim(),
 
         createdAt:
             safeClient.createdAt ||
@@ -417,7 +568,7 @@ function setupEvents() {
     }
 
 
-    /* CLOSE DRAWER */
+    /* CLOSE */
 
     const closeButton =
         document.getElementById(
@@ -447,7 +598,22 @@ function setupEvents() {
 
         cancelButton.addEventListener(
             "click",
-            closeDrawer
+            () => {
+
+                if (
+                    drawerMode === "edit" ||
+                    drawerMode === "add"
+                ) {
+
+                    closeDrawer();
+
+                } else {
+
+                    closeDrawer();
+
+                }
+
+            }
         );
 
     }
@@ -507,7 +673,7 @@ function setupEvents() {
     }
 
 
-    /* ESCAPE */
+    /* ESC */
 
     document.addEventListener(
         "keydown",
@@ -523,6 +689,131 @@ function setupEvents() {
 
         }
     );
+
+}
+
+
+/* =========================================================
+   SYNC CLIENT STATISTICS
+========================================================= */
+
+function syncClientStatistics() {
+
+    let timesheets = [];
+
+    try {
+
+        timesheets =
+            JSON.parse(
+                localStorage.getItem(
+                    "timesheets"
+                )
+            ) || [];
+
+    } catch (error) {
+
+        timesheets = [];
+
+    }
+
+
+    if (
+        !Array.isArray(timesheets) ||
+        timesheets.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    clients =
+        clients.map(
+            client => {
+
+                const clientName =
+                    String(
+                        client.name || ""
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                const matchingEntries =
+                    timesheets.filter(
+                        item => {
+
+                            const project =
+                                String(
+                                    item.project ||
+                                    ""
+                                )
+                                .trim()
+                                .toLowerCase();
+
+
+                            return (
+                                project &&
+                                (
+                                    project.includes(
+                                        clientName
+                                    ) ||
+                                    clientName.includes(
+                                        project
+                                    )
+                                )
+                            );
+
+                        }
+                    );
+
+
+                if (
+                    matchingEntries.length === 0
+                ) {
+
+                    return client;
+
+                }
+
+
+                let totalHours = 0;
+
+                matchingEntries.forEach(
+                    entry => {
+
+                        totalHours +=
+                            toNumber(
+                                entry.hours
+                            );
+
+                    }
+                );
+
+
+                return {
+
+                    ...client,
+
+                    timesheetHours:
+                        totalHours
+
+                };
+
+            }
+        );
+
+
+    clients =
+        clients.map(
+            client =>
+                normalizeClient(
+                    client
+                )
+        );
+
+
+    saveClients();
 
 }
 
@@ -624,7 +915,6 @@ function loadClients(
             0
         );
 
-
         return;
 
     }
@@ -681,6 +971,14 @@ function createClientCard(
     const completed =
         toNumber(
             client.completed
+        );
+
+
+    const pending =
+        Math.max(
+            projects -
+            completed,
+            0
         );
 
 
@@ -915,7 +1213,7 @@ function updateResultCount(
 
 
 /* =========================================================
-   OPEN VIEW DRAWER
+   OPEN VIEW
 ========================================================= */
 
 function openViewDrawer(
@@ -940,7 +1238,13 @@ function openViewDrawer(
 
 
     const client =
-        clients[index];
+        normalizeClient(
+            clients[index]
+        );
+
+
+    clients[index] =
+        client;
 
 
     fillDrawerDetails(
@@ -972,7 +1276,7 @@ function openViewDrawer(
 
 
 /* =========================================================
-   OPEN ADD DRAWER
+   OPEN ADD
 ========================================================= */
 
 function openAddDrawer() {
@@ -1009,9 +1313,27 @@ function openAddDrawer() {
 
         videos: 0,
 
+        completedVideos: 0,
+
+        pendingVideos: 0,
+
         weeklyVideos: 0,
 
         monthlyVideos: 0,
+
+        mondayVideos: 0,
+
+        tuesdayVideos: 0,
+
+        wednesdayVideos: 0,
+
+        thursdayVideos: 0,
+
+        fridayVideos: 0,
+
+        saturdayVideos: 0,
+
+        sundayVideos: 0,
 
         weeklyTarget: 0,
 
@@ -1050,7 +1372,7 @@ function openAddDrawer() {
 
 
 /* =========================================================
-   FILL DRAWER DETAILS
+   FILL DRAWER
 ========================================================= */
 
 function fillDrawerDetails(
@@ -1086,7 +1408,7 @@ function fillDrawerDetails(
     );
 
 
-    /* BASIC DETAILS */
+    /* BASIC */
 
     setText(
         "detailCode",
@@ -1156,51 +1478,73 @@ function fillDrawerDetails(
     );
 
 
-    /* WEEKLY */
+    /* VIDEO PERFORMANCE */
 
     setText(
-        "detailWeeklyVideos",
+        "weeklyVideos",
         client.weeklyVideos
     );
 
 
     setText(
-        "detailWeeklyTarget",
-        client.weeklyTarget
-    );
-
-
-    setText(
-        "detailWeeklyBalance",
-        Math.max(
-            client.weeklyTarget -
-            client.weeklyVideos,
-            0
-        )
-    );
-
-
-    /* MONTHLY */
-
-    setText(
-        "detailMonthlyVideos",
+        "monthlyVideos",
         client.monthlyVideos
     );
 
 
     setText(
-        "detailMonthlyTarget",
-        client.monthlyTarget
+        "completedVideos",
+        client.completedVideos
     );
 
 
     setText(
-        "detailMonthlyBalance",
-        Math.max(
-            client.monthlyTarget -
-            client.monthlyVideos,
-            0
-        )
+        "pendingVideos",
+        client.pendingVideos
+    );
+
+
+    /* WEEKLY DAYS */
+
+    setText(
+        "mondayVideos",
+        `${client.mondayVideos} Videos`
+    );
+
+
+    setText(
+        "tuesdayVideos",
+        `${client.tuesdayVideos} Videos`
+    );
+
+
+    setText(
+        "wednesdayVideos",
+        `${client.wednesdayVideos} Videos`
+    );
+
+
+    setText(
+        "thursdayVideos",
+        `${client.thursdayVideos} Videos`
+    );
+
+
+    setText(
+        "fridayVideos",
+        `${client.fridayVideos} Videos`
+    );
+
+
+    setText(
+        "saturdayVideos",
+        `${client.saturdayVideos} Videos`
+    );
+
+
+    setText(
+        "sundayVideos",
+        `${client.sundayVideos} Videos`
     );
 
 
@@ -1309,14 +1653,14 @@ function fillEditFields(
 
 
     setInput(
-        "editWeeklyTarget",
-        client.weeklyTarget
+        "editMonthlyVideos",
+        client.monthlyVideos
     );
 
 
     setInput(
-        "editMonthlyVideos",
-        client.monthlyVideos
+        "editWeeklyTarget",
+        client.weeklyTarget
     );
 
 
@@ -1430,7 +1774,7 @@ function setEditMode(
 
 
 /* =========================================================
-   CREATE EDIT BUTTON
+   EDIT BUTTON
 ========================================================= */
 
 function createEditButtonIfNeeded() {
@@ -1638,18 +1982,18 @@ function saveClientFromDrawer() {
         );
 
 
-    const weeklyTarget =
-        toNumber(
-            getInputValue(
-                "editWeeklyTarget"
-            )
-        );
-
-
     const monthlyVideos =
         toNumber(
             getInputValue(
                 "editMonthlyVideos"
+            )
+        );
+
+
+    const weeklyTarget =
+        toNumber(
+            getInputValue(
+                "editWeeklyTarget"
             )
         );
 
@@ -1703,7 +2047,7 @@ function saveClientFromDrawer() {
     }
 
 
-    /* DUPLICATE CODE */
+    /* DUPLICATE */
 
     const duplicate =
         clients.some(
@@ -1745,61 +2089,64 @@ function saveClientFromDrawer() {
     }
 
 
-    /* CLIENT OBJECT */
+    /* KEEP EXISTING DATA */
 
-    const clientData = {
-
-        code,
-
-        name,
-
-        location,
-
-        contact,
-
-        phone,
-
-        email,
-
-        status,
-
-        projects,
-
-        completed,
-
-        pending:
-            Math.max(
-                projects -
-                completed,
-                0
-            ),
-
-        videos,
-
-        weeklyVideos,
-
-        monthlyVideos,
-
-        weeklyTarget,
-
-        monthlyTarget,
-
-        notes,
-
-        createdAt:
-            selectedClientIndex >= 0
-                ? (
-                    clients[
-                        selectedClientIndex
-                    ]?.createdAt ||
-                    new Date().toISOString()
-                )
-                : new Date().toISOString()
-
-    };
+    const oldClient =
+        selectedClientIndex >= 0
+            ? clients[
+                selectedClientIndex
+            ]
+            : {};
 
 
-    /* ADD */
+    const clientData =
+        normalizeClient({
+
+            ...oldClient,
+
+            code,
+
+            name,
+
+            location,
+
+            contact,
+
+            phone,
+
+            email,
+
+            status,
+
+            projects,
+
+            completed,
+
+            pending:
+                Math.max(
+                    projects -
+                    completed,
+                    0
+                ),
+
+            videos,
+
+            weeklyVideos,
+
+            monthlyVideos,
+
+            weeklyTarget,
+
+            monthlyTarget,
+
+            notes,
+
+            createdAt:
+                oldClient.createdAt ||
+                new Date().toISOString()
+
+        });
+
 
     const isAdding =
         selectedClientIndex === -1;
@@ -1814,11 +2161,7 @@ function saveClientFromDrawer() {
         selectedClientIndex =
             clients.length - 1;
 
-    }
-
-    /* UPDATE */
-
-    else {
+    } else {
 
         clients[
             selectedClientIndex
@@ -1827,8 +2170,6 @@ function saveClientFromDrawer() {
 
     }
 
-
-    /* SAVE */
 
     saveClients();
 
@@ -1841,13 +2182,13 @@ function saveClientFromDrawer() {
     );
 
 
+    drawerMode =
+        "view";
+
+
     setEditMode(
         false
     );
-
-
-    drawerMode =
-        "view";
 
 
     setText(
@@ -2038,7 +2379,7 @@ function closeDrawer() {
 
 
 /* =========================================================
-   NUMBER HELPER
+   NUMBER
 ========================================================= */
 
 function toNumber(

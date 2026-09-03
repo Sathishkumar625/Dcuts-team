@@ -1737,3 +1737,8 @@
     background: rgba(220, 38, 38, 0.12);
     border: 1px solid rgba(220, 38, 38, 0.25);
 }
+.task-preserve {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.65;
+}

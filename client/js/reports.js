@@ -16,7 +16,6 @@ const REPORTS_API_BASE =
     window.apiBaseUrl ||
     "/api";
 
-
 const TIMESHEET_API =
     `${REPORTS_API_BASE}/timesheets`;
 
@@ -26,9 +25,7 @@ const TIMESHEET_API =
 ========================================================= */
 
 let allReports = [];
-
 let filteredReports = [];
-
 let currentReport = null;
 
 
@@ -39,9 +36,7 @@ let currentReport = null;
 document.addEventListener(
     "DOMContentLoaded",
     () => {
-
         initializeReportsPage();
-
     }
 );
 
@@ -53,7 +48,6 @@ document.addEventListener(
 function initializeReportsPage() {
 
     bindReportEvents();
-
     loadReports();
 
 }
@@ -66,186 +60,136 @@ function initializeReportsPage() {
 function bindReportEvents() {
 
     const refreshButton =
-        document.getElementById(
-            "refreshReports"
-        );
+        document.getElementById("refreshReports");
 
     if (refreshButton) {
-
         refreshButton.addEventListener(
             "click",
             loadReports
         );
-
     }
 
 
     const searchInput =
-        document.getElementById(
-            "reportSearch"
-        );
+        document.getElementById("reportSearch");
 
     if (searchInput) {
-
         searchInput.addEventListener(
             "input",
             applyFilters
         );
-
     }
 
 
     const employeeFilter =
-        document.getElementById(
-            "employeeFilter"
-        );
+        document.getElementById("employeeFilter");
 
     if (employeeFilter) {
-
         employeeFilter.addEventListener(
             "change",
             applyFilters
         );
-
     }
 
 
     const clientFilter =
-        document.getElementById(
-            "clientFilter"
-        );
+        document.getElementById("clientFilter");
 
     if (clientFilter) {
-
         clientFilter.addEventListener(
             "change",
             applyFilters
         );
-
     }
 
 
     const statusFilter =
-        document.getElementById(
-            "statusFilter"
-        );
+        document.getElementById("statusFilter");
 
     if (statusFilter) {
-
         statusFilter.addEventListener(
             "change",
             applyFilters
         );
-
     }
 
 
     const dateFilter =
-        document.getElementById(
-            "dateFilter"
-        );
+        document.getElementById("dateFilter");
 
     if (dateFilter) {
-
         dateFilter.addEventListener(
             "change",
             applyFilters
         );
-
     }
 
 
     const clearButton =
-        document.getElementById(
-            "clearFilters"
-        );
+        document.getElementById("clearFilters");
 
     if (clearButton) {
-
         clearButton.addEventListener(
             "click",
             clearFilters
         );
-
     }
 
 
     const emptyClearButton =
-        document.getElementById(
-            "emptyClearFilters"
-        );
+        document.getElementById("emptyClearFilters");
 
     if (emptyClearButton) {
-
         emptyClearButton.addEventListener(
             "click",
             clearFilters
         );
-
     }
 
 
     const exportButton =
-        document.getElementById(
-            "exportCSV"
-        );
+        document.getElementById("exportCSV");
 
     if (exportButton) {
-
         exportButton.addEventListener(
             "click",
             exportCSV
         );
-
     }
 
 
     const printButton =
-        document.getElementById(
-            "printReport"
-        );
+        document.getElementById("printReport");
 
     if (printButton) {
-
         printButton.addEventListener(
             "click",
             () => {
-
                 window.print();
-
             }
         );
-
     }
 
 
     const closeModal =
-        document.getElementById(
-            "closeModal"
-        );
+        document.getElementById("closeModal");
 
     if (closeModal) {
-
         closeModal.addEventListener(
             "click",
             closeReportModal
         );
-
     }
 
 
     const overlay =
-        document.querySelector(
-            ".modal-overlay"
-        );
+        document.querySelector(".modal-overlay");
 
     if (overlay) {
-
         overlay.addEventListener(
             "click",
             closeReportModal
         );
-
     }
 
 
@@ -253,12 +197,8 @@ function bindReportEvents() {
         "keydown",
         event => {
 
-            if (
-                event.key === "Escape"
-            ) {
-
+            if (event.key === "Escape") {
                 closeReportModal();
-
             }
 
         }
@@ -282,31 +222,23 @@ async function loadReports() {
                 TIMESHEET_API,
                 {
                     method: "GET",
-
                     credentials: "include",
 
                     headers: {
-
                         "Content-Type":
                             "application/json",
 
                         "Authorization":
                             `Bearer ${
-                                localStorage.getItem(
-                                    "token"
-                                ) || ""
+                                localStorage.getItem("token") || ""
                             }`
-
                     }
-
                 }
             );
 
 
         const data =
-            await parseJSONResponse(
-                response
-            );
+            await parseJSONResponse(response);
 
 
         if (!response.ok) {
@@ -320,9 +252,7 @@ async function loadReports() {
 
 
         allReports =
-            normalizeReports(
-                data
-            );
+            normalizeReports(data);
 
 
         populateEmployeeFilter(
@@ -337,7 +267,6 @@ async function loadReports() {
 
         applyFilters();
 
-
     }
 
     catch (error) {
@@ -347,17 +276,12 @@ async function loadReports() {
             error
         );
 
-
         allReports = [];
-
         filteredReports = [];
-
 
         updateSummary([]);
 
-
         renderReports([]);
-
 
         showToast(
             error.message ||
@@ -374,36 +298,25 @@ async function loadReports() {
    RESPONSE PARSER
 ========================================================= */
 
-async function parseJSONResponse(
-    response
-) {
+async function parseJSONResponse(response) {
 
     const text =
         await response.text();
 
 
     if (!text) {
-
         return {};
-
     }
 
 
     try {
-
         return JSON.parse(text);
-
     }
 
     catch {
-
         return {
-
-            message:
-                text
-
+            message: text
         };
-
     }
 
 }
@@ -413,51 +326,32 @@ async function parseJSONResponse(
    NORMALIZE REPORT DATA
 ========================================================= */
 
-function normalizeReports(
-    data
-) {
+function normalizeReports(data) {
 
     let reports = [];
 
 
-    if (
-        Array.isArray(data)
-    ) {
+    if (Array.isArray(data)) {
 
         reports = data;
 
     }
 
-    else if (
-        Array.isArray(
-            data?.timesheets
-        )
-    ) {
+    else if (Array.isArray(data?.timesheets)) {
 
-        reports =
-            data.timesheets;
+        reports = data.timesheets;
 
     }
 
-    else if (
-        Array.isArray(
-            data?.reports
-        )
-    ) {
+    else if (Array.isArray(data?.reports)) {
 
-        reports =
-            data.reports;
+        reports = data.reports;
 
     }
 
-    else if (
-        Array.isArray(
-            data?.data
-        )
-    ) {
+    else if (Array.isArray(data?.data)) {
 
-        reports =
-            data.data;
+        reports = data.data;
 
     }
 
@@ -473,9 +367,7 @@ function normalizeReports(
    NORMALIZE SINGLE REPORT
 ========================================================= */
 
-function normalizeReport(
-    report
-) {
+function normalizeReport(report) {
 
     const employee =
         report?.employee &&
@@ -484,28 +376,27 @@ function normalizeReport(
             : null;
 
 
+    /*
+       KEEP ORIGINAL TASK ARRAY
+       EXACTLY AS SAVED BY TIMESHEET
+    */
+
     const tasks =
-        Array.isArray(
-            report?.tasks
-        )
+        Array.isArray(report?.tasks)
             ? report.tasks
             : [];
 
 
     const totalVideos =
         Math.max(
-            Number(
-                report?.totalVideos
-            ) || 0,
+            Number(report?.totalVideos) || 0,
             0
         );
 
 
     const completedVideos =
         Math.max(
-            Number(
-                report?.completedVideos
-            ) || 0,
+            Number(report?.completedVideos) || 0,
             0
         );
 
@@ -537,43 +428,52 @@ function normalizeReport(
 
         employeeEmail:
             employee?.email ||
+            report?.employeeEmail ||
             "",
 
         employeeDepartment:
             employee?.department ||
+            report?.employeeDepartment ||
             "",
 
         employeeDesignation:
             employee?.designation ||
+            report?.employeeDesignation ||
             "",
 
         employeeRole:
             employee?.role ||
+            report?.employeeRole ||
             "",
 
         project:
             report?.projectName ||
-            getProjectName(
-                report?.project
-            ) ||
+            getProjectName(report?.project) ||
             "",
 
         client:
             report?.clientName ||
-            getClientName(
-                report?.client
-            ) ||
-            getClientName(
-                report?.project
-            ) ||
+            getClientName(report?.client) ||
+            getClientName(report?.project) ||
             "",
 
-        tasks,
+        /*
+           ORIGINAL TASK DATA
+        */
+
+        tasks: tasks,
+
+        /*
+           TASK TEXT
+
+           IMPORTANT:
+           Use newline instead of " | "
+           so the employee-entered task
+           formatting remains readable.
+        */
 
         taskText:
-            buildTaskText(
-                tasks
-            ),
+            buildTaskText(tasks),
 
         totalVideos,
 
@@ -586,19 +486,13 @@ function normalizeReport(
             "Pending",
 
         workingMinutes:
-            Number(
-                report?.workingMinutes
-            ) || 0,
+            Number(report?.workingMinutes) || 0,
 
         officeMinutes:
-            Number(
-                report?.officeMinutes
-            ) || 0,
+            Number(report?.officeMinutes) || 0,
 
         lunchMinutes:
-            Number(
-                report?.lunchMinutes
-            ) || 0
+            Number(report?.lunchMinutes) || 0
 
     };
 
@@ -606,160 +500,137 @@ function normalizeReport(
 
 
 /* =========================================================
-   TASK FORMAT
-   EMPLOYEE TIMESHEET FORMAT
+   TASK SEARCH / CSV TEXT
+   PRESERVE TASK CONTENT
 ========================================================= */
 
-function buildTaskText(
-    tasks
-) {
+function buildTaskText(tasks) {
 
     if (
         !Array.isArray(tasks) ||
         !tasks.length
     ) {
-
         return "";
-
     }
 
 
     return tasks
-        .map(
-            task => {
+        .map(task => {
 
-                if (
-                    typeof task === "string"
-                ) {
+            /*
+               STRING TASK
+            */
 
-                    return task;
-
-                }
-
-
-                return (
-                    task?.taskName ||
-                    task?.task ||
-                    task?.name ||
-                    ""
-                );
-
+            if (typeof task === "string") {
+                return task;
             }
+
+
+            /*
+               OBJECT TASK
+
+               Only extract the actual task
+               text. Do not add labels.
+            */
+
+            return (
+                task?.taskName ??
+                task?.task ??
+                task?.name ??
+                task?.title ??
+                task?.taskTitle ??
+                task?.description ??
+                ""
+            );
+
+        })
+        .filter(
+            value =>
+                value !== null &&
+                value !== undefined &&
+                String(value).trim() !== ""
         )
-        .filter(Boolean)
-        .join(" | ");
+        /*
+           IMPORTANT:
+           newline keeps multiple tasks separate.
+        */
+        .join("\n");
 
 }
 
 
 /* =========================================================
    TASK HTML
-   SAME FORMAT FOR TABLE + VIEW
+   EXACT TIMESHEET FORMAT
 ========================================================= */
 
-function buildTasksHTML(
-    report
-) {
+function buildTasksHTML(report) {
 
-    const tasks =
-        Array.isArray(
-            report?.tasks
-        )
-            ? report.tasks
-            : [];
+    /*
+       First use normalized taskText.
+       This keeps the original text and line breaks.
+    */
+
+    let text =
+        report?.taskText;
 
 
-    if (!tasks.length) {
+    /*
+       If taskText is unavailable,
+       rebuild it directly from tasks.
+    */
+
+    if (
+        !text &&
+        Array.isArray(report?.tasks)
+    ) {
+
+        text =
+            buildTaskText(
+                report.tasks
+            );
+
+    }
+
+
+    /*
+       No task entered
+    */
+
+    if (
+        !text ||
+        !String(text).trim()
+    ) {
 
         return `
-            <div class="task-item">
-                -
+            <div class="task-preserve task-empty">
+                No task entered
             </div>
         `;
 
     }
 
 
-    return tasks
-        .map(
-            (task, index) => {
+    /*
+       IMPORTANT:
 
-                let taskName = "";
+       Do NOT:
+       - add numbering
+       - add Task:
+       - add Hours:
+       - add Videos:
+       - change spaces
+       - change line breaks
+       - use pipe separators
 
-                let taskDetails = "";
+       Employee's saved text is displayed directly.
+    */
 
-
-                if (
-                    typeof task === "string"
-                ) {
-
-                    taskName =
-                        task;
-
-                }
-
-                else {
-
-                    taskName =
-                        task?.taskName ||
-                        task?.task ||
-                        task?.name ||
-                        "";
-
-                    taskDetails =
-                        task?.description ||
-                        task?.details ||
-                        task?.comments ||
-                        "";
-
-                }
-
-
-                if (!taskName) {
-
-                    return "";
-
-                }
-
-
-                return `
-
-                    <div class="task-item">
-
-                        <div class="task-number">
-                            ${index + 1}.
-                        </div>
-
-                        <div class="task-content">
-
-                            <div class="task-name">
-                                ${escapeHTML(
-                                    taskName
-                                )}
-                            </div>
-
-                            ${
-                                taskDetails
-                                    ? `
-                                        <div class="task-description">
-                                            ${escapeHTML(
-                                                taskDetails
-                                            )}
-                                        </div>
-                                    `
-                                    : ""
-                            }
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            }
-        )
-        .filter(Boolean)
-        .join("");
+    return `
+        <div class="task-preserve">
+            ${escapeHTML(text)}
+        </div>
+    `;
 
 }
 
@@ -768,23 +639,15 @@ function buildTasksHTML(
    PROJECT NAME
 ========================================================= */
 
-function getProjectName(
-    project
-) {
+function getProjectName(project) {
 
     if (!project) {
-
         return "";
-
     }
 
 
-    if (
-        typeof project === "string"
-    ) {
-
+    if (typeof project === "string") {
         return project;
-
     }
 
 
@@ -803,23 +666,15 @@ function getProjectName(
    CLIENT NAME
 ========================================================= */
 
-function getClientName(
-    client
-) {
+function getClientName(client) {
 
     if (!client) {
-
         return "";
-
     }
 
 
-    if (
-        typeof client === "string"
-    ) {
-
+    if (typeof client === "string") {
         return client;
-
     }
 
 
@@ -834,12 +689,10 @@ function getClientName(
 
 
 /* =========================================================
-   FILTER OPTIONS
+   EMPLOYEE FILTER
 ========================================================= */
 
-function populateEmployeeFilter(
-    reports
-) {
+function populateEmployeeFilter(reports) {
 
     const select =
         document.getElementById(
@@ -848,9 +701,7 @@ function populateEmployeeFilter(
 
 
     if (!select) {
-
         return;
-
     }
 
 
@@ -862,78 +713,62 @@ function populateEmployeeFilter(
         new Map();
 
 
-    reports.forEach(
-        report => {
+    reports.forEach(report => {
 
-            const id =
-                report.employee?._id ||
-                report.employeeId ||
-                report.employeeName;
-
-
-            if (!id) {
-
-                return;
-
-            }
+        const id =
+            report.employee?._id ||
+            report.employeeId ||
+            report.employeeName;
 
 
-            employees.set(
-                String(id),
-                report.employeeName
-            );
-
+        if (!id) {
+            return;
         }
-    );
+
+
+        employees.set(
+            String(id),
+            report.employeeName
+        );
+
+    });
 
 
     select.innerHTML = `
-
         <option value="">
             All Employees
         </option>
-
     `;
 
 
     [...employees.entries()]
         .sort(
             (a, b) =>
-                a[1].localeCompare(
-                    b[1]
-                )
+                a[1].localeCompare(b[1])
         )
-        .forEach(
-            ([id, name]) => {
+        .forEach(([id, name]) => {
 
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-
-                option.value =
-                    id;
-
-                option.textContent =
-                    name;
-
-
-                select.appendChild(
-                    option
+            const option =
+                document.createElement(
+                    "option"
                 );
 
-            }
-        );
+
+            option.value = id;
+            option.textContent = name;
+
+
+            select.appendChild(option);
+
+        });
 
 
     if (
-        [...select.options]
-            .some(
-                option =>
-                    option.value ===
-                    currentValue
-            )
+        [...select.options].some(
+            option =>
+                option.value ===
+                currentValue
+        )
     ) {
 
         select.value =
@@ -948,9 +783,7 @@ function populateEmployeeFilter(
    CLIENT FILTER
 ========================================================= */
 
-function populateClientFilter(
-    reports
-) {
+function populateClientFilter(reports) {
 
     const select =
         document.getElementById(
@@ -959,9 +792,7 @@ function populateClientFilter(
 
 
     if (!select) {
-
         return;
-
     }
 
 
@@ -973,29 +804,23 @@ function populateClientFilter(
         new Set();
 
 
-    reports.forEach(
-        report => {
+    reports.forEach(report => {
 
-            if (
+        if (report.client) {
+
+            clients.add(
                 report.client
-            ) {
-
-                clients.add(
-                    report.client
-                );
-
-            }
+            );
 
         }
-    );
+
+    });
 
 
     select.innerHTML = `
-
         <option value="">
             All Clients
         </option>
-
     `;
 
 
@@ -1004,37 +829,29 @@ function populateClientFilter(
             (a, b) =>
                 a.localeCompare(b)
         )
-        .forEach(
-            client => {
+        .forEach(client => {
 
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-
-                option.value =
-                    client;
-
-                option.textContent =
-                    client;
-
-
-                select.appendChild(
-                    option
+            const option =
+                document.createElement(
+                    "option"
                 );
 
-            }
-        );
+
+            option.value = client;
+            option.textContent = client;
+
+
+            select.appendChild(option);
+
+        });
 
 
     if (
-        [...select.options]
-            .some(
-                option =>
-                    option.value ===
-                    currentValue
-            )
+        [...select.options].some(
+            option =>
+                option.value ===
+                currentValue
+        )
     ) {
 
         select.value =
@@ -1065,152 +882,121 @@ function applyFilters() {
     const employee =
         document.getElementById(
             "employeeFilter"
-        )?.value ||
-        "";
+        )?.value || "";
 
 
     const client =
         document.getElementById(
             "clientFilter"
-        )?.value ||
-        "";
+        )?.value || "";
 
 
     const status =
         document.getElementById(
             "statusFilter"
-        )?.value ||
-        "";
+        )?.value || "";
 
 
     const selectedDate =
         document.getElementById(
             "dateFilter"
-        )?.value ||
-        "";
+        )?.value || "";
 
 
     filteredReports =
-        allReports.filter(
-            report => {
+        allReports.filter(report => {
+
+            if (search) {
+
+                const searchText = [
+
+                    report.employeeId,
+                    report.employeeName,
+                    report.employeeEmail,
+                    report.employeeDepartment,
+                    report.employeeDesignation,
+                    report.client,
+                    report.project,
+                    report.taskText,
+                    report.comments,
+                    report.status
+
+                ]
+                    .join(" ")
+                    .toLowerCase();
 
 
-                if (search) {
-
-                    const searchText = [
-
-                        report.employeeId,
-
-                        report.employeeName,
-
-                        report.employeeEmail,
-
-                        report.employeeDepartment,
-
-                        report.employeeDesignation,
-
-                        report.client,
-
-                        report.project,
-
-                        report.taskText,
-
-                        report.comments,
-
-                        report.status
-
-                    ]
-                        .join(" ")
-                        .toLowerCase();
-
-
-                    if (
-                        !searchText.includes(
-                            search
-                        )
-                    ) {
-
-                        return false;
-
-                    }
-
+                if (
+                    !searchText.includes(search)
+                ) {
+                    return false;
                 }
-
-
-                if (employee) {
-
-                    const employeeId =
-                        String(
-                            report.employee?._id ||
-                            report.employeeId ||
-                            ""
-                        );
-
-
-                    if (
-                        employeeId !==
-                        String(employee)
-                    ) {
-
-                        return false;
-
-                    }
-
-                }
-
-
-                if (client) {
-
-                    if (
-                        report.client !==
-                        client
-                    ) {
-
-                        return false;
-
-                    }
-
-                }
-
-
-                if (status) {
-
-                    if (
-                        String(
-                            report.status
-                        ).toLowerCase() !==
-                        String(
-                            status
-                        ).toLowerCase()
-                    ) {
-
-                        return false;
-
-                    }
-
-                }
-
-
-                if (selectedDate) {
-
-                    if (
-                        formatDateInput(
-                            report.date
-                        ) !==
-                        selectedDate
-                    ) {
-
-                        return false;
-
-                    }
-
-                }
-
-
-                return true;
 
             }
-        );
+
+
+            if (employee) {
+
+                const employeeId =
+                    String(
+                        report.employee?._id ||
+                        report.employeeId ||
+                        ""
+                    );
+
+
+                if (
+                    employeeId !==
+                    String(employee)
+                ) {
+                    return false;
+                }
+
+            }
+
+
+            if (client) {
+
+                if (
+                    report.client !==
+                    client
+                ) {
+                    return false;
+                }
+
+            }
+
+
+            if (status) {
+
+                if (
+                    String(report.status)
+                        .toLowerCase() !==
+                    String(status)
+                        .toLowerCase()
+                ) {
+                    return false;
+                }
+
+            }
+
+
+            if (selectedDate) {
+
+                if (
+                    formatDateInput(
+                        report.date
+                    ) !== selectedDate
+                ) {
+                    return false;
+                }
+
+            }
+
+
+            return true;
+
+        });
 
 
     updateSummary(
@@ -1258,37 +1044,27 @@ function clearFilters() {
 
 
     if (searchInput) {
-
         searchInput.value = "";
-
     }
 
 
     if (employeeFilter) {
-
         employeeFilter.value = "";
-
     }
 
 
     if (clientFilter) {
-
         clientFilter.value = "";
-
     }
 
 
     if (statusFilter) {
-
         statusFilter.value = "";
-
     }
 
 
     if (dateFilter) {
-
         dateFilter.value = "";
-
     }
 
 
@@ -1301,9 +1077,7 @@ function clearFilters() {
    RENDER REPORTS
 ========================================================= */
 
-function renderReports(
-    reports
-) {
+function renderReports(reports) {
 
     const tbody =
         document.getElementById(
@@ -1318,18 +1092,14 @@ function renderReports(
 
 
     if (!tbody) {
-
         return;
-
     }
 
 
     tbody.innerHTML = "";
 
 
-    if (
-        !reports.length
-    ) {
+    if (!reports.length) {
 
         if (emptyState) {
 
@@ -1340,10 +1110,7 @@ function renderReports(
         }
 
 
-        updateRecordInfo(
-            0
-        );
-
+        updateRecordInfo(0);
 
         return;
 
@@ -1397,8 +1164,7 @@ function createReportRow(
 
     const employeeId =
         escapeHTML(
-            report.employeeId ||
-            "-"
+            report.employeeId || "-"
         );
 
 
@@ -1423,27 +1189,22 @@ function createReportRow(
 
     const client =
         escapeHTML(
-            report.client ||
-            "-"
+            report.client || "-"
         );
 
 
     const project =
         escapeHTML(
-            report.project ||
-            "-"
+            report.project || "-"
         );
 
 
     /*
-       IMPORTANT:
-       TASK FORMAT ONLY CHANGED HERE
+       SAME TASK DATA FROM TIMESHEET
     */
 
     const taskHTML =
-        buildTasksHTML(
-            report
-        );
+        buildTasksHTML(report);
 
 
     const officeHours =
@@ -1473,15 +1234,11 @@ function createReportRow(
 
 
     const statusClass =
-        getStatusClass(
-            status
-        );
+        getStatusClass(status);
 
 
     const balanceClass =
-        Number(
-            report.balanceVideos
-        ) === 0
+        Number(report.balanceVideos) === 0
             ? "balance-zero"
             : "balance-number";
 
@@ -1489,8 +1246,7 @@ function createReportRow(
     const isPending =
         String(status)
             .toLowerCase()
-            .trim() ===
-        "pending";
+            .trim() === "pending";
 
 
     row.innerHTML = `
@@ -1681,30 +1437,28 @@ function createReportRow(
 
     row.querySelectorAll(
         "[data-action]"
-    ).forEach(
-        button => {
+    ).forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+        button.addEventListener(
+            "click",
+            () => {
 
-                    const action =
-                        button.dataset.action;
+                const action =
+                    button.dataset.action;
 
-                    const id =
-                        button.dataset.id;
+                const id =
+                    button.dataset.id;
 
 
-                    handleRowAction(
-                        action,
-                        id
-                    );
+                handleRowAction(
+                    action,
+                    id
+                );
 
-                }
-            );
+            }
+        );
 
-        }
-    );
+    });
 
 
     return row;
@@ -1741,52 +1495,36 @@ async function handleRowAction(
     }
 
 
-    if (
-        action === "view"
-    ) {
+    if (action === "view") {
 
-        openReportModal(
-            report
-        );
+        openReportModal(report);
 
         return;
 
     }
 
 
-    if (
-        action === "edit"
-    ) {
+    if (action === "edit") {
 
-        editReport(
-            report
-        );
+        editReport(report);
 
         return;
 
     }
 
 
-    if (
-        action === "approve"
-    ) {
+    if (action === "approve") {
 
-        await approveReport(
-            report
-        );
+        await approveReport(report);
 
         return;
 
     }
 
 
-    if (
-        action === "delete"
-    ) {
+    if (action === "delete") {
 
-        await deleteReport(
-            report
-        );
+        await deleteReport(report);
 
     }
 
@@ -1797,9 +1535,7 @@ async function handleRowAction(
    APPROVE REPORT
 ========================================================= */
 
-async function approveReport(
-    report
-) {
+async function approveReport(report) {
 
     if (!report?._id) {
 
@@ -1815,17 +1551,13 @@ async function approveReport(
 
     const currentStatus =
         String(
-            report.status ||
-            "Pending"
+            report.status || "Pending"
         )
             .toLowerCase()
             .trim();
 
 
-    if (
-        currentStatus !==
-        "pending"
-    ) {
+    if (currentStatus !== "pending") {
 
         showToast(
             "This report is already processed.",
@@ -1849,9 +1581,7 @@ async function approveReport(
 
 
     if (!confirmed) {
-
         return;
-
     }
 
 
@@ -1864,11 +1594,9 @@ async function approveReport(
                 )}`,
                 {
 
-                    method:
-                        "PUT",
+                    method: "PUT",
 
-                    credentials:
-                        "include",
+                    credentials: "include",
 
                     headers: {
 
@@ -1886,10 +1614,7 @@ async function approveReport(
 
                     body:
                         JSON.stringify({
-
-                            status:
-                                "Approved"
-
+                            status: "Approved"
                         })
 
                 }
@@ -1945,9 +1670,7 @@ async function approveReport(
    VIEW MODAL
 ========================================================= */
 
-function openReportModal(
-    report
-) {
+function openReportModal(report) {
 
     currentReport =
         report;
@@ -1972,29 +1695,22 @@ function openReportModal(
 
 
     if (!modal || !content) {
-
         return;
-
     }
 
 
     if (title) {
 
         title.textContent =
-            `${report.employeeName} - ${formatDisplayDate(report.date)}`;
+            `${report.employeeName} - ${formatDisplayDate(
+                report.date
+            )}`;
 
     }
 
 
-    /*
-       IMPORTANT:
-       SAME TASK FORMAT AS REPORT TABLE
-    */
-
     const tasks =
-        buildTasksHTML(
-            report
-        );
+        buildTasksHTML(report);
 
 
     content.innerHTML = `
@@ -2010,8 +1726,7 @@ function openReportModal(
 
                 <strong>
                     ${escapeHTML(
-                        report.employeeId ||
-                        "-"
+                        report.employeeId || "-"
                     )}
                 </strong>
 
@@ -2026,8 +1741,7 @@ function openReportModal(
 
                 <strong>
                     ${escapeHTML(
-                        report.employeeName ||
-                        "-"
+                        report.employeeName || "-"
                     )}
                 </strong>
 
@@ -2042,8 +1756,7 @@ function openReportModal(
 
                 <strong>
                     ${escapeHTML(
-                        report.employeeEmail ||
-                        "-"
+                        report.employeeEmail || "-"
                     )}
                 </strong>
 
@@ -2058,8 +1771,7 @@ function openReportModal(
 
                 <strong>
                     ${escapeHTML(
-                        report.employeeDepartment ||
-                        "-"
+                        report.employeeDepartment || "-"
                     )}
                 </strong>
 
@@ -2089,8 +1801,7 @@ function openReportModal(
 
                 <strong>
                     ${escapeHTML(
-                        report.client ||
-                        "-"
+                        report.client || "-"
                     )}
                 </strong>
 
@@ -2105,8 +1816,7 @@ function openReportModal(
 
                 <strong>
                     ${escapeHTML(
-                        report.project ||
-                        "-"
+                        report.project || "-"
                     )}
                 </strong>
 
@@ -2121,8 +1831,7 @@ function openReportModal(
 
                 <strong>
                     ${escapeHTML(
-                        report.status ||
-                        "Pending"
+                        report.status || "Pending"
                     )}
                 </strong>
 
@@ -2137,8 +1846,7 @@ function openReportModal(
 
                 <strong>
                     ${escapeHTML(
-                        report.checkIn ||
-                        "-"
+                        report.checkIn || "-"
                     )}
                 </strong>
 
@@ -2153,8 +1861,7 @@ function openReportModal(
 
                 <strong>
                     ${escapeHTML(
-                        report.lunchStart ||
-                        "-"
+                        report.lunchStart || "-"
                     )}
                 </strong>
 
@@ -2169,8 +1876,7 @@ function openReportModal(
 
                 <strong>
                     ${escapeHTML(
-                        report.lunchEnd ||
-                        "-"
+                        report.lunchEnd || "-"
                     )}
                 </strong>
 
@@ -2185,8 +1891,7 @@ function openReportModal(
 
                 <strong>
                     ${escapeHTML(
-                        report.checkOut ||
-                        "-"
+                        report.checkOut || "-"
                     )}
                 </strong>
 
@@ -2309,8 +2014,7 @@ function openReportModal(
 
                 <strong>
                     ${escapeHTML(
-                        report.comments ||
-                        "-"
+                        report.comments || "-"
                     )}
                 </strong>
 
@@ -2346,9 +2050,7 @@ function closeReportModal() {
 
 
     if (!modal) {
-
         return;
-
     }
 
 
@@ -2371,9 +2073,7 @@ function closeReportModal() {
    EDIT
 ========================================================= */
 
-function editReport(
-    report
-) {
+function editReport(report) {
 
     if (!report?._id) {
 
@@ -2387,14 +2087,10 @@ function editReport(
     }
 
 
-    const target =
+    window.location.href =
         `timesheet.html?edit=${encodeURIComponent(
             report._id
         )}`;
-
-
-    window.location.href =
-        target;
 
 }
 
@@ -2403,14 +2099,10 @@ function editReport(
    DELETE
 ========================================================= */
 
-async function deleteReport(
-    report
-) {
+async function deleteReport(report) {
 
     if (!report?._id) {
-
         return;
-
     }
 
 
@@ -2426,9 +2118,7 @@ async function deleteReport(
 
 
     if (!confirmed) {
-
         return;
-
     }
 
 
@@ -2441,11 +2131,9 @@ async function deleteReport(
                 )}`,
                 {
 
-                    method:
-                        "DELETE",
+                    method: "DELETE",
 
-                    credentials:
-                        "include",
+                    credentials: "include",
 
                     headers: {
 
@@ -2532,9 +2220,7 @@ async function deleteReport(
    SUMMARY
 ========================================================= */
 
-function updateSummary(
-    reports
-) {
+function updateSummary(reports) {
 
     const totalRecords =
         reports.length;
@@ -2542,10 +2228,7 @@ function updateSummary(
 
     const totalVideos =
         reports.reduce(
-            (
-                total,
-                report
-            ) =>
+            (total, report) =>
                 total +
                 Number(
                     report.totalVideos
@@ -2556,10 +2239,7 @@ function updateSummary(
 
     const completedVideos =
         reports.reduce(
-            (
-                total,
-                report
-            ) =>
+            (total, report) =>
                 total +
                 Number(
                     report.completedVideos
@@ -2570,10 +2250,7 @@ function updateSummary(
 
     const balanceVideos =
         reports.reduce(
-            (
-                total,
-                report
-            ) =>
+            (total, report) =>
                 total +
                 Number(
                     report.balanceVideos
@@ -2584,10 +2261,7 @@ function updateSummary(
 
     const workingMinutes =
         reports.reduce(
-            (
-                total,
-                report
-            ) =>
+            (total, report) =>
                 total +
                 Number(
                     report.workingMinutes
@@ -2634,9 +2308,7 @@ function updateSummary(
    RECORD INFO
 ========================================================= */
 
-function updateRecordInfo(
-    count
-) {
+function updateRecordInfo(count) {
 
     const element =
         document.getElementById(
@@ -2645,9 +2317,7 @@ function updateRecordInfo(
 
 
     if (!element) {
-
         return;
-
     }
 
 
@@ -2689,9 +2359,7 @@ function showLoading() {
 
 
     if (!tbody) {
-
         return;
-
     }
 
 
@@ -2722,17 +2390,13 @@ function showLoading() {
 
 
 /* =========================================================
-   FORMAT DATE
+   DISPLAY DATE
 ========================================================= */
 
-function formatDisplayDate(
-    value
-) {
+function formatDisplayDate(value) {
 
     if (!value) {
-
         return "-";
-
     }
 
 
@@ -2745,9 +2409,7 @@ function formatDisplayDate(
             date.getTime()
         )
     ) {
-
         return "-";
-
     }
 
 
@@ -2764,17 +2426,13 @@ function formatDisplayDate(
 
 
 /* =========================================================
-   DATE INPUT FORMAT
+   DATE INPUT
 ========================================================= */
 
-function formatDateInput(
-    value
-) {
+function formatDateInput(value) {
 
     if (!value) {
-
         return "";
-
     }
 
 
@@ -2787,9 +2445,7 @@ function formatDateInput(
             date.getTime()
         )
     ) {
-
         return "";
-
     }
 
 
@@ -2824,9 +2480,7 @@ function formatDateInput(
    FORMAT MINUTES
 ========================================================= */
 
-function formatMinutes(
-    minutes
-) {
+function formatMinutes(minutes) {
 
     minutes =
         Math.max(
@@ -2854,9 +2508,7 @@ function formatMinutes(
    STATUS CLASS
 ========================================================= */
 
-function getStatusClass(
-    status
-) {
+function getStatusClass(status) {
 
     const value =
         String(
@@ -2866,30 +2518,18 @@ function getStatusClass(
             .trim();
 
 
-    if (
-        value === "completed"
-    ) {
-
+    if (value === "completed") {
         return "status-completed";
-
     }
 
 
-    if (
-        value === "approved"
-    ) {
-
+    if (value === "approved") {
         return "status-approved";
-
     }
 
 
-    if (
-        value === "rejected"
-    ) {
-
+    if (value === "rejected") {
         return "status-rejected";
-
     }
 
 
@@ -2902,14 +2542,10 @@ function getStatusClass(
    INITIALS
 ========================================================= */
 
-function getInitials(
-    name
-) {
+function getInitials(name) {
 
     if (!name) {
-
         return "?";
-
     }
 
 
@@ -2920,9 +2556,7 @@ function getInitials(
             .filter(Boolean);
 
 
-    if (
-        parts.length === 1
-    ) {
+    if (parts.length === 1) {
 
         return parts[0]
             .substring(0, 2)
@@ -2943,15 +2577,10 @@ function getInitials(
    SET TEXT
 ========================================================= */
 
-function setText(
-    id,
-    value
-) {
+function setText(id, value) {
 
     const element =
-        document.getElementById(
-            id
-        );
+        document.getElementById(id);
 
 
     if (element) {
@@ -2970,9 +2599,7 @@ function setText(
 
 function exportCSV() {
 
-    if (
-        !filteredReports.length
-    ) {
+    if (!filteredReports.length) {
 
         showToast(
             "No reports available to export.",
@@ -2987,41 +2614,23 @@ function exportCSV() {
     const headers = [
 
         "No",
-
         "Employee ID",
-
         "Employee",
-
         "Date",
-
         "Client",
-
         "Project",
-
         "Task Details",
-
         "Total Videos",
-
         "Completed Videos",
-
         "Balance Videos",
-
         "Office Hours",
-
         "Lunch Hours",
-
         "Working Hours",
-
         "Status",
-
         "Check In",
-
         "Lunch Start",
-
         "Lunch End",
-
         "Check Out",
-
         "Comments"
 
     ];
@@ -3084,22 +2693,18 @@ function exportCSV() {
         );
 
 
-    const csv = [
-
-        headers,
-
-        ...rows
-
-    ]
-        .map(
-            row =>
-                row
-                    .map(
-                        csvEscape
-                    )
-                    .join(",")
-        )
-        .join("\r\n");
+    const csv =
+        [
+            headers,
+            ...rows
+        ]
+            .map(
+                row =>
+                    row
+                        .map(csvEscape)
+                        .join(",")
+            )
+            .join("\r\n");
 
 
     const blob =
@@ -3116,28 +2721,21 @@ function exportCSV() {
 
 
     const url =
-        URL.createObjectURL(
-            blob
-        );
+        URL.createObjectURL(blob);
 
 
     const link =
-        document.createElement(
-            "a"
-        );
+        document.createElement("a");
 
 
-    link.href =
-        url;
+    link.href = url;
 
 
     link.download =
         `THE-D-CUTS-Report-${getTodayString()}.csv`;
 
 
-    document.body.appendChild(
-        link
-    );
+    document.body.appendChild(link);
 
 
     link.click();
@@ -3146,9 +2744,7 @@ function exportCSV() {
     link.remove();
 
 
-    URL.revokeObjectURL(
-        url
-    );
+    URL.revokeObjectURL(url);
 
 
     showToast(
@@ -3163,14 +2759,11 @@ function exportCSV() {
    CSV ESCAPE
 ========================================================= */
 
-function csvEscape(
-    value
-) {
+function csvEscape(value) {
 
     const text =
         String(
-            value ??
-            ""
+            value ?? ""
         );
 
 
@@ -3228,13 +2821,10 @@ function getTodayString() {
    ESCAPE HTML
 ========================================================= */
 
-function escapeHTML(
-    value
-) {
+function escapeHTML(value) {
 
     return String(
-        value ??
-        ""
+        value ?? ""
     )
         .replace(
             /&/g,
@@ -3270,10 +2860,8 @@ function showToast(
 ) {
 
     if (
-        typeof window.showToast ===
-        "function" &&
-        window.showToast !==
-        showToast
+        typeof window.showToast === "function" &&
+        window.showToast !== showToast
     ) {
 
         window.showToast(
@@ -3295,9 +2883,7 @@ function showToast(
     if (!container) {
 
         container =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
         container.className =
             "toast-container";
@@ -3310,9 +2896,7 @@ function showToast(
 
 
     const toast =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     toast.className =
@@ -3341,16 +2925,12 @@ function showToast(
     `;
 
 
-    container.appendChild(
-        toast
-    );
+    container.appendChild(toast);
 
 
     setTimeout(
         () => {
-
             toast.remove();
-
         },
         3000
     );
