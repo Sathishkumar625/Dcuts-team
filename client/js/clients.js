@@ -695,6 +695,7 @@ function setupEvents() {
 
 /* =========================================================
    SYNC CLIENT STATISTICS
+   TIMESHEET → CLIENT VIDEO DETAILS
 ========================================================= */
 
 function syncClientStatistics() {
@@ -718,58 +719,300 @@ function syncClientStatistics() {
 
 
     if (
-        !Array.isArray(timesheets) ||
-        timesheets.length === 0
+        !Array.isArray(timesheets)
     ) {
 
-        return;
+        timesheets = [];
 
     }
 
+
+    const now = new Date();
+
+
+    /* -----------------------------------------------------
+       CURRENT WEEK START — MONDAY
+    ----------------------------------------------------- */
+
+    const weekStart =
+        new Date(
+            now
+        );
+
+    weekStart.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    const currentDay =
+        weekStart.getDay();
+
+
+    const mondayOffset =
+        currentDay === 0
+            ? -6
+            : 1 - currentDay;
+
+
+    weekStart.setDate(
+        weekStart.getDate() +
+        mondayOffset
+    );
+
+
+    /* -----------------------------------------------------
+       CURRENT MONTH START
+    ----------------------------------------------------- */
+
+    const monthStart =
+        new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            1
+        );
+
+
+    /* -----------------------------------------------------
+       GET ENTRY DATE
+    ----------------------------------------------------- */
+
+    function getEntryDate(
+        entry
+    ) {
+
+        const value =
+            entry?.date ||
+            entry?.workDate ||
+            entry?.createdAt ||
+            entry?.created_at ||
+            "";
+
+
+        const date =
+            new Date(
+                value
+            );
+
+
+        return Number.isNaN(
+            date.getTime()
+        )
+            ? null
+            : date;
+
+    }
+
+
+    /* -----------------------------------------------------
+       SAFE TEXT
+    ----------------------------------------------------- */
+
+    function getText(
+        value
+    ) {
+
+        return String(
+            value ?? ""
+        )
+        .trim()
+        .toLowerCase();
+
+    }
+
+
+    /* -----------------------------------------------------
+       VIDEO NUMBER
+    ----------------------------------------------------- */
+
+    function getVideoNumber(
+        entry,
+        keys
+    ) {
+
+        for (
+            const key of keys
+        ) {
+
+            if (
+                entry?.[key] !== undefined &&
+                entry?.[key] !== null &&
+                entry?.[key] !== ""
+            ) {
+
+                return toNumber(
+                    entry[key]
+                );
+
+            }
+
+        }
+
+
+        return null;
+
+    }
+
+
+    /* -----------------------------------------------------
+       CHECK TIMESHEET BELONGS TO CLIENT
+    ----------------------------------------------------- */
+
+    function belongsToClient(
+        entry,
+        client
+    ) {
+
+        const clientCode =
+            getText(
+                client?.code
+            );
+
+
+        const clientName =
+            getText(
+                client?.name
+            );
+
+
+        const values = [
+
+            entry?.clientCode,
+
+            entry?.client,
+
+            entry?.clientName,
+
+            entry?.project,
+
+            entry?.projectCode,
+
+            entry?.projectName,
+
+            entry?.Client?.code,
+
+            entry?.Client?.name,
+
+            entry?.client?.code,
+
+            entry?.client?.name,
+
+            entry?.project?.code,
+
+            entry?.project?.name
+
+        ]
+        .map(
+            getText
+        )
+        .filter(
+            Boolean
+        );
+
+
+        if (
+            !values.length
+        ) {
+
+            return false;
+
+        }
+
+
+        return values.some(
+            value => {
+
+                return (
+
+                    (
+                        clientCode &&
+                        value === clientCode
+                    ) ||
+
+                    (
+                        clientName &&
+                        value === clientName
+                    ) ||
+
+                    (
+                        clientCode &&
+                        value.includes(
+                            clientCode
+                        )
+                    ) ||
+
+                    (
+                        clientName &&
+                        value.includes(
+                            clientName
+                        )
+                    ) ||
+
+                    (
+                        clientName &&
+                        clientName.includes(
+                            value
+                        )
+                    )
+
+                );
+
+            }
+        );
+
+    }
+
+
+    /* -----------------------------------------------------
+       DAILY FIELD NAMES
+    ----------------------------------------------------- */
+
+    const dayKeys = [
+
+        "mondayVideos",
+
+        "tuesdayVideos",
+
+        "wednesdayVideos",
+
+        "thursdayVideos",
+
+        "fridayVideos",
+
+        "saturdayVideos",
+
+        "sundayVideos"
+
+    ];
+
+
+    /* -----------------------------------------------------
+       UPDATE EVERY CLIENT
+    ----------------------------------------------------- */
 
     clients =
         clients.map(
             client => {
 
-                const clientName =
-                    String(
-                        client.name || ""
-                    )
-                    .trim()
-                    .toLowerCase();
-
-
                 const matchingEntries =
                     timesheets.filter(
-                        item => {
-
-                            const project =
-                                String(
-                                    item.project ||
-                                    ""
-                                )
-                                .trim()
-                                .toLowerCase();
-
-
-                            return (
-                                project &&
-                                (
-                                    project.includes(
-                                        clientName
-                                    ) ||
-                                    clientName.includes(
-                                        project
-                                    )
-                                )
-                            );
-
-                        }
+                        entry =>
+                            belongsToClient(
+                                entry,
+                                client
+                            )
                     );
 
 
+                /*
+                   If there are no matching timesheets,
+                   keep existing client information.
+                */
+
                 if (
-                    matchingEntries.length === 0
+                    !matchingEntries.length
                 ) {
 
                     return client;
@@ -777,39 +1020,448 @@ function syncClientStatistics() {
                 }
 
 
-                let totalHours = 0;
+                let totalVideos = 0;
+
+                let completedVideos = 0;
+
+                let pendingVideos = 0;
+
+                let weeklyVideos = 0;
+
+                let monthlyVideos = 0;
+
+
+                let hasExplicitTotal =
+                    false;
+
+                let hasExplicitCompleted =
+                    false;
+
+                let hasExplicitPending =
+                    false;
+
+
+                const daily = {
+
+                    mondayVideos: 0,
+
+                    tuesdayVideos: 0,
+
+                    wednesdayVideos: 0,
+
+                    thursdayVideos: 0,
+
+                    fridayVideos: 0,
+
+                    saturdayVideos: 0,
+
+                    sundayVideos: 0
+
+                };
+
+
+                const projectSet =
+                    new Set();
+
+
+                /* -----------------------------------------
+                   PROCESS EACH TIMESHEET
+                ----------------------------------------- */
 
                 matchingEntries.forEach(
                     entry => {
 
-                        totalHours +=
-                            toNumber(
-                                entry.hours
+                        const entryDate =
+                            getEntryDate(
+                                entry
                             );
+
+
+                        /* ---------------------------------
+                           TOTAL VIDEOS
+                        --------------------------------- */
+
+                        const total =
+                            getVideoNumber(
+                                entry,
+                                [
+                                    "totalVideos",
+                                    "videos",
+                                    "videoCount",
+                                    "totalVideo"
+                                ]
+                            );
+
+
+                        /* ---------------------------------
+                           COMPLETED VIDEOS
+                        --------------------------------- */
+
+                        const completed =
+                            getVideoNumber(
+                                entry,
+                                [
+                                    "completedVideos",
+                                    "completedVideo",
+                                    "doneVideos",
+                                    "completed"
+                                ]
+                            );
+
+
+                        /* ---------------------------------
+                           BALANCE / PENDING VIDEOS
+                        --------------------------------- */
+
+                        const balance =
+                            getVideoNumber(
+                                entry,
+                                [
+                                    "balanceVideos",
+                                    "pendingVideos",
+                                    "pendingVideo",
+                                    "balanceVideo",
+                                    "balance"
+                                ]
+                            );
+
+
+                        /*
+                           Determine total for this entry.
+                        */
+
+                        const recordTotal =
+                            total !== null
+
+                                ? total
+
+                                : (
+                                    completed !== null ||
+                                    balance !== null
+                                )
+
+                                    ? (
+                                        toNumber(
+                                            completed
+                                        ) +
+                                        toNumber(
+                                            balance
+                                        )
+                                    )
+
+                                    : 1;
+
+
+                        /*
+                           Completed for this entry.
+                        */
+
+                        const recordCompleted =
+                            completed !== null
+
+                                ? Math.min(
+                                    completed,
+                                    recordTotal
+                                )
+
+                                : 0;
+
+
+                        /*
+                           Pending for this entry.
+                        */
+
+                        const recordPending =
+                            balance !== null
+
+                                ? Math.min(
+                                    balance,
+                                    Math.max(
+                                        recordTotal -
+                                        recordCompleted,
+                                        0
+                                    )
+                                )
+
+                                : Math.max(
+                                    recordTotal -
+                                    recordCompleted,
+                                    0
+                                );
+
+
+                        if (
+                            total !== null
+                        ) {
+
+                            hasExplicitTotal =
+                                true;
+
+                        }
+
+
+                        if (
+                            completed !== null
+                        ) {
+
+                            hasExplicitCompleted =
+                                true;
+
+                        }
+
+
+                        if (
+                            balance !== null
+                        ) {
+
+                            hasExplicitPending =
+                                true;
+
+                        }
+
+
+                        totalVideos +=
+                            recordTotal;
+
+
+                        completedVideos +=
+                            recordCompleted;
+
+
+                        pendingVideos +=
+                            recordPending;
+
+
+                        /* ---------------------------------
+                           DATE BASED VIDEO STATISTICS
+                        --------------------------------- */
+
+                        if (
+                            entryDate
+                        ) {
+
+                            /* CURRENT WEEK */
+
+                            if (
+                                entryDate >=
+                                    weekStart &&
+                                entryDate <=
+                                    now
+                            ) {
+
+                                weeklyVideos +=
+                                    recordTotal;
+
+                            }
+
+
+                            /* CURRENT MONTH */
+
+                            if (
+
+                                entryDate >=
+                                    monthStart &&
+
+                                entryDate.getFullYear() ===
+                                    now.getFullYear() &&
+
+                                entryDate.getMonth() ===
+                                    now.getMonth()
+
+                            ) {
+
+                                monthlyVideos +=
+                                    recordTotal;
+
+                            }
+
+
+                            /* DAY OF WEEK */
+
+                            const jsDay =
+                                entryDate.getDay();
+
+
+                            const index =
+                                jsDay === 0
+                                    ? 6
+                                    : jsDay - 1;
+
+
+                            daily[
+                                dayKeys[
+                                    index
+                                ]
+                            ] +=
+                                recordTotal;
+
+                        }
+
+
+                        /* ---------------------------------
+                           PROJECT INFORMATION
+                        --------------------------------- */
+
+                        const projectValue =
+
+                            entry?.projectCode ||
+
+                            entry?.projectName ||
+
+                            (
+                                typeof entry?.project ===
+                                    "string"
+
+                                    ? entry.project
+
+                                    : (
+                                        entry?.project?.code ||
+                                        entry?.project?.name ||
+                                        ""
+                                    )
+                            );
+
+
+                        if (
+                            String(
+                                projectValue
+                            ).trim()
+                        ) {
+
+                            projectSet.add(
+                                String(
+                                    projectValue
+                                ).trim()
+                            );
+
+                        }
 
                     }
                 );
 
 
-                return {
+                /* -----------------------------------------
+                   FINAL VALUES
+                ----------------------------------------- */
+
+                const finalCompleted =
+                    hasExplicitCompleted
+
+                        ? completedVideos
+
+                        : toNumber(
+                            client.completedVideos
+                        );
+
+
+                const finalPending =
+                    hasExplicitPending
+
+                        ? pendingVideos
+
+                        : Math.max(
+                            totalVideos -
+                            finalCompleted,
+                            0
+                        );
+
+
+                const finalTotal =
+                    (
+                        hasExplicitTotal ||
+                        hasExplicitCompleted ||
+                        hasExplicitPending
+                    )
+
+                        ? totalVideos
+
+                        : toNumber(
+                            client.videos
+                        );
+
+
+                /* -----------------------------------------
+                   RETURN UPDATED CLIENT
+                ----------------------------------------- */
+
+                return normalizeClient({
 
                     ...client,
 
-                    timesheetHours:
-                        totalHours
+                    videos:
+                        finalTotal,
 
-                };
+
+                    completedVideos:
+                        Math.min(
+                            finalCompleted,
+                            finalTotal
+                        ),
+
+
+                    pendingVideos:
+                        Math.max(
+                            Math.min(
+                                finalPending,
+                                finalTotal
+                            ),
+                            0
+                        ),
+
+
+                    weeklyVideos,
+
+                    monthlyVideos,
+
+
+                    ...daily,
+
+
+                    /*
+                       Only update project count
+                       when timesheet actually has
+                       project information.
+                    */
+
+                    projects:
+                        projectSet.size > 0
+
+                            ? projectSet.size
+
+                            : client.projects,
+
+
+                    /*
+                       Keep timesheet hours
+                       for future use/display.
+                    */
+
+                    timesheetHours:
+                        matchingEntries.reduce(
+                            (
+                                sum,
+                                entry
+                            ) => {
+
+                                return (
+                                    sum +
+                                    toNumber(
+                                        entry?.hours ||
+                                        entry?.workingHours ||
+                                        (
+                                            entry?.workingMinutes /
+                                            60
+                                        )
+                                    )
+                                );
+
+                            },
+                            0
+                        )
+
+                });
 
             }
-        );
-
-
-    clients =
-        clients.map(
-            client =>
-                normalizeClient(
-                    client
-                )
         );
 
 
