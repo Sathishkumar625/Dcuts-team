@@ -1,1470 +1,1367 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Settings | THE D CUTS</title>
 
-    <link
-        rel="stylesheet"
-        href="../css/style.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../css/settings.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-    >
-
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/settings.css">
 </head>
 
 <body>
 
-<!-- ==========================================
-     AUTH
-========================================== -->
+    <!-- =====================================================
+         NAVBAR
+    ====================================================== -->
 
-<script src="../js/auth.js"></script>
+    <nav class="navbar">
 
-<script>
-
-const role =
-    localStorage.getItem("role");
-
-if (!role) {
-
-    window.location.href =
-        "../login.html";
-
-}
-
-if (role !== "admin") {
-
-    window.location.href =
-        "timesheet.html";
-
-}
-
-</script>
-
-
-<!-- ==========================================
-     NAVBAR
-========================================== -->
-
-<nav class="navbar">
-
-    <div class="logo">
-
-        <div class="logo-icon">
-
-            <i class="fa-regular fa-clock"></i>
-
+        <div class="navbar-brand">
+            <span class="brand-main">THE D CUTS</span>
+            <span class="brand-sub">Management System</span>
         </div>
 
-        <h2>DCUTS.TS</h2>
+        <button
+            class="mobile-menu-btn"
+            type="button"
+            onclick="toggleSettingsSidebar()"
+            aria-label="Toggle settings menu">
+            ☰
+        </button>
 
-    </div>
-
-
-    <ul class="menu">
-
-        <li>
+        <div class="menu">
 
             <a href="../index.html">
-
-                <i class="fa-solid fa-house"></i>
-
+                <span>⌂</span>
                 Home
-
             </a>
 
-        </li>
-
-
-        <li>
-
-            <a href="dashboard.html">
-
-                <i class="fa-solid fa-table-columns"></i>
-
+            <a href="../index.html">
+                <span>▦</span>
                 Dashboard
-
             </a>
-
-        </li>
-
-
-        <li>
 
             <a href="timesheet.html">
-
-                <i class="fa-regular fa-clock"></i>
-
+                <span>◷</span>
                 Timesheet
-
             </a>
-
-        </li>
-
-
-        <li>
 
             <a href="reports.html">
-
-                <i class="fa-regular fa-file-lines"></i>
-
+                <span>▤</span>
                 Reports
-
             </a>
-
-        </li>
-
-
-        <li>
 
             <a href="calendar.html">
-
-                <i class="fa-solid fa-calendar-days"></i>
-
+                <span>□</span>
                 Calendar
-
             </a>
-
-        </li>
-
-
-        <li>
 
             <a href="employees.html">
-
-                <i class="fa-solid fa-users"></i>
-
+                <span>♙</span>
                 Employees
-
             </a>
-
-        </li>
-
-
-        <li>
 
             <a href="clients.html">
-
-                <i class="fa-solid fa-user-tie"></i>
-
+                <span>♧</span>
                 Clients
-
             </a>
 
-        </li>
-
-
-        <li class="active">
-
-            <a href="settings.html">
-
-                <i class="fa-solid fa-gear"></i>
-
+            <a href="settings.html" class="active">
+                <span>⚙</span>
                 Settings
-
             </a>
 
-        </li>
-
-    </ul>
-
-
-    <div class="profile">
-
-        <p>Dcuts</p>
-
-        <span>
-
-            <i class="fa-solid fa-shield-halved"></i>
-
-            Admin
-
-        </span>
-
-    </div>
-
-</nav>
-
-
-
-<!-- ==========================================
-     SETTINGS PAGE
-========================================== -->
-
-<div class="settings-page">
-
-
-    <!-- ======================================
-         SIDEBAR
-    ======================================= -->
-
-    <aside class="settings-sidebar">
-
-
-        <div class="sidebar-title">
-
-            <div class="settings-title-icon">
-
-                <i class="fa-solid fa-gear"></i>
-
-            </div>
-
-            <div>
-
-                <h2>Settings</h2>
-
-                <span>
-                    Manage your system
-                </span>
-
-            </div>
+            <a href="../login.html" onclick="logoutSettings(event)">
+                <span>↪</span>
+                Logout
+            </a>
 
         </div>
 
+    </nav>
 
-        <ul>
 
+    <!-- =====================================================
+         SETTINGS PAGE
+    ====================================================== -->
 
-            <li
-                class="active"
-                onclick="showSection('profile', this)"
-            >
+    <main class="settings-page">
 
-                <i class="fa-solid fa-user"></i>
-
-                <span>Profile</span>
-
-            </li>
-
-
-            <li
-                onclick="showSection('company', this)"
-            >
-
-                <i class="fa-solid fa-building"></i>
-
-                <span>Company</span>
-
-            </li>
-
-
-            <li
-                onclick="showSection('employees', this)"
-            >
-
-                <i class="fa-solid fa-users"></i>
-
-                <span>Employees</span>
-
-            </li>
-
-
-            <li
-                onclick="showSection('projects', this)"
-            >
-
-                <i class="fa-solid fa-diagram-project"></i>
-
-                <span>Projects</span>
-
-            </li>
-
-
-            <li
-                onclick="showSection('clients', this)"
-            >
-
-                <i class="fa-solid fa-store"></i>
-
-                <span>Clients</span>
-
-            </li>
-
-
-            <li
-                onclick="showSection('security', this)"
-            >
-
-                <i class="fa-solid fa-lock"></i>
-
-                <span>Security</span>
-
-            </li>
-
-
-            <li
-                onclick="showSection('notifications', this)"
-            >
-
-                <i class="fa-solid fa-bell"></i>
-
-                <span>Notifications</span>
-
-            </li>
-
-
-            <li
-                onclick="showSection('appearance', this)"
-            >
-
-                <i class="fa-solid fa-palette"></i>
-
-                <span>Appearance</span>
-
-            </li>
-
-
-            <li
-                onclick="showSection('backup', this)"
-            >
-
-                <i class="fa-solid fa-database"></i>
-
-                <span>Backup</span>
-
-            </li>
-
-
-            <li
-                onclick="showSection('about', this)"
-            >
-
-                <i class="fa-solid fa-circle-info"></i>
-
-                <span>About</span>
-
-            </li>
-
-
-        </ul>
-
-
-        <div class="sidebar-footer">
-
-            <i class="fa-solid fa-shield-halved"></i>
-
-            <div>
-
-                <strong>Admin Access</strong>
-
-                <small>
-                    Full system control
-                </small>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-
-    <!-- ======================================
-         CONTENT
-    ======================================= -->
-
-    <main class="settings-content">
-
-
-        <div class="content-top">
-
-            <div>
-
-                <span class="content-label">
-                    SYSTEM SETTINGS
-                </span>
-
-                <h1>
-                    Settings
-                </h1>
-
-                <p>
-                    Manage your THE D CUTS
-                    timesheet system.
-                </p>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ==================================
-             PROFILE
-        =================================== -->
-
+        <!-- Mobile Overlay -->
         <div
-            class="settings-card"
-            id="profile"
-        >
+            class="settings-overlay"
+            id="settingsOverlay"
+            onclick="toggleSettingsSidebar()">
+        </div>
 
-            <div class="card-heading">
 
-                <div class="card-icon">
+        <!-- =================================================
+             SIDEBAR
+        ================================================== -->
 
-                    <i class="fa-solid fa-user"></i>
+        <aside class="settings-sidebar" id="settingsSidebar">
 
+            <div class="sidebar-header">
+
+                <div class="sidebar-logo">
+                    ⚙
                 </div>
 
                 <div>
-
-                    <h2>Admin Profile</h2>
-
-                    <p>
-                        Manage your administrator
-                        account information.
-                    </p>
-
+                    <h2>Settings</h2>
+                    <p>System Control Center</p>
                 </div>
-
-            </div>
-
-
-            <div class="form-grid">
-
-
-                <div class="form-group">
-
-                    <label>
-                        Admin Name
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-user"></i>
-
-                        <input
-                            id="adminName"
-                            type="text"
-                            placeholder="Admin Name"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Admin Email
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-envelope"></i>
-
-                        <input
-                            id="adminEmail"
-                            type="email"
-                            placeholder="Admin Email"
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="card-actions">
 
                 <button
-                    class="primary-btn"
-                    onclick="saveProfile()"
-                >
-
-                    <i class="fa-solid fa-check"></i>
-
-                    Save Profile
-
+                    class="sidebar-close"
+                    type="button"
+                    onclick="toggleSettingsSidebar()">
+                    ×
                 </button>
 
             </div>
 
-        </div>
+
+            <div class="sidebar-divider"></div>
 
 
-
-        <!-- ==================================
-             COMPANY
-        =================================== -->
-
-        <div
-            class="settings-card hidden"
-            id="company"
-        >
-
-            <div class="card-heading">
-
-                <div class="card-icon">
-
-                    <i class="fa-solid fa-building"></i>
-
-                </div>
-
-                <div>
-
-                    <h2>Company Settings</h2>
-
-                    <p>
-                        Update your company
-                        information.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="form-grid">
-
-
-                <div class="form-group">
-
-                    <label>
-                        Company Name
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-building"></i>
-
-                        <input
-                            id="companyName"
-                            placeholder="Company Name"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Phone
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-phone"></i>
-
-                        <input
-                            id="companyPhone"
-                            placeholder="Phone Number"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Email
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-envelope"></i>
-
-                        <input
-                            id="companyEmail"
-                            type="email"
-                            placeholder="Company Email"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group full-width">
-
-                    <label>
-                        Address
-                    </label>
-
-                    <textarea
-                        id="companyAddress"
-                        placeholder="Company Address"
-                    ></textarea>
-
-                </div>
-
-            </div>
-
-
-            <div class="card-actions">
+            <div class="settings-menu">
 
                 <button
-                    class="primary-btn"
-                    onclick="saveCompany()"
-                >
+                    class="settings-menu-item active"
+                    data-section="profile"
+                    onclick="showSection('profile')">
 
-                    <i class="fa-solid fa-check"></i>
+                    <span class="menu-icon">◉</span>
 
-                    Save Company
+                    <span class="menu-text">
+                        <strong>Profile</strong>
+                        <small>Admin information</small>
+                    </span>
 
                 </button>
 
-            </div>
 
-        </div>
+                <button
+                    class="settings-menu-item"
+                    data-section="company"
+                    onclick="showSection('company')">
 
+                    <span class="menu-icon">▣</span>
 
+                    <span class="menu-text">
+                        <strong>Company</strong>
+                        <small>Company information</small>
+                    </span>
 
-        <!-- ==================================
-             EMPLOYEES
-        =================================== -->
-
-        <div
-            class="settings-card hidden"
-            id="employees"
-        >
-
-            <div class="card-heading">
-
-                <div class="card-icon">
-
-                    <i class="fa-solid fa-users"></i>
-
-                </div>
-
-                <div>
-
-                    <h2>Employees</h2>
-
-                    <p>
-                        Add and manage employees.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="add-form">
-
-
-                <div class="form-group">
-
-                    <label>
-                        Employee Name
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-user"></i>
-
-                        <input
-                            id="newEmployeeName"
-                            placeholder="Employee Name"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Employee Email
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-envelope"></i>
-
-                        <input
-                            id="newEmployeeEmail"
-                            type="email"
-                            placeholder="Employee Email"
-                        >
-
-                    </div>
-
-                </div>
+                </button>
 
 
                 <button
-                    class="primary-btn add-btn"
-                    onclick="addEmployee()"
-                >
+                    class="settings-menu-item"
+                    data-section="employees"
+                    onclick="showSection('employees')">
 
-                    <i class="fa-solid fa-plus"></i>
+                    <span class="menu-icon">♙</span>
 
-                    Add Employee
+                    <span class="menu-text">
+                        <strong>Employees</strong>
+                        <small>Employee settings</small>
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-menu-item"
+                    data-section="projects"
+                    onclick="showSection('projects')">
+
+                    <span class="menu-icon">▤</span>
+
+                    <span class="menu-text">
+                        <strong>Projects</strong>
+                        <small>Project management</small>
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-menu-item"
+                    data-section="clients"
+                    onclick="showSection('clients')">
+
+                    <span class="menu-icon">♧</span>
+
+                    <span class="menu-text">
+                        <strong>Clients</strong>
+                        <small>Client management</small>
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-menu-item"
+                    data-section="security"
+                    onclick="showSection('security')">
+
+                    <span class="menu-icon">⌕</span>
+
+                    <span class="menu-text">
+                        <strong>Security</strong>
+                        <small>Password & access</small>
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-menu-item"
+                    data-section="notifications"
+                    onclick="showSection('notifications')">
+
+                    <span class="menu-icon">♢</span>
+
+                    <span class="menu-text">
+                        <strong>Notifications</strong>
+                        <small>Notification preferences</small>
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-menu-item"
+                    data-section="appearance"
+                    onclick="showSection('appearance')">
+
+                    <span class="menu-icon">◐</span>
+
+                    <span class="menu-text">
+                        <strong>Appearance</strong>
+                        <small>Theme settings</small>
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-menu-item"
+                    data-section="backup"
+                    onclick="showSection('backup')">
+
+                    <span class="menu-icon">⇩</span>
+
+                    <span class="menu-text">
+                        <strong>Backup</strong>
+                        <small>Data backup & restore</small>
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="settings-menu-item"
+                    data-section="about"
+                    onclick="showSection('about')">
+
+                    <span class="menu-icon">ⓘ</span>
+
+                    <span class="menu-text">
+                        <strong>About</strong>
+                        <small>System information</small>
+                    </span>
 
                 </button>
 
             </div>
 
 
-            <div class="list-heading">
+            <div class="sidebar-footer">
 
-                <span>
-                    Employee List
-                </span>
+                <div class="admin-status">
 
-            </div>
-
-
-            <div id="employeeList"></div>
-
-        </div>
-
-
-
-        <!-- ==================================
-             PROJECTS
-        =================================== -->
-
-        <div
-            class="settings-card hidden"
-            id="projects"
-        >
-
-            <div class="card-heading">
-
-                <div class="card-icon">
-
-                    <i class="fa-solid fa-diagram-project"></i>
-
-                </div>
-
-                <div>
-
-                    <h2>Projects</h2>
-
-                    <p>
-                        Manage your project list.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="add-form">
-
-
-                <div class="form-group">
-
-                    <label>
-                        Project Name
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-folder"></i>
-
-                        <input
-                            id="newProjectName"
-                            placeholder="Project Name"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Project Code
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-hashtag"></i>
-
-                        <input
-                            id="newProjectCode"
-                            placeholder="Project Code"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <button
-                    class="primary-btn add-btn"
-                    onclick="addProject()"
-                >
-
-                    <i class="fa-solid fa-plus"></i>
-
-                    Add Project
-
-                </button>
-
-            </div>
-
-
-            <div class="list-heading">
-
-                <span>
-                    Project List
-                </span>
-
-            </div>
-
-
-            <div id="projectList"></div>
-
-        </div>
-
-
-
-        <!-- ==================================
-             CLIENTS
-        =================================== -->
-
-        <div
-            class="settings-card hidden"
-            id="clients"
-        >
-
-            <div class="card-heading">
-
-                <div class="card-icon">
-
-                    <i class="fa-solid fa-store"></i>
-
-                </div>
-
-                <div>
-
-                    <h2>Clients</h2>
-
-                    <p>
-                        Manage your client database.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="add-form client-form">
-
-
-                <div class="form-group">
-
-                    <label>
-                        Client Name
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-user-tie"></i>
-
-                        <input
-                            id="newClientName"
-                            placeholder="Client Name"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Client Code
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-hashtag"></i>
-
-                        <input
-                            id="newClientCode"
-                            placeholder="Client Code"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Location
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-location-dot"></i>
-
-                        <input
-                            id="newClientLocation"
-                            placeholder="Location"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <button
-                    class="primary-btn add-btn"
-                    onclick="addClient()"
-                >
-
-                    <i class="fa-solid fa-plus"></i>
-
-                    Add Client
-
-                </button>
-
-            </div>
-
-
-            <div class="list-heading">
-
-                <span>
-                    Client List
-                </span>
-
-            </div>
-
-
-            <div id="clientList"></div>
-
-        </div>
-
-
-
-        <!-- ==================================
-             SECURITY
-        =================================== -->
-
-        <div
-            class="settings-card hidden"
-            id="security"
-        >
-
-            <div class="card-heading">
-
-                <div class="card-icon danger-icon">
-
-                    <i class="fa-solid fa-lock"></i>
-
-                </div>
-
-                <div>
-
-                    <h2>Security</h2>
-
-                    <p>
-                        Change your administrator
-                        password.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="form-grid">
-
-
-                <div class="form-group full-width">
-
-                    <label>
-                        Current Password
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-lock"></i>
-
-                        <input
-                            type="password"
-                            id="currentPassword"
-                            placeholder="Current Password"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        New Password
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-key"></i>
-
-                        <input
-                            type="password"
-                            id="newPassword"
-                            placeholder="New Password"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Confirm Password
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="fa-solid fa-key"></i>
-
-                        <input
-                            type="password"
-                            id="confirmPassword"
-                            placeholder="Confirm Password"
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="card-actions">
-
-                <button
-                    class="primary-btn"
-                    onclick="changePassword()"
-                >
-
-                    <i class="fa-solid fa-shield-halved"></i>
-
-                    Change Password
-
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ==================================
-             NOTIFICATIONS
-        =================================== -->
-
-        <div
-            class="settings-card hidden"
-            id="notifications"
-        >
-
-            <div class="card-heading">
-
-                <div class="card-icon">
-
-                    <i class="fa-solid fa-bell"></i>
-
-                </div>
-
-                <div>
-
-                    <h2>Notifications</h2>
-
-                    <p>
-                        Control your notification
-                        preferences.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="toggle-list">
-
-
-                <label class="toggle-row">
+                    <div class="status-dot"></div>
 
                     <div>
-
-                        <strong>
-                            Email Notification
-                        </strong>
-
-                        <span>
-                            Receive important updates
-                            through email.
-                        </span>
-
+                        <strong>Administrator</strong>
+                        <small>Full system access</small>
                     </div>
-
-                    <input
-                        type="checkbox"
-                        id="emailNotifications"
-                    >
-
-                </label>
-
-
-                <label class="toggle-row">
-
-                    <div>
-
-                        <strong>
-                            Report Notification
-                        </strong>
-
-                        <span>
-                            Get notified about reports.
-                        </span>
-
-                    </div>
-
-                    <input
-                        type="checkbox"
-                        id="reportNotifications"
-                    >
-
-                </label>
-
-
-                <label class="toggle-row">
-
-                    <div>
-
-                        <strong>
-                            Reminder
-                        </strong>
-
-                        <span>
-                            Receive timesheet reminders.
-                        </span>
-
-                    </div>
-
-                    <input
-                        type="checkbox"
-                        id="reminderNotifications"
-                    >
-
-                </label>
-
-            </div>
-
-
-            <div class="card-actions">
-
-                <button
-                    class="primary-btn"
-                    onclick="saveNotifications()"
-                >
-
-                    <i class="fa-solid fa-check"></i>
-
-                    Save Notifications
-
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ==================================
-             APPEARANCE
-        =================================== -->
-
-        <div
-            class="settings-card hidden"
-            id="appearance"
-        >
-
-            <div class="card-heading">
-
-                <div class="card-icon">
-
-                    <i class="fa-solid fa-palette"></i>
 
                 </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
+
+        <section class="settings-content">
+
+            <!-- Page Header -->
+
+            <header class="settings-page-header">
 
                 <div>
 
-                    <h2>Appearance</h2>
-
-                    <p>
-                        Choose your preferred
-                        application theme.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="theme-selector">
-
-                <label>
-                    Theme
-                </label>
-
-                <select id="themeSelect">
-
-                    <option value="dark">
-                        Dark
-                    </option>
-
-                    <option value="light">
-                        Light
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <div class="card-actions">
-
-                <button
-                    class="primary-btn"
-                    onclick="saveAppearance()"
-                >
-
-                    <i class="fa-solid fa-check"></i>
-
-                    Save Appearance
-
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ==================================
-             BACKUP
-        =================================== -->
-
-        <div
-            class="settings-card hidden"
-            id="backup"
-        >
-
-            <div class="card-heading">
-
-                <div class="card-icon">
-
-                    <i class="fa-solid fa-database"></i>
-
-                </div>
-
-                <div>
-
-                    <h2>Backup & Restore</h2>
-
-                    <p>
-                        Protect and restore your
-                        system data.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="backup-grid">
-
-
-                <div class="backup-box">
-
-                    <div class="backup-box-icon">
-
-                        <i class="fa-solid fa-download"></i>
-
-                    </div>
-
-                    <h3>
-                        Download Backup
-                    </h3>
-
-                    <p>
-                        Save your current system
-                        data as a backup file.
-                    </p>
-
-                    <button
-                        class="primary-btn"
-                        onclick="backupData()"
-                    >
-
-                        <i class="fa-solid fa-download"></i>
-
-                        Download Backup
-
-                    </button>
-
-                </div>
-
-
-                <div class="backup-box">
-
-                    <div class="backup-box-icon">
-
-                        <i class="fa-solid fa-upload"></i>
-
-                    </div>
-
-                    <h3>
-                        Restore Backup
-                    </h3>
-
-                    <p>
-                        Restore your system from
-                        an existing backup file.
-                    </p>
-
-                    <input
-                        type="file"
-                        id="restoreFile"
-                    >
-
-                    <button
-                        class="secondary-btn"
-                        onclick="restoreData()"
-                    >
-
-                        <i class="fa-solid fa-upload"></i>
-
-                        Restore
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ==================================
-             ABOUT
-        =================================== -->
-
-        <div
-            class="settings-card hidden"
-            id="about"
-        >
-
-            <div class="about-header">
-
-                <div class="about-logo">
-
-                    <i class="fa-regular fa-clock"></i>
-
-                </div>
-
-                <div>
-
-                    <h2>
+                    <span class="page-eyebrow">
                         THE D CUTS
-                    </h2>
+                    </span>
+
+                    <h1>
+                        System Settings
+                    </h1>
 
                     <p>
-                        Timesheet Management System
+                        Manage your profile, company information,
+                        preferences and system data.
                     </p>
 
                 </div>
 
-            </div>
+                <div class="settings-status-card">
+
+                    <span class="status-indicator"></span>
+
+                    <div>
+                        <strong>System Active</strong>
+                        <small>Settings are synchronized</small>
+                    </div>
+
+                </div>
+
+            </header>
 
 
-            <div class="about-grid">
+            <!-- =================================================
+                 PROFILE
+            ================================================== -->
 
+            <section
+                class="settings-card"
+                id="profile-section"
+                data-section-content="profile">
 
-                <div class="about-item">
+                <div class="card-header">
 
-                    <span>Application</span>
+                    <div class="card-icon">
+                        ◉
+                    </div>
 
-                    <strong>
-                        DCUTS.TS
-                    </strong>
+                    <div>
+                        <h2>Administrator Profile</h2>
+                        <p>Manage the administrator account information.</p>
+                    </div>
 
                 </div>
 
 
-                <div class="about-item">
+                <div class="form-grid">
 
-                    <span>Version</span>
+                    <div class="form-group">
 
-                    <strong>
-                        2.0
-                    </strong>
+                        <label for="adminName">
+                            Administrator Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="adminName"
+                            placeholder="Enter administrator name"
+                            autocomplete="name">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="adminEmail">
+                            Administrator Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="adminEmail"
+                            placeholder="Enter administrator email"
+                            autocomplete="email">
+
+                    </div>
 
                 </div>
 
 
-                <div class="about-item">
+                <div class="card-actions">
 
-                    <span>Access</span>
+                    <button
+                        class="btn btn-primary"
+                        type="button"
+                        onclick="saveProfile()">
 
-                    <strong>
-                        Admin
-                    </strong>
+                        <span>✓</span>
+                        Save Profile
+
+                    </button>
 
                 </div>
 
-            </div>
+            </section>
 
-        </div>
 
+            <!-- =================================================
+                 COMPANY
+            ================================================== -->
+
+            <section
+                class="settings-card hidden"
+                id="company-section"
+                data-section-content="company">
+
+                <div class="card-header">
+
+                    <div class="card-icon">
+                        ▣
+                    </div>
+
+                    <div>
+                        <h2>Company Information</h2>
+                        <p>Update your company details.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="companyName">
+                            Company Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="companyName"
+                            placeholder="THE D CUTS">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="companyPhone">
+                            Company Phone
+                        </label>
+
+                        <input
+                            type="text"
+                            id="companyPhone"
+                            placeholder="Enter phone number">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="companyEmail">
+                            Company Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="companyEmail"
+                            placeholder="Enter company email">
+
+                    </div>
+
+
+                    <div class="form-group form-group-full">
+
+                        <label for="companyAddress">
+                            Company Address
+                        </label>
+
+                        <textarea
+                            id="companyAddress"
+                            rows="4"
+                            placeholder="Enter company address"></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-actions">
+
+                    <button
+                        class="btn btn-primary"
+                        type="button"
+                        onclick="saveCompany()">
+
+                        <span>✓</span>
+                        Save Company
+
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 EMPLOYEES
+            ================================================== -->
+
+            <section
+                class="settings-card hidden"
+                id="employees-section"
+                data-section-content="employees">
+
+                <div class="card-header">
+
+                    <div class="card-icon">
+                        ♙
+                    </div>
+
+                    <div>
+                        <h2>Employee Settings</h2>
+                        <p>Manage employee entries used by the settings system.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="inline-form">
+
+                    <div class="form-group">
+
+                        <label for="newEmployeeName">
+                            Employee Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="newEmployeeName"
+                            placeholder="Enter employee name">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="newEmployeeEmail">
+                            Employee Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="newEmployeeEmail"
+                            placeholder="Enter employee email">
+
+                    </div>
+
+
+                    <div class="inline-action">
+
+                        <button
+                            class="btn btn-primary"
+                            type="button"
+                            onclick="addEmployee()">
+
+                            + Add Employee
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="list-section">
+
+                    <div class="list-title-row">
+
+                        <div>
+                            <h3>Employee List</h3>
+                            <p>Saved employee entries</p>
+                        </div>
+
+                        <span
+                            class="list-count"
+                            id="employeeCount">
+                            0
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="settings-list"
+                        id="employeeList">
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 PROJECTS
+            ================================================== -->
+
+            <section
+                class="settings-card hidden"
+                id="projects-section"
+                data-section-content="projects">
+
+                <div class="card-header">
+
+                    <div class="card-icon">
+                        ▤
+                    </div>
+
+                    <div>
+                        <h2>Project Settings</h2>
+                        <p>Manage project information stored in settings.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="inline-form">
+
+                    <div class="form-group">
+
+                        <label for="newProjectName">
+                            Project Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="newProjectName"
+                            placeholder="Enter project name">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="newProjectCode">
+                            Project Code
+                        </label>
+
+                        <input
+                            type="text"
+                            id="newProjectCode"
+                            placeholder="Enter project code">
+
+                    </div>
+
+
+                    <div class="inline-action">
+
+                        <button
+                            class="btn btn-primary"
+                            type="button"
+                            onclick="addProject()">
+
+                            + Add Project
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="list-section">
+
+                    <div class="list-title-row">
+
+                        <div>
+                            <h3>Project List</h3>
+                            <p>Saved project entries</p>
+                        </div>
+
+                        <span
+                            class="list-count"
+                            id="projectCount">
+                            0
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="settings-list"
+                        id="projectList">
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 CLIENTS
+            ================================================== -->
+
+            <section
+                class="settings-card hidden"
+                id="clients-section"
+                data-section-content="clients">
+
+                <div class="card-header">
+
+                    <div class="card-icon">
+                        ♧
+                    </div>
+
+                    <div>
+                        <h2>Client Settings</h2>
+                        <p>Manage client information stored in settings.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="client-form-grid">
+
+                    <div class="form-group">
+
+                        <label for="newClientName">
+                            Client Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="newClientName"
+                            placeholder="Enter client name">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="newClientCode">
+                            Client Code
+                        </label>
+
+                        <input
+                            type="text"
+                            id="newClientCode"
+                            placeholder="Enter client code">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="newClientLocation">
+                            Location
+                        </label>
+
+                        <input
+                            type="text"
+                            id="newClientLocation"
+                            placeholder="Enter location">
+
+                    </div>
+
+
+                    <div class="inline-action">
+
+                        <button
+                            class="btn btn-primary"
+                            type="button"
+                            onclick="addClient()">
+
+                            + Add Client
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="list-section">
+
+                    <div class="list-title-row">
+
+                        <div>
+                            <h3>Client List</h3>
+                            <p>Saved client entries</p>
+                        </div>
+
+                        <span
+                            class="list-count"
+                            id="clientCount">
+                            0
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="settings-list"
+                        id="clientList">
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 SECURITY
+            ================================================== -->
+
+            <section
+                class="settings-card hidden"
+                id="security-section"
+                data-section-content="security">
+
+                <div class="card-header">
+
+                    <div class="card-icon">
+                        ⌕
+                    </div>
+
+                    <div>
+                        <h2>Security</h2>
+                        <p>Change the administrator password.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="security-warning">
+
+                    <div class="warning-icon">
+                        !
+                    </div>
+
+                    <div>
+                        <strong>Security notice</strong>
+                        <p>
+                            Use a strong password and avoid sharing
+                            administrator credentials.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="currentPassword">
+                            Current Password
+                        </label>
+
+                        <div class="password-field">
+
+                            <input
+                                type="password"
+                                id="currentPassword"
+                                placeholder="Enter current password"
+                                autocomplete="current-password">
+
+                            <button
+                                type="button"
+                                onclick="togglePassword('currentPassword', this)"
+                                class="password-toggle">
+                                Show
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="newPassword">
+                            New Password
+                        </label>
+
+                        <div class="password-field">
+
+                            <input
+                                type="password"
+                                id="newPassword"
+                                placeholder="Enter new password"
+                                autocomplete="new-password">
+
+                            <button
+                                type="button"
+                                onclick="togglePassword('newPassword', this)"
+                                class="password-toggle">
+                                Show
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="confirmPassword">
+                            Confirm New Password
+                        </label>
+
+                        <div class="password-field">
+
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                placeholder="Confirm new password"
+                                autocomplete="new-password">
+
+                            <button
+                                type="button"
+                                onclick="togglePassword('confirmPassword', this)"
+                                class="password-toggle">
+                                Show
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-actions">
+
+                    <button
+                        class="btn btn-primary"
+                        type="button"
+                        onclick="changePassword()">
+
+                        <span>✓</span>
+                        Change Password
+
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 NOTIFICATIONS
+            ================================================== -->
+
+            <section
+                class="settings-card hidden"
+                id="notifications-section"
+                data-section-content="notifications">
+
+                <div class="card-header">
+
+                    <div class="card-icon">
+                        ♢
+                    </div>
+
+                    <div>
+                        <h2>Notifications</h2>
+                        <p>Choose which notifications you want to receive.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="toggle-list">
+
+                    <label class="toggle-row">
+
+                        <div class="toggle-info">
+
+                            <strong>Email Notifications</strong>
+
+                            <span>
+                                Receive important system notifications.
+                            </span>
+
+                        </div>
+
+                        <input
+                            type="checkbox"
+                            id="emailNotifications"
+                            onchange="saveNotifications()">
+
+                        <span class="toggle-switch"></span>
+
+                    </label>
+
+
+                    <label class="toggle-row">
+
+                        <div class="toggle-info">
+
+                            <strong>Report Notifications</strong>
+
+                            <span>
+                                Receive notifications related to reports.
+                            </span>
+
+                        </div>
+
+                        <input
+                            type="checkbox"
+                            id="reportNotifications"
+                            onchange="saveNotifications()">
+
+                        <span class="toggle-switch"></span>
+
+                    </label>
+
+
+                    <label class="toggle-row">
+
+                        <div class="toggle-info">
+
+                            <strong>Reminder Notifications</strong>
+
+                            <span>
+                                Receive reminders for pending tasks.
+                            </span>
+
+                        </div>
+
+                        <input
+                            type="checkbox"
+                            id="reminderNotifications"
+                            onchange="saveNotifications()">
+
+                        <span class="toggle-switch"></span>
+
+                    </label>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 APPEARANCE
+            ================================================== -->
+
+            <section
+                class="settings-card hidden"
+                id="appearance-section"
+                data-section-content="appearance">
+
+                <div class="card-header">
+
+                    <div class="card-icon">
+                        ◐
+                    </div>
+
+                    <div>
+                        <h2>Appearance</h2>
+                        <p>Customize the appearance of the settings page.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="appearance-preview">
+
+                    <div class="preview-window">
+
+                        <div class="preview-top"></div>
+
+                        <div class="preview-body">
+
+                            <div class="preview-sidebar"></div>
+
+                            <div class="preview-content">
+
+                                <div class="preview-line large"></div>
+                                <div class="preview-line"></div>
+                                <div class="preview-line short"></div>
+
+                                <div class="preview-card-row">
+
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="appearance-controls">
+
+                        <div class="form-group">
+
+                            <label for="themeSelect">
+                                Theme
+                            </label>
+
+                            <select
+                                id="themeSelect"
+                                onchange="changeTheme()">
+
+                                <option value="dark">
+                                    Dark Mode
+                                </option>
+
+                                <option value="light">
+                                    Light Mode
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <p class="helper-text">
+                            Your selected theme will be saved automatically.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 BACKUP
+            ================================================== -->
+
+            <section
+                class="settings-card hidden"
+                id="backup-section"
+                data-section-content="backup">
+
+                <div class="card-header">
+
+                    <div class="card-icon">
+                        ⇩
+                    </div>
+
+                    <div>
+                        <h2>Backup & Restore</h2>
+                        <p>Download your application data or restore a backup.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="backup-grid">
+
+                    <div class="backup-box">
+
+                        <div class="backup-box-icon">
+                            ⇩
+                        </div>
+
+                        <div>
+
+                            <h3>Download Backup</h3>
+
+                            <p>
+                                Save your local employees, clients,
+                                projects, timesheets and settings data.
+                            </p>
+
+                            <button
+                                class="btn btn-primary"
+                                type="button"
+                                onclick="downloadBackup()">
+
+                                Download Backup
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="backup-box">
+
+                        <div class="backup-box-icon">
+                            ⇧
+                        </div>
+
+                        <div>
+
+                            <h3>Restore Backup</h3>
+
+                            <p>
+                                Restore data from a previously downloaded
+                                THE D CUTS backup file.
+                            </p>
+
+                            <label class="file-upload">
+
+                                <input
+                                    type="file"
+                                    id="restoreFile"
+                                    accept=".json,application/json"
+                                    onchange="restoreBackup(event)">
+
+                                <span>
+                                    Choose Backup File
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="backup-note">
+
+                    <strong>Important:</strong>
+
+                    <span>
+                        Backup files do not contain your login token
+                        or administrator password.
+                    </span>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 ABOUT
+            ================================================== -->
+
+            <section
+                class="settings-card hidden"
+                id="about-section"
+                data-section-content="about">
+
+                <div class="card-header">
+
+                    <div class="card-icon">
+                        ⓘ
+                    </div>
+
+                    <div>
+                        <h2>About THE D CUTS</h2>
+                        <p>Application information.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="about-grid">
+
+                    <div class="about-main">
+
+                        <div class="about-logo">
+                            D
+                        </div>
+
+                        <div>
+
+                            <h2>THE D CUTS</h2>
+
+                            <p>
+                                Digital Production & Management System
+                            </p>
+
+                            <span class="version-badge">
+                                Version 1.0
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="about-info">
+
+                        <div>
+                            <span>Application</span>
+                            <strong>THE D CUTS Management System</strong>
+                        </div>
+
+                        <div>
+                            <span>Platform</span>
+                            <strong>Web Application</strong>
+                        </div>
+
+                        <div>
+                            <span>Access</span>
+                            <strong>Administrator</strong>
+                        </div>
+
+                        <div>
+                            <span>Status</span>
+                            <strong class="online-text">
+                                ● Online
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="about-footer">
+
+                    <span>
+                        © THE D CUTS
+                    </span>
+
+                    <span>
+                        Built for efficient business management
+                    </span>
+
+                </div>
+
+            </section>
+
+        </section>
 
     </main>
 
-</div>
+
+    <!-- =====================================================
+         TOAST CONTAINER
+    ====================================================== -->
+
+    <div
+        class="toast-container"
+        id="toastContainer">
+    </div>
 
 
+    <!-- =====================================================
+         SCRIPTS
+    ====================================================== -->
 
-<!-- ==========================================
-     JS
-========================================== -->
-
-<script src="../js/sidebar.js"></script>
-
-<script src="../js/auth.js"></script>
-
-<script src="../js/settings.js"></script>
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/settings.js"></script>
 
 </body>
-
 </html>

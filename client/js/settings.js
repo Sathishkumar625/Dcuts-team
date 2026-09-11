@@ -1,475 +1,357 @@
-/* ==========================================
-   THE D CUTS SETTINGS SYSTEM
-========================================== */
+/* =========================================================
+   THE D CUTS — SETTINGS SYSTEM
+========================================================= */
 
 const API = "/api";
 
 
-/* ==========================================
-   TOKEN
-========================================== */
+/* =========================================================
+   BASIC HELPERS
+========================================================= */
 
 function getToken() {
-
     return localStorage.getItem("token") || "";
-
 }
 
 
-/* ==========================================
-   AUTH HEADERS
-========================================== */
-
-function authHeaders() {
-
-    return {
-
-        "Content-Type": "application/json",
-
-        "Authorization":
-            `Bearer ${getToken()}`
-
-    };
-
-}
-
-
-/* ==========================================
-   PAGE LOAD
-========================================== */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    async () => {
-
-        const role =
-            localStorage.getItem("role");
-
-
-        if (!role) {
-
-            window.location.href =
-                "../login.html";
-
-            return;
-
-        }
-
-
-        if (role !== "admin") {
-
-            window.location.href =
-                "timesheet.html";
-
-            return;
-
-        }
-
-
-        await loadSettings();
-
-    }
-);
-
-
-/* ==========================================
-   SECTION NAVIGATION
-========================================== */
-
-function showSection(
-    sectionId,
-    clickedItem = null
-) {
-
-    document
-        .querySelectorAll(".settings-card")
-        .forEach(card => {
-
-            card.classList.add("hidden");
-
-        });
-
-
-    const selected =
-        document.getElementById(
-            sectionId
-        );
-
-
-    if (selected) {
-
-        selected.classList.remove(
-            "hidden"
-        );
-
-    }
-
-
-    document
-        .querySelectorAll(
-            ".settings-sidebar li"
-        )
-        .forEach(li => {
-
-            li.classList.remove(
-                "active"
-            );
-
-        });
-
-
-    if (clickedItem) {
-
-        clickedItem.classList.add(
-            "active"
-        );
-
-    }
-
-}
-
-
-/* ==========================================
-   LOAD SETTINGS FROM MONGODB
-========================================== */
-
-async function loadSettings() {
+function getLoggedUser() {
 
     try {
 
-        const response =
-            await fetch(
-                `${API}/settings`,
-                {
-
-                    method: "GET",
-
-                    headers:
-                        authHeaders()
-
-                }
-            );
-
-
-        if (
-            response.status === 401
-        ) {
-
-            window.location.href =
-                "../login.html";
-
-            return;
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        if (
-            !response.ok ||
-            !data.success
-        ) {
-
-            throw new Error(
-                data.message ||
-                "Unable to load settings"
-            );
-
-        }
-
-
-        const setting =
-            data.setting || {};
-
-
-        /* ============================
-           PROFILE
-        ============================ */
-
-        const adminName =
-            document.getElementById(
-                "adminName"
-            );
-
-
-        const adminEmail =
-            document.getElementById(
-                "adminEmail"
-            );
-
-
-        if (adminName) {
-
-            adminName.value =
-                setting.adminName || "";
-
-        }
-
-
-        if (adminEmail) {
-
-            adminEmail.value =
-                setting.adminEmail || "";
-
-        }
-
-
-        /* ============================
-           COMPANY
-        ============================ */
-
-        const companyName =
-            document.getElementById(
-                "companyName"
-            );
-
-
-        const companyPhone =
-            document.getElementById(
-                "companyPhone"
-            );
-
-
-        const companyEmail =
-            document.getElementById(
-                "companyEmail"
-            );
-
-
-        const companyAddress =
-            document.getElementById(
-                "companyAddress"
-            );
-
-
-        if (companyName) {
-
-            companyName.value =
-                setting.companyName ||
-                "THE D CUTS";
-
-        }
-
-
-        if (companyPhone) {
-
-            companyPhone.value =
-                setting.companyPhone || "";
-
-        }
-
-
-        if (companyEmail) {
-
-            companyEmail.value =
-                setting.companyEmail || "";
-
-        }
-
-
-        if (companyAddress) {
-
-            companyAddress.value =
-                setting.companyAddress || "";
-
-        }
-
-
-        /* ============================
-           THEME
-        ============================ */
-
-        const themeSelect =
-            document.getElementById(
-                "themeSelect"
-            );
-
-
-        const theme =
-            setting.theme || "dark";
-
-
-        if (themeSelect) {
-
-            themeSelect.value =
-                theme;
-
-        }
-
-
-        applyTheme(theme);
-
-
-        /* ============================
-           KEEP EXISTING FUNCTIONS
-        ============================ */
-
-        loadEmployees();
-
-        loadProjects();
-
-        loadClients();
-
-        loadNotifications();
-
-
-        /* ============================
-           LOCAL STORAGE BACKUP
-           FOR EXISTING UI
-        ============================ */
-
-        if (
-            setting.adminName
-        ) {
-
-            localStorage.setItem(
-                "adminName",
-                setting.adminName
-            );
-
-        }
-
-
-        if (
-            setting.adminEmail
-        ) {
-
-            localStorage.setItem(
-                "adminEmail",
-                setting.adminEmail
-            );
-
-        }
-
-
-        if (
-            setting.companyName
-        ) {
-
-            localStorage.setItem(
-                "companyName",
-                setting.companyName
-            );
-
-        }
-
-
-        if (
-            setting.companyPhone !== undefined
-        ) {
-
-            localStorage.setItem(
-                "companyPhone",
-                setting.companyPhone || ""
-            );
-
-        }
-
-
-        if (
-            setting.companyEmail !== undefined
-        ) {
-
-            localStorage.setItem(
-                "companyEmail",
-                setting.companyEmail || ""
-            );
-
-        }
-
-
-        if (
-            setting.companyAddress !== undefined
-        ) {
-
-            localStorage.setItem(
-                "companyAddress",
-                setting.companyAddress || ""
-            );
-
-        }
-
-
-        if (setting.theme) {
-
-            localStorage.setItem(
-                "theme",
-                setting.theme
-            );
-
-        }
-
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "LOAD SETTINGS ERROR:",
-            error
+        return JSON.parse(
+            localStorage.getItem("loggedUser") || "null"
         );
 
-
-        alert(
-            "Unable to load Settings from server."
-        );
-
-    }
-
-}
-
-
-/* ==========================================
-   SAVE SETTINGS TO MONGODB
-========================================== */
-
-async function updateSettingsOnServer(
-    settings
-) {
-
-    const response =
-        await fetch(
-            `${API}/settings`,
-            {
-
-                method: "PUT",
-
-                headers:
-                    authHeaders(),
-
-                body:
-                    JSON.stringify(settings)
-
-            }
-        );
-
-
-    if (
-        response.status === 401
-    ) {
-
-        window.location.href =
-            "../login.html";
+    } catch (error) {
 
         return null;
 
     }
 
+}
+
+
+function authHeaders() {
+
+    const token = getToken();
+
+    const headers = {
+        "Content-Type": "application/json"
+    };
+
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+
+    return headers;
+}
+
+
+function safeParse(value, fallback = null) {
+
+    try {
+        return JSON.parse(value);
+    } catch (error) {
+        return fallback;
+    }
+
+}
+
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+function normalizeRole(value) {
+
+    return String(value || "")
+        .trim()
+        .toLowerCase();
+
+}
+
+
+/* =========================================================
+   ADMIN CHECK
+========================================================= */
+
+function isAdminUser() {
+
+    const loggedUser = getLoggedUser();
+
+    const roleFromUser = normalizeRole(
+        loggedUser?.role
+    );
+
+    const roleFromStorage = normalizeRole(
+        localStorage.getItem("role")
+    );
+
+    return (
+        roleFromUser === "admin" ||
+        roleFromUser === "administrator" ||
+        roleFromStorage === "admin" ||
+        roleFromStorage === "administrator"
+    );
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function ensureToastContainer() {
+
+    let container =
+        document.getElementById("toastContainer");
+
+    if (!container) {
+
+        container = document.createElement("div");
+
+        container.id = "toastContainer";
+
+        container.className = "toast-container";
+
+        document.body.appendChild(container);
+
+    }
+
+    return container;
+
+}
+
+
+function showToast(
+    message,
+    type = "info"
+) {
+
+    const container =
+        ensureToastContainer();
+
+    const toast =
+        document.createElement("div");
+
+    toast.className =
+        `toast ${type}`;
+
+    let icon = "ⓘ";
+
+    if (type === "success") {
+        icon = "✓";
+    }
+
+    if (type === "error") {
+        icon = "!";
+    }
+
+    toast.innerHTML = `
+        <div class="toast-icon">
+            ${icon}
+        </div>
+
+        <div class="toast-message">
+            ${escapeHTML(message)}
+        </div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(8px)";
+
+        setTimeout(() => {
+
+            toast.remove();
+
+        }, 250);
+
+    }, 3000);
+
+}
+
+
+/* =========================================================
+   BUTTON LOADING
+========================================================= */
+
+function setButtonLoading(
+    button,
+    loading,
+    loadingText = "Saving..."
+) {
+
+    if (!button) {
+        return;
+    }
+
+    if (loading) {
+
+        if (!button.dataset.originalText) {
+            button.dataset.originalText =
+                button.innerHTML;
+        }
+
+        button.disabled = true;
+
+        button.innerHTML = `
+            <span class="button-spinner"></span>
+            ${escapeHTML(loadingText)}
+        `;
+
+    } else {
+
+        button.disabled = false;
+
+        if (button.dataset.originalText) {
+
+            button.innerHTML =
+                button.dataset.originalText;
+
+            delete button.dataset.originalText;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE SIDEBAR
+========================================================= */
+
+function toggleSettingsSidebar() {
+
+    const sidebar =
+        document.getElementById("settingsSidebar");
+
+    const overlay =
+        document.getElementById("settingsOverlay");
+
+    if (!sidebar) {
+        return;
+    }
+
+    sidebar.classList.toggle("open");
+
+    if (overlay) {
+
+        overlay.classList.toggle(
+            "active",
+            sidebar.classList.contains("open")
+        );
+
+    }
+
+}
+
+
+function closeSettingsSidebar() {
+
+    const sidebar =
+        document.getElementById("settingsSidebar");
+
+    const overlay =
+        document.getElementById("settingsOverlay");
+
+    sidebar?.classList.remove("open");
+
+    overlay?.classList.remove("active");
+
+}
+
+
+/* =========================================================
+   SECTION NAVIGATION
+========================================================= */
+
+function showSection(section) {
+
+    const cards =
+        document.querySelectorAll(
+            "[data-section-content]"
+        );
+
+    cards.forEach(card => {
+
+        const cardSection =
+            card.dataset.sectionContent;
+
+        card.classList.toggle(
+            "hidden",
+            cardSection !== section
+        );
+
+    });
+
+
+    const menuItems =
+        document.querySelectorAll(
+            ".settings-menu-item"
+        );
+
+    menuItems.forEach(item => {
+
+        item.classList.toggle(
+            "active",
+            item.dataset.section === section
+        );
+
+    });
+
+
+    closeSettingsSidebar();
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+/* =========================================================
+   API REQUEST
+========================================================= */
+
+async function updateSettingsOnServer(settings) {
+
+    const response = await fetch(
+        `${API}/settings`,
+        {
+            method: "PUT",
+
+            headers: authHeaders(),
+
+            body: JSON.stringify(settings)
+        }
+    );
+
 
     const data =
-        await response.json();
+        await response.json()
+            .catch(() => ({}));
 
 
-    if (
-        !response.ok ||
-        !data.success
-    ) {
+    if (!response.ok) {
 
         throw new Error(
-            data.message ||
-            "Unable to save settings"
+            data?.message ||
+            data?.error ||
+            `Request failed with status ${response.status}`
         );
 
     }
@@ -480,120 +362,102 @@ async function updateSettingsOnServer(
 }
 
 
-/* ==========================================
-   PROFILE
-========================================== */
+/* =========================================================
+   LOAD SETTINGS
+========================================================= */
 
-async function saveProfile() {
+async function loadSettings() {
 
-    const name =
-        document
-            .getElementById(
-                "adminName"
-            )
-            .value
-            .trim();
-
-
-    const email =
-        document
-            .getElementById(
-                "adminEmail"
-            )
-            .value
-            .trim();
-
-
-    if (!name || !email) {
-
-        alert(
-            "Please enter Name and Email"
-        );
-
-        return;
-
-    }
+    const localSettings =
+        safeParse(
+            localStorage.getItem("settings"),
+            {}
+        ) || {};
 
 
     try {
 
-        const data =
-            await updateSettingsOnServer({
-
-                adminName: name,
-
-                adminEmail: email
-
-            });
-
-
-        if (!data) return;
-
-
-        /* ============================
-           LOCAL STORAGE
-        ============================ */
-
-        localStorage.setItem(
-            "adminName",
-            name
-        );
-
-
-        localStorage.setItem(
-            "adminEmail",
-            email
-        );
-
-
-        /* ============================
-           LOGGED USER
-        ============================ */
-
-        const loggedUser =
-            JSON.parse(
-                localStorage.getItem(
-                    "loggedUser"
-                )
+        const response =
+            await fetch(
+                `${API}/settings`,
+                {
+                    method: "GET",
+                    headers: authHeaders()
+                }
             );
 
 
-        if (loggedUser) {
+        if (!response.ok) {
 
-            loggedUser.name =
-                name;
-
-            loggedUser.email =
-                email;
-
-
-            localStorage.setItem(
-                "loggedUser",
-                JSON.stringify(
-                    loggedUser
-                )
+            throw new Error(
+                `Request failed with status ${response.status}`
             );
 
         }
 
 
-        alert(
-            "Profile Saved Successfully ✅"
+        const data =
+            await response.json();
+
+
+        const settings =
+            data?.setting ||
+            data?.settings ||
+            data ||
+            {};
+
+
+        loadProfile(settings);
+
+        loadCompany(settings);
+
+        loadAppearance(settings);
+
+        loadNotifications();
+
+        loadEmployees();
+
+        loadProjects();
+
+        loadClients();
+
+
+        localStorage.setItem(
+            "settings",
+            JSON.stringify(settings)
         );
 
-    }
+    } catch (error) {
 
-    catch (error) {
-
-        console.error(
-            "PROFILE SAVE ERROR:",
+        console.warn(
+            "Settings API unavailable:",
             error
         );
 
 
-        alert(
-            "Profile Save Failed ❌\n" +
-            error.message
+        /*
+         * If backend is temporarily unavailable,
+         * use the last locally saved settings.
+         */
+
+        loadProfile(localSettings);
+
+        loadCompany(localSettings);
+
+        loadAppearance(localSettings);
+
+        loadNotifications();
+
+        loadEmployees();
+
+        loadProjects();
+
+        loadClients();
+
+
+        showToast(
+            "Server settings could not be loaded. Local settings were used.",
+            "info"
         );
 
     }
@@ -601,52 +465,298 @@ async function saveProfile() {
 }
 
 
-/* ==========================================
-   COMPANY
-========================================== */
+/* =========================================================
+   LOAD PROFILE
+========================================================= */
 
-async function saveCompany() {
+function loadProfile(settings = {}) {
+
+    const loggedUser =
+        getLoggedUser();
+
 
     const name =
-        document
-            .getElementById(
-                "companyName"
-            )
-            .value
-            .trim();
-
-
-    const phone =
-        document
-            .getElementById(
-                "companyPhone"
-            )
-            .value
-            .trim();
+        settings.adminName ||
+        settings.name ||
+        loggedUser?.name ||
+        localStorage.getItem("userName") ||
+        "Sathish Kumar";
 
 
     const email =
-        document
-            .getElementById(
-                "companyEmail"
-            )
-            .value
-            .trim();
+        settings.adminEmail ||
+        settings.email ||
+        loggedUser?.email ||
+        "dcutsdigitalsolutions@gmail.com";
 
 
-    const address =
-        document
-            .getElementById(
-                "companyAddress"
-            )
-            .value
-            .trim();
+    const nameInput =
+        document.getElementById("adminName");
+
+    const emailInput =
+        document.getElementById("adminEmail");
+
+
+    if (nameInput) {
+        nameInput.value = name;
+    }
+
+
+    if (emailInput) {
+        emailInput.value = email;
+    }
+
+}
+
+
+/* =========================================================
+   SAVE PROFILE
+========================================================= */
+
+async function saveProfile() {
+
+    const nameInput =
+        document.getElementById("adminName");
+
+    const emailInput =
+        document.getElementById("adminEmail");
+
+
+    const name =
+        nameInput?.value.trim() || "";
+
+
+    const email =
+        emailInput?.value.trim() || "";
 
 
     if (!name) {
 
-        alert(
-            "Company Name is required"
+        showToast(
+            "Please enter administrator name.",
+            "error"
+        );
+
+        nameInput?.focus();
+
+        return;
+
+    }
+
+
+    if (
+        email &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+
+        showToast(
+            "Please enter a valid email address.",
+            "error"
+        );
+
+        emailInput?.focus();
+
+        return;
+
+    }
+
+
+    const button =
+        document.querySelector(
+            '#profile-section .btn-primary'
+        );
+
+
+    setButtonLoading(
+        button,
+        true,
+        "Saving..."
+    );
+
+
+    try {
+
+        const currentSettings =
+            safeParse(
+                localStorage.getItem("settings"),
+                {}
+            ) || {};
+
+
+        const updatedSettings = {
+            ...currentSettings,
+
+            adminName: name,
+
+            adminEmail:
+                email ||
+                "dcutsdigitalsolutions@gmail.com"
+        };
+
+
+        const result =
+            await updateSettingsOnServer(
+                updatedSettings
+            );
+
+
+        const savedSettings =
+            result?.setting ||
+            result?.settings ||
+            result?.data ||
+            updatedSettings;
+
+
+        localStorage.setItem(
+            "settings",
+            JSON.stringify(savedSettings)
+        );
+
+
+        localStorage.setItem(
+            "userName",
+            name
+        );
+
+
+        const loggedUser =
+            getLoggedUser();
+
+
+        if (loggedUser) {
+
+            loggedUser.name = name;
+
+            loggedUser.email =
+                email ||
+                loggedUser.email;
+
+            localStorage.setItem(
+                "loggedUser",
+                JSON.stringify(loggedUser)
+            );
+
+        }
+
+
+        showToast(
+            "Profile saved successfully.",
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            error.message ||
+            "Unable to save profile.",
+            "error"
+        );
+
+    } finally {
+
+        setButtonLoading(
+            button,
+            false
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOAD COMPANY
+========================================================= */
+
+function loadCompany(settings = {}) {
+
+    const localSettings =
+        safeParse(
+            localStorage.getItem("settings"),
+            {}
+        ) || {};
+
+
+    const source = {
+        ...localSettings,
+        ...settings
+    };
+
+
+    const fields = {
+
+        companyName:
+            source.companyName ||
+            "THE D CUTS",
+
+        companyPhone:
+            source.companyPhone ||
+            "",
+
+        companyEmail:
+            source.companyEmail ||
+            "",
+
+        companyAddress:
+            source.companyAddress ||
+            ""
+
+    };
+
+
+    Object.entries(fields).forEach(
+        ([id, value]) => {
+
+            const element =
+                document.getElementById(id);
+
+            if (element) {
+                element.value = value;
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SAVE COMPANY
+========================================================= */
+
+async function saveCompany() {
+
+    const companyName =
+        document.getElementById(
+            "companyName"
+        )?.value.trim() || "";
+
+
+    const companyPhone =
+        document.getElementById(
+            "companyPhone"
+        )?.value.trim() || "";
+
+
+    const companyEmail =
+        document.getElementById(
+            "companyEmail"
+        )?.value.trim() || "";
+
+
+    const companyAddress =
+        document.getElementById(
+            "companyAddress"
+        )?.value.trim() || "";
+
+
+    if (!companyName) {
+
+        showToast(
+            "Please enter company name.",
+            "error"
         );
 
         return;
@@ -654,70 +764,99 @@ async function saveCompany() {
     }
 
 
-    try {
+    if (
+        companyEmail &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+            companyEmail
+        )
+    ) {
 
-        const data =
-            await updateSettingsOnServer({
-
-                companyName: name,
-
-                companyPhone: phone,
-
-                companyEmail: email,
-
-                companyAddress: address
-
-            });
-
-
-        if (!data) return;
-
-
-        /* ============================
-           LOCAL STORAGE
-        ============================ */
-
-        localStorage.setItem(
-            "companyName",
-            name
+        showToast(
+            "Please enter a valid company email.",
+            "error"
         );
 
-
-        localStorage.setItem(
-            "companyPhone",
-            phone
-        );
-
-
-        localStorage.setItem(
-            "companyEmail",
-            email
-        );
-
-
-        localStorage.setItem(
-            "companyAddress",
-            address
-        );
-
-
-        alert(
-            "Company Settings Saved Successfully ✅"
-        );
+        return;
 
     }
 
-    catch (error) {
 
-        console.error(
-            "COMPANY SAVE ERROR:",
-            error
+    const button =
+        document.querySelector(
+            '#company-section .btn-primary'
         );
 
 
-        alert(
-            "Company Save Failed ❌\n" +
-            error.message
+    setButtonLoading(
+        button,
+        true,
+        "Saving..."
+    );
+
+
+    try {
+
+        const currentSettings =
+            safeParse(
+                localStorage.getItem("settings"),
+                {}
+            ) || {};
+
+
+        const updatedSettings = {
+
+            ...currentSettings,
+
+            companyName,
+
+            companyPhone,
+
+            companyEmail,
+
+            companyAddress
+
+        };
+
+
+        const result =
+            await updateSettingsOnServer(
+                updatedSettings
+            );
+
+
+        const savedSettings =
+            result?.setting ||
+            result?.settings ||
+            result?.data ||
+            updatedSettings;
+
+
+        localStorage.setItem(
+            "settings",
+            JSON.stringify(savedSettings)
+        );
+
+
+        showToast(
+            "Company information saved successfully.",
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            error.message ||
+            "Unable to save company information.",
+            "error"
+        );
+
+    } finally {
+
+        setButtonLoading(
+            button,
+            false
         );
 
     }
@@ -725,9 +864,143 @@ async function saveCompany() {
 }
 
 
-/* ==========================================
-   EMPLOYEES
-========================================== */
+/* =========================================================
+   EMPLOYEES — LOCAL STORAGE
+========================================================= */
+
+function getEmployees() {
+
+    const employees =
+        safeParse(
+            localStorage.getItem("employees"),
+            []
+        );
+
+
+    return Array.isArray(employees)
+        ? employees
+        : [];
+
+}
+
+
+function saveEmployees(employees) {
+
+    localStorage.setItem(
+        "employees",
+        JSON.stringify(employees)
+    );
+
+}
+
+
+function loadEmployees() {
+
+    const list =
+        document.getElementById(
+            "employeeList"
+        );
+
+
+    const count =
+        document.getElementById(
+            "employeeCount"
+        );
+
+
+    if (!list) {
+        return;
+    }
+
+
+    const employees =
+        getEmployees();
+
+
+    if (count) {
+        count.textContent =
+            employees.length;
+    }
+
+
+    if (!employees.length) {
+
+        list.innerHTML = `
+            <div class="settings-list-item">
+                <div class="list-item-main">
+                    <span class="list-item-title">
+                        No employees added
+                    </span>
+                    <span class="list-item-meta">
+                        Add an employee using the form above.
+                    </span>
+                </div>
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        employees
+            .map((employee, index) => {
+
+                const name =
+                    typeof employee === "string"
+                        ? employee
+                        : employee?.name ||
+                          employee?.employeeName ||
+                          "Unnamed Employee";
+
+
+                const email =
+                    typeof employee === "object"
+                        ? employee?.email || ""
+                        : "";
+
+
+                return `
+                    <div class="settings-list-item">
+
+                        <div class="list-item-main">
+
+                            <span class="list-item-title">
+                                ${escapeHTML(name)}
+                            </span>
+
+                            <span class="list-item-meta">
+                                ${escapeHTML(
+                                    email ||
+                                    "Employee entry"
+                                )}
+                            </span>
+
+                        </div>
+
+                        <div class="list-item-actions">
+
+                            <button
+                                type="button"
+                                class="delete-btn"
+                                onclick="deleteEmployee(${index})"
+                                title="Delete employee">
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    </div>
+                `;
+
+            })
+            .join("");
+
+}
+
 
 function addEmployee() {
 
@@ -743,29 +1016,36 @@ function addEmployee() {
         );
 
 
-    if (!nameInput || !emailInput) {
-
-        alert(
-            "Employee input fields not found in HTML"
-        );
-
-        return;
-
-    }
-
-
     const name =
-        nameInput.value.trim();
+        nameInput?.value.trim() || "";
 
 
     const email =
-        emailInput.value.trim();
+        emailInput?.value.trim() || "";
 
 
-    if (!name || !email) {
+    if (!name) {
 
-        alert(
-            "Enter Employee Name and Email"
+        showToast(
+            "Please enter employee name.",
+            "error"
+        );
+
+        nameInput?.focus();
+
+        return;
+
+    }
+
+
+    if (
+        email &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+
+        showToast(
+            "Please enter a valid employee email.",
+            "error"
         );
 
         return;
@@ -773,185 +1053,222 @@ function addEmployee() {
     }
 
 
-    let employees =
-        JSON.parse(
-            localStorage.getItem(
-                "employees"
-            )
-        ) || [];
-
-
-    const exists =
-        employees.some(
-            employee =>
-                employee.email
-                    .toLowerCase()
-                ===
-                email.toLowerCase()
-        );
-
-
-    if (exists) {
-
-        alert(
-            "Employee already exists"
-        );
-
-        return;
-
-    }
+    const employees =
+        getEmployees();
 
 
     employees.push({
-
-        id: Date.now(),
-
-        name: name,
-
-        email: email,
-
-        createdAt:
-            new Date().toISOString()
-
+        name,
+        email
     });
 
 
-    localStorage.setItem(
-        "employees",
-        JSON.stringify(
-            employees
-        )
-    );
+    saveEmployees(employees);
+
+    loadEmployees();
 
 
     nameInput.value = "";
 
-    emailInput.value = "";
+    if (emailInput) {
+        emailInput.value = "";
+    }
 
 
-    loadEmployees();
-
-
-    alert(
-        "Employee Added Successfully ✅"
+    showToast(
+        "Employee added successfully.",
+        "success"
     );
 
 }
 
 
-function loadEmployees() {
-
-    const container =
-        document.getElementById(
-            "employeeList"
-        );
-
-
-    if (!container) return;
-
+function deleteEmployee(index) {
 
     const employees =
-        JSON.parse(
-            localStorage.getItem(
-                "employees"
-            )
-        ) || [];
+        getEmployees();
 
 
-    container.innerHTML = "";
-
-
-    if (employees.length === 0) {
-
-        container.innerHTML =
-            "<p>No Employees Added</p>";
-
+    if (!employees[index]) {
         return;
-
     }
 
 
-    employees.forEach(
-        employee => {
-
-            container.innerHTML += `
-
-                <div class="settings-list-item">
-
-                    <div>
-
-                        <strong>
-                            ${employee.name}
-                        </strong>
-
-                        <small>
-                            ${employee.email}
-                        </small>
-
-                    </div>
-
-                    <button
-                        type="button"
-                        onclick="deleteEmployee(${employee.id})">
-
-                        🗑️
-
-                    </button>
-
-                </div>
-
-            `;
-
-        }
-    );
-
-}
+    const employee =
+        employees[index];
 
 
-function deleteEmployee(id) {
-
-    if (
-        !confirm(
-            "Delete this employee?"
-        )
-    ) {
-
-        return;
-
-    }
+    const name =
+        typeof employee === "string"
+            ? employee
+            : employee?.name || "this employee";
 
 
-    let employees =
-        JSON.parse(
-            localStorage.getItem(
-                "employees"
-            )
-        ) || [];
-
-
-    employees =
-        employees.filter(
-            employee =>
-                employee.id !== id
+    const confirmed =
+        window.confirm(
+            `Delete ${name}?`
         );
 
 
-    localStorage.setItem(
-        "employees",
-        JSON.stringify(
-            employees
-        )
-    );
+    if (!confirmed) {
+        return;
+    }
 
+
+    employees.splice(index, 1);
+
+    saveEmployees(employees);
 
     loadEmployees();
+
+
+    showToast(
+        "Employee deleted.",
+        "success"
+    );
 
 }
 
 
-/* ==========================================
-   PROJECTS
-========================================== */
+/* =========================================================
+   PROJECTS — LOCAL STORAGE
+========================================================= */
+
+function getProjects() {
+
+    const projects =
+        safeParse(
+            localStorage.getItem("projects"),
+            []
+        );
+
+
+    return Array.isArray(projects)
+        ? projects
+        : [];
+
+}
+
+
+function saveProjects(projects) {
+
+    localStorage.setItem(
+        "projects",
+        JSON.stringify(projects)
+    );
+
+}
+
+
+function loadProjects() {
+
+    const list =
+        document.getElementById(
+            "projectList"
+        );
+
+
+    const count =
+        document.getElementById(
+            "projectCount"
+        );
+
+
+    if (!list) {
+        return;
+    }
+
+
+    const projects =
+        getProjects();
+
+
+    if (count) {
+        count.textContent =
+            projects.length;
+    }
+
+
+    if (!projects.length) {
+
+        list.innerHTML = `
+            <div class="settings-list-item">
+                <div class="list-item-main">
+                    <span class="list-item-title">
+                        No projects added
+                    </span>
+                    <span class="list-item-meta">
+                        Add a project using the form above.
+                    </span>
+                </div>
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        projects
+            .map((project, index) => {
+
+                const name =
+                    typeof project === "string"
+                        ? project
+                        : project?.name ||
+                          project?.projectName ||
+                          "Unnamed Project";
+
+
+                const code =
+                    typeof project === "object"
+                        ? project?.code ||
+                          project?.projectCode ||
+                          ""
+                        : "";
+
+
+                return `
+                    <div class="settings-list-item">
+
+                        <div class="list-item-main">
+
+                            <span class="list-item-title">
+                                ${escapeHTML(name)}
+                            </span>
+
+                            <span class="list-item-meta">
+                                ${escapeHTML(
+                                    code ||
+                                    "Project entry"
+                                )}
+                            </span>
+
+                        </div>
+
+                        <div class="list-item-actions">
+
+                            <button
+                                type="button"
+                                class="delete-btn"
+                                onclick="deleteProject(${index})"
+                                title="Delete project">
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    </div>
+                `;
+
+            })
+            .join("");
+
+}
+
 
 function addProject() {
 
@@ -967,214 +1284,256 @@ function addProject() {
         );
 
 
-    if (!nameInput || !codeInput) {
-
-        alert(
-            "Project input fields not found in HTML"
-        );
-
-        return;
-
-    }
-
-
     const name =
-        nameInput.value.trim();
+        nameInput?.value.trim() || "";
 
 
     const code =
-        codeInput.value
-            .trim()
-            .toUpperCase();
+        codeInput?.value.trim() || "";
 
 
-    if (!name || !code) {
+    if (!name) {
 
-        alert(
-            "Enter Project Name and Code"
+        showToast(
+            "Please enter project name.",
+            "error"
         );
+
+        nameInput?.focus();
 
         return;
 
     }
 
 
-    let projects =
-        JSON.parse(
-            localStorage.getItem(
-                "projects"
-            )
-        ) || [];
-
-
-    const exists =
-        projects.some(
-            project =>
-                project.code === code
-        );
-
-
-    if (exists) {
-
-        alert(
-            "Project code already exists"
-        );
-
-        return;
-
-    }
+    const projects =
+        getProjects();
 
 
     projects.push({
-
-        id: Date.now(),
-
-        name: name,
-
-        code: code,
-
-        createdAt:
-            new Date().toISOString()
-
+        name,
+        code
     });
 
 
-    localStorage.setItem(
-        "projects",
-        JSON.stringify(
-            projects
-        )
-    );
+    saveProjects(projects);
+
+    loadProjects();
 
 
     nameInput.value = "";
 
-    codeInput.value = "";
+    if (codeInput) {
+        codeInput.value = "";
+    }
 
 
-    loadProjects();
-
-
-    alert(
-        "Project Added Successfully ✅"
+    showToast(
+        "Project added successfully.",
+        "success"
     );
 
 }
 
 
-function loadProjects() {
-
-    const container =
-        document.getElementById(
-            "projectList"
-        );
-
-
-    if (!container) return;
-
+function deleteProject(index) {
 
     const projects =
-        JSON.parse(
-            localStorage.getItem(
-                "projects"
-            )
-        ) || [];
+        getProjects();
 
 
-    container.innerHTML = "";
-
-
-    if (projects.length === 0) {
-
-        container.innerHTML =
-            "<p>No Projects Added</p>";
-
+    if (!projects[index]) {
         return;
-
     }
 
 
-    projects.forEach(
-        project => {
-
-            container.innerHTML += `
-
-                <div class="settings-list-item">
-
-                    <div>
-
-                        <strong>
-                            ${project.name}
-                        </strong>
-
-                        <small>
-                            Code: ${project.code}
-                        </small>
-
-                    </div>
-
-                    <button
-                        type="button"
-                        onclick="deleteProject(${project.id})">
-
-                        🗑️
-
-                    </button>
-
-                </div>
-
-            `;
-
-        }
-    );
-
-}
+    const project =
+        projects[index];
 
 
-function deleteProject(id) {
-
-    if (
-        !confirm(
-            "Delete this project?"
-        )
-    ) {
-
-        return;
-
-    }
+    const name =
+        typeof project === "string"
+            ? project
+            : project?.name || "this project";
 
 
-    let projects =
-        JSON.parse(
-            localStorage.getItem(
-                "projects"
-            )
-        ) || [];
-
-
-    projects =
-        projects.filter(
-            project =>
-                project.id !== id
+    const confirmed =
+        window.confirm(
+            `Delete ${name}?`
         );
 
 
-    localStorage.setItem(
-        "projects",
-        JSON.stringify(
-            projects
-        )
-    );
+    if (!confirmed) {
+        return;
+    }
 
+
+    projects.splice(index, 1);
+
+    saveProjects(projects);
 
     loadProjects();
+
+
+    showToast(
+        "Project deleted.",
+        "success"
+    );
 
 }
 
 
-/* ==========================================
-   CLIENTS
-========================================== */
+/* =========================================================
+   CLIENTS — LOCAL STORAGE
+========================================================= */
+
+function getClients() {
+
+    const clients =
+        safeParse(
+            localStorage.getItem("clients"),
+            []
+        );
+
+
+    return Array.isArray(clients)
+        ? clients
+        : [];
+
+}
+
+
+function saveClients(clients) {
+
+    localStorage.setItem(
+        "clients",
+        JSON.stringify(clients)
+    );
+
+}
+
+
+function loadClients() {
+
+    const list =
+        document.getElementById(
+            "clientList"
+        );
+
+
+    const count =
+        document.getElementById(
+            "clientCount"
+        );
+
+
+    if (!list) {
+        return;
+    }
+
+
+    const clients =
+        getClients();
+
+
+    if (count) {
+        count.textContent =
+            clients.length;
+    }
+
+
+    if (!clients.length) {
+
+        list.innerHTML = `
+            <div class="settings-list-item">
+                <div class="list-item-main">
+                    <span class="list-item-title">
+                        No clients added
+                    </span>
+                    <span class="list-item-meta">
+                        Add a client using the form above.
+                    </span>
+                </div>
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        clients
+            .map((client, index) => {
+
+                const name =
+                    typeof client === "string"
+                        ? client
+                        : client?.name ||
+                          client?.clientName ||
+                          "Unnamed Client";
+
+
+                const code =
+                    typeof client === "object"
+                        ? client?.code ||
+                          client?.clientCode ||
+                          ""
+                        : "";
+
+
+                const location =
+                    typeof client === "object"
+                        ? client?.location ||
+                          client?.clientLocation ||
+                          ""
+                        : "";
+
+
+                const meta =
+                    [code, location]
+                        .filter(Boolean)
+                        .join(" • ") ||
+                    "Client entry";
+
+
+                return `
+                    <div class="settings-list-item">
+
+                        <div class="list-item-main">
+
+                            <span class="list-item-title">
+                                ${escapeHTML(name)}
+                            </span>
+
+                            <span class="list-item-meta">
+                                ${escapeHTML(meta)}
+                            </span>
+
+                        </div>
+
+                        <div class="list-item-actions">
+
+                            <button
+                                type="button"
+                                class="delete-btn"
+                                onclick="deleteClient(${index})"
+                                title="Delete client">
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    </div>
+                `;
+
+            })
+            .join("");
+
+}
+
 
 function addClient() {
 
@@ -1196,280 +1555,191 @@ function addClient() {
         );
 
 
-    if (!nameInput || !codeInput) {
-
-        alert(
-            "Client input fields not found in HTML"
-        );
-
-        return;
-
-    }
-
-
     const name =
-        nameInput.value.trim();
+        nameInput?.value.trim() || "";
 
 
     const code =
-        codeInput.value
-            .trim()
-            .toUpperCase();
+        codeInput?.value.trim() || "";
 
 
     const location =
-        locationInput
-            ? locationInput.value.trim()
-            : "";
+        locationInput?.value.trim() || "";
 
 
-    if (!name || !code) {
+    if (!name) {
 
-        alert(
-            "Enter Client Name and Code"
+        showToast(
+            "Please enter client name.",
+            "error"
         );
+
+        nameInput?.focus();
 
         return;
 
     }
 
 
-    let clients =
-        JSON.parse(
-            localStorage.getItem(
-                "clients"
-            )
-        ) || [];
-
-
-    const exists =
-        clients.some(
-            client =>
-                client.code === code
-        );
-
-
-    if (exists) {
-
-        alert(
-            "Client code already exists"
-        );
-
-        return;
-
-    }
+    const clients =
+        getClients();
 
 
     clients.push({
 
-        id: Date.now(),
+        name,
 
-        name: name,
+        code,
 
-        code: code,
-
-        location: location,
-
-        createdAt:
-            new Date().toISOString()
+        location
 
     });
 
 
-    localStorage.setItem(
-        "clients",
-        JSON.stringify(
-            clients
-        )
-    );
+    saveClients(clients);
+
+    loadClients();
 
 
     nameInput.value = "";
 
-    codeInput.value = "";
+    if (codeInput) {
+        codeInput.value = "";
+    }
 
     if (locationInput) {
-
         locationInput.value = "";
-
     }
 
 
-    loadClients();
-
-
-    alert(
-        "Client Added Successfully ✅"
+    showToast(
+        "Client added successfully.",
+        "success"
     );
 
 }
 
 
-function loadClients() {
-
-    const container =
-        document.getElementById(
-            "clientList"
-        );
-
-
-    if (!container) return;
-
+function deleteClient(index) {
 
     const clients =
-        JSON.parse(
-            localStorage.getItem(
-                "clients"
-            )
-        ) || [];
+        getClients();
 
 
-    container.innerHTML = "";
-
-
-    if (clients.length === 0) {
-
-        container.innerHTML =
-            "<p>No Clients Added</p>";
-
+    if (!clients[index]) {
         return;
-
     }
 
 
-    clients.forEach(
-        client => {
-
-            container.innerHTML += `
-
-                <div class="settings-list-item">
-
-                    <div>
-
-                        <strong>
-                            ${client.name}
-                        </strong>
-
-                        <small>
-                            ${client.code}
-                            ${
-                                client.location
-                                    ? " - " +
-                                      client.location
-                                    : ""
-                            }
-                        </small>
-
-                    </div>
-
-                    <button
-                        type="button"
-                        onclick="deleteClient(${client.id})">
-
-                        🗑️
-
-                    </button>
-
-                </div>
-
-            `;
-
-        }
-    );
-
-}
+    const client =
+        clients[index];
 
 
-function deleteClient(id) {
-
-    if (
-        !confirm(
-            "Delete this client?"
-        )
-    ) {
-
-        return;
-
-    }
+    const name =
+        typeof client === "string"
+            ? client
+            : client?.name || "this client";
 
 
-    let clients =
-        JSON.parse(
-            localStorage.getItem(
-                "clients"
-            )
-        ) || [];
-
-
-    clients =
-        clients.filter(
-            client =>
-                client.id !== id
+    const confirmed =
+        window.confirm(
+            `Delete ${name}?`
         );
 
 
-    localStorage.setItem(
-        "clients",
-        JSON.stringify(
-            clients
-        )
-    );
+    if (!confirmed) {
+        return;
+    }
 
+
+    clients.splice(index, 1);
+
+    saveClients(clients);
 
     loadClients();
+
+
+    showToast(
+        "Client deleted.",
+        "success"
+    );
 
 }
 
 
-/* ==========================================
-   SECURITY
-========================================== */
+/* =========================================================
+   PASSWORD
+========================================================= */
+
+function togglePassword(
+    inputId,
+    button
+) {
+
+    const input =
+        document.getElementById(inputId);
+
+
+    if (!input) {
+        return;
+    }
+
+
+    if (input.type === "password") {
+
+        input.type = "text";
+
+        if (button) {
+            button.textContent = "Hide";
+        }
+
+    } else {
+
+        input.type = "password";
+
+        if (button) {
+            button.textContent = "Show";
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   CHANGE PASSWORD
+========================================================= */
 
 function changePassword() {
 
-    const currentPassword =
+    const currentInput =
         document.getElementById(
             "currentPassword"
         );
 
 
-    const newPassword =
+    const newInput =
         document.getElementById(
             "newPassword"
         );
 
 
-    const confirmPassword =
+    const confirmInput =
         document.getElementById(
             "confirmPassword"
         );
 
 
-    if (
-        !currentPassword ||
-        !newPassword ||
-        !confirmPassword
-    ) {
-
-        alert(
-            "Password fields not found in HTML"
-        );
-
-        return;
-
-    }
-
-
     const current =
-        currentPassword.value;
+        currentInput?.value || "";
 
 
-    const newPass =
-        newPassword.value;
+    const newPassword =
+        newInput?.value || "";
 
 
-    const confirmPass =
-        confirmPassword.value;
+    const confirmPassword =
+        confirmInput?.value || "";
 
 
     const savedPassword =
@@ -1478,39 +1748,70 @@ function changePassword() {
         ) || "admin123";
 
 
-    if (
-        current !== savedPassword
-    ) {
+    if (!current) {
 
-        alert(
-            "Current password is incorrect"
+        showToast(
+            "Please enter your current password.",
+            "error"
         );
+
+        currentInput?.focus();
 
         return;
 
     }
 
 
-    if (
-        newPass.length < 6
-    ) {
+    if (current !== savedPassword) {
 
-        alert(
-            "New password must contain at least 6 characters"
+        showToast(
+            "Current password is incorrect.",
+            "error"
         );
+
+        currentInput?.focus();
 
         return;
 
     }
 
 
-    if (
-        newPass !== confirmPass
-    ) {
+    if (!newPassword) {
 
-        alert(
-            "New passwords do not match"
+        showToast(
+            "Please enter a new password.",
+            "error"
         );
+
+        newInput?.focus();
+
+        return;
+
+    }
+
+
+    if (newPassword.length < 6) {
+
+        showToast(
+            "New password must contain at least 6 characters.",
+            "error"
+        );
+
+        newInput?.focus();
+
+        return;
+
+    }
+
+
+    if (newPassword !== confirmPassword) {
+
+        showToast(
+            "New password and confirmation do not match.",
+            "error"
+        );
+
+        confirmInput?.focus();
 
         return;
 
@@ -1519,74 +1820,44 @@ function changePassword() {
 
     localStorage.setItem(
         "adminPassword",
-        newPass
+        newPassword
     );
 
 
-    currentPassword.value = "";
+    if (currentInput) {
+        currentInput.value = "";
+    }
 
-    newPassword.value = "";
+    if (newInput) {
+        newInput.value = "";
+    }
 
-    confirmPassword.value = "";
+    if (confirmInput) {
+        confirmInput.value = "";
+    }
 
 
-    alert(
-        "Password Changed Successfully ✅"
+    showToast(
+        "Password changed successfully.",
+        "success"
     );
 
 }
 
 
-/* ==========================================
+/* =========================================================
    NOTIFICATIONS
-========================================== */
+========================================================= */
 
-function saveNotifications() {
+function getNotifications() {
 
-    const email =
-        document.getElementById(
-            "emailNotifications"
-        );
-
-
-    const report =
-        document.getElementById(
-            "reportNotifications"
-        );
-
-
-    const reminder =
-        document.getElementById(
-            "reminderNotifications"
-        );
-
-
-    localStorage.setItem(
-        "emailNotifications",
-        email
-            ? email.checked
-            : false
-    );
-
-
-    localStorage.setItem(
-        "reportNotifications",
-        report
-            ? report.checked
-            : false
-    );
-
-
-    localStorage.setItem(
-        "reminderNotifications",
-        reminder
-            ? reminder.checked
-            : false
-    );
-
-
-    alert(
-        "Notification Settings Saved ✅"
+    return safeParse(
+        localStorage.getItem("notifications"),
+        {
+            emailNotifications: true,
+            reportNotifications: true,
+            reminderNotifications: true
+        }
     );
 
 }
@@ -1594,19 +1865,23 @@ function saveNotifications() {
 
 function loadNotifications() {
 
+    const notifications =
+        getNotifications();
+
+
     const email =
         document.getElementById(
             "emailNotifications"
         );
 
 
-    const report =
+    const reports =
         document.getElementById(
             "reportNotifications"
         );
 
 
-    const reminder =
+    const reminders =
         document.getElementById(
             "reminderNotifications"
         );
@@ -1615,469 +1890,572 @@ function loadNotifications() {
     if (email) {
 
         email.checked =
-            localStorage.getItem(
-                "emailNotifications"
-            ) === "true";
+            notifications.emailNotifications !== false;
 
     }
 
 
-    if (report) {
+    if (reports) {
 
-        report.checked =
-            localStorage.getItem(
-                "reportNotifications"
-            ) === "true";
+        reports.checked =
+            notifications.reportNotifications !== false;
 
     }
 
 
-    if (reminder) {
+    if (reminders) {
 
-        reminder.checked =
-            localStorage.getItem(
-                "reminderNotifications"
-            ) === "true";
+        reminders.checked =
+            notifications.reminderNotifications !== false;
 
     }
 
 }
 
 
-/* ==========================================
+function saveNotifications() {
+
+    const notifications = {
+
+        emailNotifications:
+            document.getElementById(
+                "emailNotifications"
+            )?.checked || false,
+
+        reportNotifications:
+            document.getElementById(
+                "reportNotifications"
+            )?.checked || false,
+
+        reminderNotifications:
+            document.getElementById(
+                "reminderNotifications"
+            )?.checked || false
+
+    };
+
+
+    localStorage.setItem(
+        "notifications",
+        JSON.stringify(notifications)
+    );
+
+
+    showToast(
+        "Notification preferences saved.",
+        "success"
+    );
+
+}
+
+
+/* =========================================================
    APPEARANCE
-========================================== */
+========================================================= */
 
-async function saveAppearance() {
+function loadAppearance(settings = {}) {
 
-    const theme =
+    const savedTheme =
+        settings.theme ||
+        safeParse(
+            localStorage.getItem("settings"),
+            {}
+        )?.theme ||
+        localStorage.getItem("theme") ||
+        "dark";
+
+
+    const select =
         document.getElementById(
             "themeSelect"
         );
 
 
-    if (!theme) return;
+    if (select) {
 
-
-    const selectedTheme =
-        theme.value;
-
-
-    try {
-
-        const data =
-            await updateSettingsOnServer({
-
-                theme: selectedTheme
-
-            });
-
-
-        if (!data) return;
-
-
-        localStorage.setItem(
-            "theme",
-            selectedTheme
-        );
-
-
-        applyTheme(
-            selectedTheme
-        );
-
-
-        alert(
-            "Appearance Saved Successfully ✅"
-        );
+        select.value =
+            savedTheme === "light"
+                ? "light"
+                : "dark";
 
     }
 
-    catch (error) {
 
-        console.error(
-            "APPEARANCE SAVE ERROR:",
-            error
-        );
-
-
-        alert(
-            "Appearance Save Failed ❌\n" +
-            error.message
-        );
-
-    }
+    applyTheme(
+        select?.value || "dark"
+    );
 
 }
 
 
 function applyTheme(theme) {
 
-    document.body.classList.remove(
-        "theme-dark",
-        "theme-light"
+    document.body.classList.toggle(
+        "theme-light",
+        theme === "light"
     );
 
 
-    if (
-        theme === "light"
-    ) {
-
-        document.body.classList.add(
-            "theme-light"
-        );
-
-    }
-
-    else {
-
-        document.body.classList.add(
-            "theme-dark"
-        );
-
-    }
+    localStorage.setItem(
+        "theme",
+        theme
+    );
 
 }
 
 
-/* ==========================================
-   BACKUP
-========================================== */
+async function changeTheme() {
 
-function backupData() {
+    const select =
+        document.getElementById(
+            "themeSelect"
+        );
 
-    const backup = {
 
-        version: "2.0",
+    const theme =
+        select?.value === "light"
+            ? "light"
+            : "dark";
 
-        createdAt:
-            new Date().toISOString(),
 
-        data: {
+    applyTheme(theme);
 
-            employees:
-                JSON.parse(
-                    localStorage.getItem(
-                        "employees"
-                    )
-                ) || [],
 
-            clients:
-                JSON.parse(
-                    localStorage.getItem(
-                        "clients"
-                    )
-                ) || [],
+    const currentSettings =
+        safeParse(
+            localStorage.getItem("settings"),
+            {}
+        ) || {};
 
-            projects:
-                JSON.parse(
-                    localStorage.getItem(
-                        "projects"
-                    )
-                ) || [],
 
-            timesheets:
-                JSON.parse(
-                    localStorage.getItem(
-                        "timesheets"
-                    )
-                ) || [],
+    const updatedSettings = {
 
-            settings: {
+        ...currentSettings,
 
-                adminName:
-                    localStorage.getItem(
-                        "adminName"
-                    ) || "",
-
-                adminEmail:
-                    localStorage.getItem(
-                        "adminEmail"
-                    ) || "",
-
-                companyName:
-                    localStorage.getItem(
-                        "companyName"
-                    ) || "",
-
-                companyPhone:
-                    localStorage.getItem(
-                        "companyPhone"
-                    ) || "",
-
-                companyEmail:
-                    localStorage.getItem(
-                        "companyEmail"
-                    ) || "",
-
-                companyAddress:
-                    localStorage.getItem(
-                        "companyAddress"
-                    ) || ""
-
-            }
-
-        }
+        theme
 
     };
 
 
-    const blob =
-        new Blob(
-            [
-                JSON.stringify(
-                    backup,
-                    null,
-                    2
-                )
-            ],
-            {
-                type:
-                    "application/json"
-            }
+    try {
+
+        const result =
+            await updateSettingsOnServer(
+                updatedSettings
+            );
+
+
+        const savedSettings =
+            result?.setting ||
+            result?.settings ||
+            result?.data ||
+            updatedSettings;
+
+
+        localStorage.setItem(
+            "settings",
+            JSON.stringify(savedSettings)
         );
 
 
-    const url =
-        URL.createObjectURL(
-            blob
+        showToast(
+            `${theme === "light" ? "Light" : "Dark"} theme enabled.`,
+            "success"
+        );
+
+    } catch (error) {
+
+        /*
+         * Theme is still saved locally
+         * even when server save fails.
+         */
+
+        console.warn(
+            "Theme server save failed:",
+            error
         );
 
 
-    const link =
-        document.createElement(
-            "a"
+        localStorage.setItem(
+            "settings",
+            JSON.stringify(updatedSettings)
         );
 
 
-    link.href = url;
+        showToast(
+            "Theme saved locally.",
+            "info"
+        );
 
-
-    link.download =
-        `dcuts-backup-${new Date()
-            .toISOString()
-            .slice(0, 10)}.json`;
-
-
-    document.body.appendChild(
-        link
-    );
-
-
-    link.click();
-
-
-    link.remove();
-
-
-    URL.revokeObjectURL(
-        url
-    );
-
-
-    alert(
-        "Backup Downloaded Successfully ✅"
-    );
+    }
 
 }
 
 
-/* ==========================================
-   RESTORE
-========================================== */
+/* =========================================================
+   BACKUP
+========================================================= */
 
-function restoreData() {
+function downloadBackup() {
 
-    const input =
-        document.getElementById(
-            "restoreFile"
-        );
+    try {
 
+        const backup = {
 
-    if (!input) {
+            version: "1.0",
 
-        alert(
-            "Restore file input not found"
-        );
+            application:
+                "THE D CUTS Management System",
 
-        return;
+            exportedAt:
+                new Date().toISOString(),
 
-    }
+            employees:
+                getEmployees(),
 
+            projects:
+                getProjects(),
 
-    const file =
-        input.files[0];
+            clients:
+                getClients(),
 
+            timesheets:
+                safeParse(
+                    localStorage.getItem("timesheets"),
+                    []
+                ) || [],
 
-    if (!file) {
+            settings:
+                safeParse(
+                    localStorage.getItem("settings"),
+                    {}
+                ) || {},
 
-        alert(
-            "Please select a backup file"
-        );
-
-        return;
-
-    }
-
-
-    const reader =
-        new FileReader();
-
-
-    reader.onload =
-        function(event) {
-
-            try {
-
-                const backup =
-                    JSON.parse(
-                        event.target.result
-                    );
-
-
-                if (
-                    !backup.data
-                ) {
-
-                    throw new Error(
-                        "Invalid backup file"
-                    );
-
-                }
-
-
-                if (
-                    !confirm(
-                        "Restore backup? Existing data may be replaced."
-                    )
-                ) {
-
-                    return;
-
-                }
-
-
-                const data =
-                    backup.data;
-
-
-                if (
-                    data.employees
-                ) {
-
-                    localStorage.setItem(
-                        "employees",
-                        JSON.stringify(
-                            data.employees
-                        )
-                    );
-
-                }
-
-
-                if (
-                    data.clients
-                ) {
-
-                    localStorage.setItem(
-                        "clients",
-                        JSON.stringify(
-                            data.clients
-                        )
-                    );
-
-                }
-
-
-                if (
-                    data.projects
-                ) {
-
-                    localStorage.setItem(
-                        "projects",
-                        JSON.stringify(
-                            data.projects
-                        )
-                    );
-
-                }
-
-
-                if (
-                    data.timesheets
-                ) {
-
-                    localStorage.setItem(
-                        "timesheets",
-                        JSON.stringify(
-                            data.timesheets
-                        )
-                    );
-
-                }
-
-
-                if (
-                    data.settings
-                ) {
-
-                    Object.keys(
-                        data.settings
-                    ).forEach(
-                        key => {
-
-                            localStorage.setItem(
-                                key,
-                                data.settings[key]
-                            );
-
-                        }
-                    );
-
-                }
-
-
-                alert(
-                    "Backup Restored Successfully ✅"
-                );
-
-
-                location.reload();
-
-            }
-
-            catch (error) {
-
-                alert(
-                    "Invalid backup file ❌"
-                );
-
-            }
+            notifications:
+                getNotifications()
 
         };
 
 
-    reader.readAsText(
-        file
-    );
+        const blob =
+            new Blob(
+                [
+                    JSON.stringify(
+                        backup,
+                        null,
+                        2
+                    )
+                ],
+                {
+                    type:
+                        "application/json"
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(blob);
+
+
+        const link =
+            document.createElement("a");
+
+
+        const date =
+            new Date()
+                .toISOString()
+                .slice(0, 10);
+
+
+        link.href = url;
+
+        link.download =
+            `the-dcuts-backup-${date}.json`;
+
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+
+        URL.revokeObjectURL(url);
+
+
+        showToast(
+            "Backup downloaded successfully.",
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            "Unable to create backup.",
+            "error"
+        );
+
+    }
 
 }
 
 
-/* ==========================================
-   LOGOUT
-========================================== */
+/* =========================================================
+   RESTORE BACKUP
+========================================================= */
 
-function logoutSettings() {
+async function restoreBackup(event) {
+
+    const file =
+        event?.target?.files?.[0];
+
+
+    if (!file) {
+        return;
+    }
+
 
     if (
-        !confirm(
-            "Logout?"
-        )
+        file.type !== "application/json" &&
+        !file.name.toLowerCase().endsWith(".json")
     ) {
+
+        showToast(
+            "Please select a valid JSON backup file.",
+            "error"
+        );
+
+        event.target.value = "";
 
         return;
 
+    }
+
+
+    const confirmed =
+        window.confirm(
+            "Restoring this backup will replace the current local settings data. Continue?"
+        );
+
+
+    if (!confirmed) {
+
+        event.target.value = "";
+
+        return;
+
+    }
+
+
+    try {
+
+        const text =
+            await file.text();
+
+
+        const backup =
+            JSON.parse(text);
+
+
+        if (
+            !backup ||
+            typeof backup !== "object"
+        ) {
+
+            throw new Error(
+                "Invalid backup format."
+            );
+
+        }
+
+
+        if (
+            backup.employees !== undefined &&
+            !Array.isArray(backup.employees)
+        ) {
+
+            throw new Error(
+                "Invalid employees data."
+            );
+
+        }
+
+
+        if (
+            backup.projects !== undefined &&
+            !Array.isArray(backup.projects)
+        ) {
+
+            throw new Error(
+                "Invalid projects data."
+            );
+
+        }
+
+
+        if (
+            backup.clients !== undefined &&
+            !Array.isArray(backup.clients)
+        ) {
+
+            throw new Error(
+                "Invalid clients data."
+            );
+
+        }
+
+
+        if (
+            backup.timesheets !== undefined &&
+            !Array.isArray(backup.timesheets)
+        ) {
+
+            throw new Error(
+                "Invalid timesheets data."
+            );
+
+        }
+
+
+        if (
+            backup.employees !== undefined
+        ) {
+
+            saveEmployees(
+                backup.employees
+            );
+
+        }
+
+
+        if (
+            backup.projects !== undefined
+        ) {
+
+            saveProjects(
+                backup.projects
+            );
+
+        }
+
+
+        if (
+            backup.clients !== undefined
+        ) {
+
+            saveClients(
+                backup.clients
+            );
+
+        }
+
+
+        if (
+            backup.timesheets !== undefined
+        ) {
+
+            localStorage.setItem(
+                "timesheets",
+                JSON.stringify(
+                    backup.timesheets
+                )
+            );
+
+        }
+
+
+        if (
+            backup.settings &&
+            typeof backup.settings === "object"
+        ) {
+
+            localStorage.setItem(
+                "settings",
+                JSON.stringify(
+                    backup.settings
+                )
+            );
+
+        }
+
+
+        if (
+            backup.notifications &&
+            typeof backup.notifications === "object"
+        ) {
+
+            localStorage.setItem(
+                "notifications",
+                JSON.stringify(
+                    backup.notifications
+                )
+            );
+
+        }
+
+
+        loadEmployees();
+
+        loadProjects();
+
+        loadClients();
+
+        loadNotifications();
+
+
+        const restoredSettings =
+            backup.settings || {};
+
+
+        loadProfile(
+            restoredSettings
+        );
+
+        loadCompany(
+            restoredSettings
+        );
+
+        loadAppearance(
+            restoredSettings
+        );
+
+
+        showToast(
+            "Backup restored successfully.",
+            "success"
+        );
+
+
+        event.target.value = "";
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            error.message ||
+            "Unable to restore backup.",
+            "error"
+        );
+
+
+        event.target.value = "";
+
+    }
+
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+function logoutSettings(event) {
+
+    if (event) {
+        event.preventDefault();
     }
 
 
@@ -2093,6 +2471,10 @@ function logoutSettings() {
         "userName"
     );
 
+    localStorage.removeItem(
+        "token"
+    );
+
 
     window.location.href =
         "../login.html";
@@ -2100,9 +2482,156 @@ function logoutSettings() {
 }
 
 
-/* ==========================================
-   GLOBAL FUNCTIONS
-========================================== */
+/* =========================================================
+   ENTER KEY SUPPORT
+========================================================= */
+
+function setupEnterKeyActions() {
+
+    const mappings = [
+
+        [
+            "newEmployeeName",
+            "addEmployee"
+        ],
+
+        [
+            "newEmployeeEmail",
+            "addEmployee"
+        ],
+
+        [
+            "newProjectName",
+            "addProject"
+        ],
+
+        [
+            "newProjectCode",
+            "addProject"
+        ],
+
+        [
+            "newClientName",
+            "addClient"
+        ],
+
+        [
+            "newClientCode",
+            "addClient"
+        ],
+
+        [
+            "newClientLocation",
+            "addClient"
+        ]
+
+    ];
+
+
+    mappings.forEach(
+        ([inputId, functionName]) => {
+
+            const input =
+                document.getElementById(
+                    inputId
+                );
+
+
+            if (!input) {
+                return;
+            }
+
+
+            input.addEventListener(
+                "keydown",
+                event => {
+
+                    if (
+                        event.key === "Enter"
+                    ) {
+
+                        event.preventDefault();
+
+                        window[
+                            functionName
+                        ]();
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ADMIN GUARD
+========================================================= */
+
+function settingsAdminGuard() {
+
+    if (!isAdminUser()) {
+
+        showToast(
+            "Administrator access required.",
+            "error"
+        );
+
+
+        setTimeout(() => {
+
+            window.location.href =
+                "../login.html";
+
+        }, 700);
+
+
+        return false;
+
+    }
+
+
+    return true;
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+        if (!settingsAdminGuard()) {
+            return;
+        }
+
+
+        setupEnterKeyActions();
+
+
+        showSection(
+            "profile"
+        );
+
+
+        await loadSettings();
+
+    }
+);
+
+
+/* =========================================================
+   GLOBAL EXPORTS
+========================================================= */
+
+window.toggleSettingsSidebar =
+    toggleSettingsSidebar;
 
 window.showSection =
     showSection;
@@ -2131,20 +2660,26 @@ window.addClient =
 window.deleteClient =
     deleteClient;
 
+window.togglePassword =
+    togglePassword;
+
 window.changePassword =
     changePassword;
 
 window.saveNotifications =
     saveNotifications;
 
-window.saveAppearance =
-    saveAppearance;
+window.changeTheme =
+    changeTheme;
 
-window.backupData =
-    backupData;
+window.downloadBackup =
+    downloadBackup;
 
-window.restoreData =
-    restoreData;
+window.restoreBackup =
+    restoreBackup;
 
 window.logoutSettings =
     logoutSettings;
+
+window.showToast =
+    showToast;

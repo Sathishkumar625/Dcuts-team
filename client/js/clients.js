@@ -230,7 +230,7 @@ const defaultClients = [
 
 
 /* =========================================================
-   GLOBAL STATE
+   GLOBAL VARIABLES
 ========================================================= */
 
 let clients = [];
@@ -241,75 +241,18 @@ let drawerMode = "view";
 
 
 /* =========================================================
-   LOAD CLIENT DATA
-========================================================= */
-
-try {
-
-    clients =
-        JSON.parse(
-            localStorage.getItem("clients")
-        );
-
-} catch (error) {
-
-    clients = [];
-
-}
-
-
-if (
-    !Array.isArray(clients) ||
-    clients.length === 0
-) {
-
-    clients =
-        defaultClients.map(
-            client => ({
-                ...client
-            })
-        );
-
-}
-
-
-/* =========================================================
-   NORMALIZE EXISTING CLIENT DATA
-========================================================= */
-
-clients =
-    clients.map(
-        client =>
-            normalizeClient(client)
-    );
-
-
-/* =========================================================
-   SAVE
-========================================================= */
-
-saveClients();
-
-
-/* =========================================================
-   DOM READY
+   INITIALIZE
 ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
-
-        initializeClients();
-
-    }
+    initializeClients
 );
 
 
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
 function initializeClients() {
+
+    loadStoredClients();
 
     setupEvents();
 
@@ -323,59 +266,63 @@ function initializeClients() {
 
 
 /* =========================================================
+   LOAD STORED CLIENTS
+========================================================= */
+
+function loadStoredClients() {
+
+    let stored = [];
+
+    try {
+
+        stored =
+            JSON.parse(
+                localStorage.getItem(
+                    "clients"
+                )
+            ) || [];
+
+    } catch (error) {
+
+        stored = [];
+
+    }
+
+
+    if (
+        Array.isArray(stored) &&
+        stored.length
+    ) {
+
+        clients =
+            stored.map(
+                normalizeClient
+            );
+
+    } else {
+
+        clients =
+            defaultClients.map(
+                normalizeClient
+            );
+
+        saveClients();
+
+    }
+
+}
+
+
+/* =========================================================
    NORMALIZE CLIENT
 ========================================================= */
 
-function normalizeClient(client) {
+function normalizeClient(
+    client
+) {
 
     const safeClient =
         client || {};
-
-
-    const projects =
-        toNumber(
-            safeClient.projects
-        );
-
-
-    const completed =
-        Math.min(
-            toNumber(
-                safeClient.completed
-            ),
-            projects
-        );
-
-
-    const pending =
-        Math.max(
-            projects -
-            completed,
-            0
-        );
-
-
-    const videos =
-        toNumber(
-            safeClient.videos
-        );
-
-
-    const completedVideos =
-        Math.min(
-            toNumber(
-                safeClient.completedVideos
-            ),
-            videos
-        );
-
-
-    const pendingVideos =
-        Math.max(
-            videos -
-            completedVideos,
-            0
-        );
 
 
     return {
@@ -417,21 +364,43 @@ function normalizeClient(client) {
             ).trim(),
 
         status:
-            safeClient.status === "Inactive"
+            safeClient.status ===
+            "Inactive"
                 ? "Inactive"
                 : "Active",
 
-        projects,
 
-        completed,
+        projects:
+            toNumber(
+                safeClient.projects
+            ),
 
-        pending,
+        completed:
+            toNumber(
+                safeClient.completed
+            ),
 
-        videos,
+        pending:
+            toNumber(
+                safeClient.pending
+            ),
 
-        completedVideos,
 
-        pendingVideos,
+        videos:
+            toNumber(
+                safeClient.videos
+            ),
+
+        completedVideos:
+            toNumber(
+                safeClient.completedVideos
+            ),
+
+        pendingVideos:
+            toNumber(
+                safeClient.pendingVideos
+            ),
+
 
         weeklyVideos:
             toNumber(
@@ -442,6 +411,7 @@ function normalizeClient(client) {
             toNumber(
                 safeClient.monthlyVideos
             ),
+
 
         mondayVideos:
             toNumber(
@@ -478,6 +448,7 @@ function normalizeClient(client) {
                 safeClient.sundayVideos
             ),
 
+
         weeklyTarget:
             toNumber(
                 safeClient.weeklyTarget
@@ -488,11 +459,19 @@ function normalizeClient(client) {
                 safeClient.monthlyTarget
             ),
 
+
         notes:
             String(
                 safeClient.notes ||
                 ""
             ).trim(),
+
+
+        timesheetHours:
+            toNumber(
+                safeClient.timesheetHours
+            ),
+
 
         createdAt:
             safeClient.createdAt ||
@@ -525,9 +504,6 @@ function saveClients() {
 
 function setupEvents() {
 
-
-    /* SEARCH */
-
     const search =
         document.getElementById(
             "searchClient"
@@ -550,8 +526,6 @@ function setupEvents() {
     }
 
 
-    /* ADD CLIENT */
-
     const addButton =
         document.getElementById(
             "addClientBtn"
@@ -567,8 +541,6 @@ function setupEvents() {
 
     }
 
-
-    /* CLOSE */
 
     const closeButton =
         document.getElementById(
@@ -586,8 +558,6 @@ function setupEvents() {
     }
 
 
-    /* CANCEL */
-
     const cancelButton =
         document.getElementById(
             "cancelDrawerBtn"
@@ -598,28 +568,11 @@ function setupEvents() {
 
         cancelButton.addEventListener(
             "click",
-            () => {
-
-                if (
-                    drawerMode === "edit" ||
-                    drawerMode === "add"
-                ) {
-
-                    closeDrawer();
-
-                } else {
-
-                    closeDrawer();
-
-                }
-
-            }
+            closeDrawer
         );
 
     }
 
-
-    /* OVERLAY */
 
     const overlay =
         document.getElementById(
@@ -637,8 +590,6 @@ function setupEvents() {
     }
 
 
-    /* SAVE */
-
     const saveButton =
         document.getElementById(
             "saveClientBtn"
@@ -655,8 +606,6 @@ function setupEvents() {
     }
 
 
-    /* DELETE */
-
     const deleteButton =
         document.getElementById(
             "deleteClientBtn"
@@ -672,8 +621,6 @@ function setupEvents() {
 
     }
 
-
-    /* ESC */
 
     document.addEventListener(
         "keydown",
@@ -695,7 +642,6 @@ function setupEvents() {
 
 /* =========================================================
    SYNC CLIENT STATISTICS
-   TIMESHEET → CLIENT VIDEO DETAILS
 ========================================================= */
 
 function syncClientStatistics() {
@@ -727,741 +673,137 @@ function syncClientStatistics() {
     }
 
 
-    const now = new Date();
-
-
-    /* -----------------------------------------------------
-       CURRENT WEEK START — MONDAY
-    ----------------------------------------------------- */
-
-    const weekStart =
-        new Date(
-            now
-        );
-
-    weekStart.setHours(
-        0,
-        0,
-        0,
-        0
-    );
-
-
-    const currentDay =
-        weekStart.getDay();
-
-
-    const mondayOffset =
-        currentDay === 0
-            ? -6
-            : 1 - currentDay;
-
-
-    weekStart.setDate(
-        weekStart.getDate() +
-        mondayOffset
-    );
-
-
-    /* -----------------------------------------------------
-       CURRENT MONTH START
-    ----------------------------------------------------- */
-
-    const monthStart =
-        new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            1
-        );
-
-
-    /* -----------------------------------------------------
-       GET ENTRY DATE
-    ----------------------------------------------------- */
-
-    function getEntryDate(
-        entry
-    ) {
-
-        const value =
-            entry?.date ||
-            entry?.workDate ||
-            entry?.createdAt ||
-            entry?.created_at ||
-            "";
-
-
-        const date =
-            new Date(
-                value
-            );
-
-
-        return Number.isNaN(
-            date.getTime()
-        )
-            ? null
-            : date;
-
-    }
-
-
-    /* -----------------------------------------------------
-       SAFE TEXT
-    ----------------------------------------------------- */
-
-    function getText(
-        value
-    ) {
-
-        return String(
-            value ?? ""
-        )
-        .trim()
-        .toLowerCase();
-
-    }
-
-
-    /* -----------------------------------------------------
-       VIDEO NUMBER
-    ----------------------------------------------------- */
-
-    function getVideoNumber(
-        entry,
-        keys
-    ) {
-
-        for (
-            const key of keys
-        ) {
-
-            if (
-                entry?.[key] !== undefined &&
-                entry?.[key] !== null &&
-                entry?.[key] !== ""
-            ) {
-
-                return toNumber(
-                    entry[key]
-                );
-
-            }
-
-        }
-
-
-        return null;
-
-    }
-
-
-    /* -----------------------------------------------------
-       CHECK TIMESHEET BELONGS TO CLIENT
-    ----------------------------------------------------- */
-
-    function belongsToClient(
-        entry,
-        client
-    ) {
-
-        const clientCode =
-            getText(
-                client?.code
-            );
-
-
-        const clientName =
-            getText(
-                client?.name
-            );
-
-
-        const values = [
-
-            entry?.clientCode,
-
-            entry?.client,
-
-            entry?.clientName,
-
-            entry?.project,
-
-            entry?.projectCode,
-
-            entry?.projectName,
-
-            entry?.Client?.code,
-
-            entry?.Client?.name,
-
-            entry?.client?.code,
-
-            entry?.client?.name,
-
-            entry?.project?.code,
-
-            entry?.project?.name
-
-        ]
-        .map(
-            getText
-        )
-        .filter(
-            Boolean
-        );
-
-
-        if (
-            !values.length
-        ) {
-
-            return false;
-
-        }
-
-
-        return values.some(
-            value => {
-
-                return (
-
-                    (
-                        clientCode &&
-                        value === clientCode
-                    ) ||
-
-                    (
-                        clientName &&
-                        value === clientName
-                    ) ||
-
-                    (
-                        clientCode &&
-                        value.includes(
-                            clientCode
-                        )
-                    ) ||
-
-                    (
-                        clientName &&
-                        value.includes(
-                            clientName
-                        )
-                    ) ||
-
-                    (
-                        clientName &&
-                        clientName.includes(
-                            value
-                        )
-                    )
-
-                );
-
-            }
-        );
-
-    }
-
-
-    /* -----------------------------------------------------
-       DAILY FIELD NAMES
-    ----------------------------------------------------- */
-
-    const dayKeys = [
-
-        "mondayVideos",
-
-        "tuesdayVideos",
-
-        "wednesdayVideos",
-
-        "thursdayVideos",
-
-        "fridayVideos",
-
-        "saturdayVideos",
-
-        "sundayVideos"
-
-    ];
-
-
-    /* -----------------------------------------------------
-       UPDATE EVERY CLIENT
-    ----------------------------------------------------- */
-
     clients =
         clients.map(
             client => {
 
+                const clientName =
+                    String(
+                        client.name || ""
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                const clientCode =
+                    String(
+                        client.code || ""
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
                 const matchingEntries =
                     timesheets.filter(
-                        entry =>
-                            belongsToClient(
-                                entry,
-                                client
+                        item => {
+
+                            const values = [
+
+                                item.clientCode,
+                                item.client,
+                                item.clientName,
+
+                                item.project,
+                                item.projectCode,
+                                item.projectName,
+
+                                item.Client?.code,
+                                item.Client?.name,
+
+                                item.project?.code,
+                                item.project?.name
+
+                            ]
+                            .map(
+                                value =>
+                                    String(
+                                        value ?? ""
+                                    )
+                                    .trim()
+                                    .toLowerCase()
                             )
+                            .filter(Boolean);
+
+
+                            return values.some(
+                                value => {
+
+                                    if (
+                                        clientCode &&
+                                        value ===
+                                        clientCode
+                                    ) {
+
+                                        return true;
+
+                                    }
+
+
+                                    if (
+                                        clientName &&
+                                        (
+                                            value ===
+                                            clientName ||
+                                            value.includes(
+                                                clientName
+                                            ) ||
+                                            clientName.includes(
+                                                value
+                                            )
+                                        )
+                                    ) {
+
+                                        return true;
+
+                                    }
+
+
+                                    return false;
+
+                                }
+                            );
+
+                        }
                     );
 
 
-                /*
-                   If there are no matching timesheets,
-                   keep existing client information.
-                */
+                let totalHours = 0;
 
-                if (
-                    !matchingEntries.length
-                ) {
-
-                    return client;
-
-                }
-
-
-                let totalVideos = 0;
-
-                let completedVideos = 0;
-
-                let pendingVideos = 0;
-
-                let weeklyVideos = 0;
-
-                let monthlyVideos = 0;
-
-
-                let hasExplicitTotal =
-                    false;
-
-                let hasExplicitCompleted =
-                    false;
-
-                let hasExplicitPending =
-                    false;
-
-
-                const daily = {
-
-                    mondayVideos: 0,
-
-                    tuesdayVideos: 0,
-
-                    wednesdayVideos: 0,
-
-                    thursdayVideos: 0,
-
-                    fridayVideos: 0,
-
-                    saturdayVideos: 0,
-
-                    sundayVideos: 0
-
-                };
-
-
-                const projectSet =
-                    new Set();
-
-
-                /* -----------------------------------------
-                   PROCESS EACH TIMESHEET
-                ----------------------------------------- */
 
                 matchingEntries.forEach(
                     entry => {
 
-                        const entryDate =
-                            getEntryDate(
-                                entry
-                            );
-
-
-                        /* ---------------------------------
-                           TOTAL VIDEOS
-                        --------------------------------- */
-
-                        const total =
-                            getVideoNumber(
-                                entry,
-                                [
-                                    "totalVideos",
-                                    "videos",
-                                    "videoCount",
-                                    "totalVideo"
-                                ]
-                            );
-
-
-                        /* ---------------------------------
-                           COMPLETED VIDEOS
-                        --------------------------------- */
-
-                        const completed =
-                            getVideoNumber(
-                                entry,
-                                [
-                                    "completedVideos",
-                                    "completedVideo",
-                                    "doneVideos",
-                                    "completed"
-                                ]
-                            );
-
-
-                        /* ---------------------------------
-                           BALANCE / PENDING VIDEOS
-                        --------------------------------- */
-
-                        const balance =
-                            getVideoNumber(
-                                entry,
-                                [
-                                    "balanceVideos",
-                                    "pendingVideos",
-                                    "pendingVideo",
-                                    "balanceVideo",
-                                    "balance"
-                                ]
-                            );
-
-
-                        /*
-                           Determine total for this entry.
-                        */
-
-                        const recordTotal =
-                            total !== null
-
-                                ? total
-
-                                : (
-                                    completed !== null ||
-                                    balance !== null
+                        totalHours +=
+                            toNumber(
+                                entry.hours ??
+                                entry.workingHours ??
+                                (
+                                    toNumber(
+                                        entry.workingMinutes
+                                    ) / 60
                                 )
-
-                                    ? (
-                                        toNumber(
-                                            completed
-                                        ) +
-                                        toNumber(
-                                            balance
-                                        )
-                                    )
-
-                                    : 1;
-
-
-                        /*
-                           Completed for this entry.
-                        */
-
-                        const recordCompleted =
-                            completed !== null
-
-                                ? Math.min(
-                                    completed,
-                                    recordTotal
-                                )
-
-                                : 0;
-
-
-                        /*
-                           Pending for this entry.
-                        */
-
-                        const recordPending =
-                            balance !== null
-
-                                ? Math.min(
-                                    balance,
-                                    Math.max(
-                                        recordTotal -
-                                        recordCompleted,
-                                        0
-                                    )
-                                )
-
-                                : Math.max(
-                                    recordTotal -
-                                    recordCompleted,
-                                    0
-                                );
-
-
-                        if (
-                            total !== null
-                        ) {
-
-                            hasExplicitTotal =
-                                true;
-
-                        }
-
-
-                        if (
-                            completed !== null
-                        ) {
-
-                            hasExplicitCompleted =
-                                true;
-
-                        }
-
-
-                        if (
-                            balance !== null
-                        ) {
-
-                            hasExplicitPending =
-                                true;
-
-                        }
-
-
-                        totalVideos +=
-                            recordTotal;
-
-
-                        completedVideos +=
-                            recordCompleted;
-
-
-                        pendingVideos +=
-                            recordPending;
-
-
-                        /* ---------------------------------
-                           DATE BASED VIDEO STATISTICS
-                        --------------------------------- */
-
-                        if (
-                            entryDate
-                        ) {
-
-                            /* CURRENT WEEK */
-
-                            if (
-                                entryDate >=
-                                    weekStart &&
-                                entryDate <=
-                                    now
-                            ) {
-
-                                weeklyVideos +=
-                                    recordTotal;
-
-                            }
-
-
-                            /* CURRENT MONTH */
-
-                            if (
-
-                                entryDate >=
-                                    monthStart &&
-
-                                entryDate.getFullYear() ===
-                                    now.getFullYear() &&
-
-                                entryDate.getMonth() ===
-                                    now.getMonth()
-
-                            ) {
-
-                                monthlyVideos +=
-                                    recordTotal;
-
-                            }
-
-
-                            /* DAY OF WEEK */
-
-                            const jsDay =
-                                entryDate.getDay();
-
-
-                            const index =
-                                jsDay === 0
-                                    ? 6
-                                    : jsDay - 1;
-
-
-                            daily[
-                                dayKeys[
-                                    index
-                                ]
-                            ] +=
-                                recordTotal;
-
-                        }
-
-
-                        /* ---------------------------------
-                           PROJECT INFORMATION
-                        --------------------------------- */
-
-                        const projectValue =
-
-                            entry?.projectCode ||
-
-                            entry?.projectName ||
-
-                            (
-                                typeof entry?.project ===
-                                    "string"
-
-                                    ? entry.project
-
-                                    : (
-                                        entry?.project?.code ||
-                                        entry?.project?.name ||
-                                        ""
-                                    )
                             );
-
-
-                        if (
-                            String(
-                                projectValue
-                            ).trim()
-                        ) {
-
-                            projectSet.add(
-                                String(
-                                    projectValue
-                                ).trim()
-                            );
-
-                        }
 
                     }
                 );
 
 
-                /* -----------------------------------------
-                   FINAL VALUES
-                ----------------------------------------- */
-
-                const finalCompleted =
-                    hasExplicitCompleted
-
-                        ? completedVideos
-
-                        : toNumber(
-                            client.completedVideos
-                        );
-
-
-                const finalPending =
-                    hasExplicitPending
-
-                        ? pendingVideos
-
-                        : Math.max(
-                            totalVideos -
-                            finalCompleted,
-                            0
-                        );
-
-
-                const finalTotal =
-                    (
-                        hasExplicitTotal ||
-                        hasExplicitCompleted ||
-                        hasExplicitPending
-                    )
-
-                        ? totalVideos
-
-                        : toNumber(
-                            client.videos
-                        );
-
-
-                /* -----------------------------------------
-                   RETURN UPDATED CLIENT
-                ----------------------------------------- */
-
-                return normalizeClient({
+                return {
 
                     ...client,
 
-                    videos:
-                        finalTotal,
-
-
-                    completedVideos:
-                        Math.min(
-                            finalCompleted,
-                            finalTotal
-                        ),
-
-
-                    pendingVideos:
-                        Math.max(
-                            Math.min(
-                                finalPending,
-                                finalTotal
-                            ),
-                            0
-                        ),
-
-
-                    weeklyVideos,
-
-                    monthlyVideos,
-
-
-                    ...daily,
-
-
-                    /*
-                       Only update project count
-                       when timesheet actually has
-                       project information.
-                    */
-
-                    projects:
-                        projectSet.size > 0
-
-                            ? projectSet.size
-
-                            : client.projects,
-
-
-                    /*
-                       Keep timesheet hours
-                       for future use/display.
-                    */
-
                     timesheetHours:
-                        matchingEntries.reduce(
-                            (
-                                sum,
-                                entry
-                            ) => {
+                        totalHours
 
-                                return (
-                                    sum +
-                                    toNumber(
-                                        entry?.hours ||
-                                        entry?.workingHours ||
-                                        (
-                                            entry?.workingMinutes /
-                                            60
-                                        )
-                                    )
-                                );
-
-                            },
-                            0
-                        )
-
-                });
+                };
 
             }
+        );
+
+
+    clients =
+        clients.map(
+            normalizeClient
         );
 
 
@@ -1506,17 +848,11 @@ function loadClients(
                 const text = [
 
                     client.code,
-
                     client.name,
-
                     client.location,
-
                     client.contact,
-
                     client.phone,
-
                     client.email,
-
                     client.status
 
                 ]
@@ -1562,7 +898,6 @@ function loadClients(
 
         `;
 
-
         updateResultCount(
             0
         );
@@ -1572,25 +907,24 @@ function loadClients(
     }
 
 
-    filtered.forEach(
-        client => {
+    clientBox.innerHTML =
+        filtered
+            .map(
+                client => {
 
-            const realIndex =
-                clients.indexOf(
-                    client
-                );
+                    const index =
+                        clients.indexOf(
+                            client
+                        );
 
+                    return createClientCard(
+                        client,
+                        index
+                    );
 
-            clientBox.insertAdjacentHTML(
-                "beforeend",
-                createClientCard(
-                    client,
-                    realIndex
-                )
-            );
-
-        }
-    );
+                }
+            )
+            .join("");
 
 
     updateResultCount(
@@ -1614,29 +948,9 @@ function createClientCard(
         "Active";
 
 
-    const projects =
-        toNumber(
-            client.projects
-        );
-
-
-    const completed =
-        toNumber(
-            client.completed
-        );
-
-
-    const pending =
-        Math.max(
-            projects -
-            completed,
-            0
-        );
-
-
-    const videos =
-        toNumber(
-            client.videos
+    const workflow =
+        getWorkflowSummary(
+            client
         );
 
 
@@ -1660,14 +974,11 @@ function createClientCard(
 
 
                 <span
-                    class="
-                        client-status
-                        ${
-                            status === "Active"
-                                ? "status-active"
-                                : "status-inactive"
-                        }
-                    "
+                    class="client-status ${
+                        status === "Active"
+                            ? "status-active"
+                            : "status-inactive"
+                    }"
                 >
 
                     <span class="status-dot"></span>
@@ -1720,7 +1031,9 @@ function createClientCard(
                 <div>
 
                     <strong>
-                        ${projects}
+                        ${toNumber(
+                            client.projects
+                        )}
                     </strong>
 
                     <span>
@@ -1733,7 +1046,9 @@ function createClientCard(
                 <div>
 
                     <strong>
-                        ${completed}
+                        ${toNumber(
+                            client.completedVideos
+                        )}
                     </strong>
 
                     <span>
@@ -1746,12 +1061,104 @@ function createClientCard(
                 <div>
 
                     <strong>
-                        ${videos}
+                        ${toNumber(
+                            client.videos
+                        )}
                     </strong>
 
                     <span>
-                        Videos
+                        Current Videos
                     </span>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="client-workflow-mini"
+                style="
+                    display:grid;
+                    grid-template-columns:repeat(3,1fr);
+                    gap:6px;
+                    margin-top:12px;
+                "
+            >
+
+                <div
+                    style="
+                        padding:7px;
+                        border-radius:9px;
+                        background:rgba(255,255,255,.035);
+                        text-align:center;
+                    "
+                >
+
+                    <strong>
+                        ${workflow.shoot}
+                    </strong>
+
+                    <small
+                        style="
+                            display:block;
+                            opacity:.55;
+                            font-size:9px;
+                        "
+                    >
+                        SHOOT
+                    </small>
+
+                </div>
+
+
+                <div
+                    style="
+                        padding:7px;
+                        border-radius:9px;
+                        background:rgba(255,255,255,.035);
+                        text-align:center;
+                    "
+                >
+
+                    <strong>
+                        ${workflow.edit}
+                    </strong>
+
+                    <small
+                        style="
+                            display:block;
+                            opacity:.55;
+                            font-size:9px;
+                        "
+                    >
+                        EDIT
+                    </small>
+
+                </div>
+
+
+                <div
+                    style="
+                        padding:7px;
+                        border-radius:9px;
+                        background:rgba(255,255,255,.035);
+                        text-align:center;
+                    "
+                >
+
+                    <strong>
+                        ${workflow.upload}
+                    </strong>
+
+                    <small
+                        style="
+                            display:block;
+                            opacity:.55;
+                            font-size:9px;
+                        "
+                    >
+                        UPLOAD
+                    </small>
 
                 </div>
 
@@ -1761,7 +1168,7 @@ function createClientCard(
             <div class="client-card-footer">
 
                 <span>
-                    View Complete Details
+                    View Current Details
                 </span>
 
                 <i class="fa-solid fa-arrow-right"></i>
@@ -1781,64 +1188,45 @@ function createClientCard(
 
 function updateSummary() {
 
-    const total =
-        clients.length;
-
-
-    const active =
-        clients.filter(
-            client =>
-                client.status === "Active"
-        ).length;
-
-
-    const inactive =
-        clients.filter(
-            client =>
-                client.status === "Inactive"
-        ).length;
-
-
-    const projects =
-        clients.reduce(
-            (
-                sum,
-                client
-            ) => {
-
-                return (
-                    sum +
-                    toNumber(
-                        client.projects
-                    )
-                );
-
-            },
-            0
-        );
-
-
     setText(
         "clientCount",
-        total
+        clients.length
     );
 
 
     setText(
         "activeClientCount",
-        active
+        clients.filter(
+            client =>
+                client.status ===
+                "Active"
+        ).length
     );
 
 
     setText(
         "inactiveClientCount",
-        inactive
+        clients.filter(
+            client =>
+                client.status ===
+                "Inactive"
+        ).length
     );
 
 
     setText(
         "projectCount",
-        projects
+        clients.reduce(
+            (
+                total,
+                client
+            ) =>
+                total +
+                toNumber(
+                    client.projects
+                ),
+            0
+        )
     );
 
 }
@@ -1865,7 +1253,7 @@ function updateResultCount(
 
 
 /* =========================================================
-   OPEN VIEW
+   VIEW DRAWER
 ========================================================= */
 
 function openViewDrawer(
@@ -1889,18 +1277,14 @@ function openViewDrawer(
         "view";
 
 
-    const client =
+    clients[index] =
         normalizeClient(
             clients[index]
         );
 
 
-    clients[index] =
-        client;
-
-
     fillDrawerDetails(
-        client
+        clients[index]
     );
 
 
@@ -1917,7 +1301,7 @@ function openViewDrawer(
 
     setText(
         "drawerTitle",
-        client.name ||
+        clients[index].name ||
         "Client Details"
     );
 
@@ -1928,7 +1312,7 @@ function openViewDrawer(
 
 
 /* =========================================================
-   OPEN ADD
+   ADD DRAWER
 ========================================================= */
 
 function openAddDrawer() {
@@ -1941,63 +1325,49 @@ function openAddDrawer() {
         "add";
 
 
-    const emptyClient = {
+    const empty =
+        normalizeClient({
 
-        code: "",
+            code: "",
+            name: "",
+            location: "",
 
-        name: "",
+            contact: "",
+            phone: "",
+            email: "",
 
-        location: "",
+            status: "Active",
 
-        contact: "",
+            projects: 0,
+            completed: 0,
+            pending: 0,
 
-        phone: "",
+            videos: 0,
 
-        email: "",
+            completedVideos: 0,
+            pendingVideos: 0,
 
-        status: "Active",
+            weeklyVideos: 0,
+            monthlyVideos: 0,
 
-        projects: 0,
+            mondayVideos: 0,
+            tuesdayVideos: 0,
+            wednesdayVideos: 0,
+            thursdayVideos: 0,
+            fridayVideos: 0,
+            saturdayVideos: 0,
+            sundayVideos: 0,
 
-        completed: 0,
+            weeklyTarget: 0,
+            monthlyTarget: 0,
 
-        pending: 0,
+            notes: ""
 
-        videos: 0,
-
-        completedVideos: 0,
-
-        pendingVideos: 0,
-
-        weeklyVideos: 0,
-
-        monthlyVideos: 0,
-
-        mondayVideos: 0,
-
-        tuesdayVideos: 0,
-
-        wednesdayVideos: 0,
-
-        thursdayVideos: 0,
-
-        fridayVideos: 0,
-
-        saturdayVideos: 0,
-
-        sundayVideos: 0,
-
-        weeklyTarget: 0,
-
-        monthlyTarget: 0,
-
-        notes: ""
-
-    };
+        });
 
 
     fillDrawerDetails(
-        emptyClient
+        empty
     );
 
 
@@ -2024,7 +1394,7 @@ function openAddDrawer() {
 
 
 /* =========================================================
-   FILL DRAWER
+   FILL DRAWER DETAILS
 ========================================================= */
 
 function fillDrawerDetails(
@@ -2036,8 +1406,6 @@ function fillDrawerDetails(
             client
         );
 
-
-    /* PROFILE */
 
     setText(
         "drawerClientCode",
@@ -2059,8 +1427,6 @@ function fillDrawerDetails(
         "Active"
     );
 
-
-    /* BASIC */
 
     setText(
         "detailCode",
@@ -2104,8 +1470,6 @@ function fillDrawerDetails(
     );
 
 
-    /* PROJECT */
-
     setText(
         "detailProjects",
         client.projects
@@ -2130,8 +1494,6 @@ function fillDrawerDetails(
     );
 
 
-    /* VIDEO PERFORMANCE */
-
     setText(
         "weeklyVideos",
         client.weeklyVideos
@@ -2155,8 +1517,6 @@ function fillDrawerDetails(
         client.pendingVideos
     );
 
-
-    /* WEEKLY DAYS */
 
     setText(
         "mondayVideos",
@@ -2200,16 +1560,12 @@ function fillDrawerDetails(
     );
 
 
-    /* NOTES */
-
     setText(
         "detailNotes",
         client.notes ||
         "No notes available."
     );
 
-
-    /* STATUS */
 
     const statusElement =
         document.getElementById(
@@ -2230,6 +1586,11 @@ function fillDrawerDetails(
 
 
     fillEditFields(
+        client
+    );
+
+
+    renderClientWorkflow(
         client
     );
 
@@ -2346,7 +1707,7 @@ function fillEditFields(
 
 
 /* =========================================================
-   EDIT MODE
+   EDIT BUTTON
 ========================================================= */
 
 function setEditMode(
@@ -2359,15 +1720,21 @@ function setEditMode(
         );
 
 
-    const saveButton =
+    const save =
         document.getElementById(
             "saveClientBtn"
         );
 
 
-    const deleteButton =
+    const del =
         document.getElementById(
             "deleteClientBtn"
+        );
+
+
+    const cancel =
+        document.getElementById(
+            "cancelDrawerBtn"
         );
 
 
@@ -2381,9 +1748,9 @@ function setEditMode(
     }
 
 
-    if (saveButton) {
+    if (save) {
 
-        saveButton.style.display =
+        save.style.display =
             editing
                 ? "inline-flex"
                 : "none";
@@ -2391,28 +1758,20 @@ function setEditMode(
     }
 
 
-    if (deleteButton) {
+    if (del) {
 
-        deleteButton.style.display =
-            (
-                editing &&
-                selectedClientIndex >= 0
-            )
+        del.style.display =
+            editing &&
+            selectedClientIndex >= 0
                 ? "inline-flex"
                 : "none";
 
     }
 
 
-    const cancelButton =
-        document.getElementById(
-            "cancelDrawerBtn"
-        );
+    if (cancel) {
 
-
-    if (cancelButton) {
-
-        cancelButton.textContent =
+        cancel.textContent =
             editing
                 ? "Cancel"
                 : "Close";
@@ -2426,7 +1785,7 @@ function setEditMode(
 
 
 /* =========================================================
-   EDIT BUTTON
+   CREATE EDIT BUTTON
 ========================================================= */
 
 function createEditButtonIfNeeded() {
@@ -2444,47 +1803,47 @@ function createEditButtonIfNeeded() {
     }
 
 
-    let editButton =
+    let edit =
         document.getElementById(
             "editClientBtn"
         );
 
 
-    if (!editButton) {
+    if (!edit) {
 
-        editButton =
+        edit =
             document.createElement(
                 "button"
             );
 
 
-        editButton.type =
+        edit.type =
             "button";
 
 
-        editButton.id =
+        edit.id =
             "editClientBtn";
 
 
-        editButton.className =
+        edit.className =
             "drawer-edit-btn";
 
 
-        editButton.innerHTML = `
+        edit.innerHTML = `
 
             <i class="fa-solid fa-pen"></i>
-
             Edit
 
         `;
 
 
-        editButton.addEventListener(
+        edit.addEventListener(
             "click",
             () => {
 
                 if (
-                    selectedClientIndex < 0
+                    selectedClientIndex <
+                    0
                 ) {
 
                     return;
@@ -2516,25 +1875,23 @@ function createEditButtonIfNeeded() {
         );
 
 
-        const saveButton =
+        const save =
             document.getElementById(
                 "saveClientBtn"
             );
 
 
-        if (
-            saveButton
-        ) {
+        if (save) {
 
             actions.insertBefore(
-                editButton,
-                saveButton
+                edit,
+                save
             );
 
         } else {
 
             actions.appendChild(
-                editButton
+                edit
             );
 
         }
@@ -2542,8 +1899,9 @@ function createEditButtonIfNeeded() {
     }
 
 
-    editButton.style.display =
-        selectedClientIndex >= 0
+    edit.style.display =
+        selectedClientIndex >= 0 &&
+        drawerMode !== "add"
             ? "inline-flex"
             : "none";
 
@@ -2573,98 +1931,6 @@ function saveClientFromDrawer() {
             "editLocation"
         );
 
-
-    const contact =
-        getInputValue(
-            "editContact"
-        );
-
-
-    const phone =
-        getInputValue(
-            "editPhone"
-        );
-
-
-    const email =
-        getInputValue(
-            "editEmail"
-        );
-
-
-    const status =
-        document.getElementById(
-            "editStatus"
-        )?.value ||
-        "Active";
-
-
-    const projects =
-        toNumber(
-            getInputValue(
-                "editProjects"
-            )
-        );
-
-
-    const completed =
-        Math.min(
-            toNumber(
-                getInputValue(
-                    "editCompleted"
-                )
-            ),
-            projects
-        );
-
-
-    const videos =
-        toNumber(
-            getInputValue(
-                "editVideos"
-            )
-        );
-
-
-    const weeklyVideos =
-        toNumber(
-            getInputValue(
-                "editWeeklyVideos"
-            )
-        );
-
-
-    const monthlyVideos =
-        toNumber(
-            getInputValue(
-                "editMonthlyVideos"
-            )
-        );
-
-
-    const weeklyTarget =
-        toNumber(
-            getInputValue(
-                "editWeeklyTarget"
-            )
-        );
-
-
-    const monthlyTarget =
-        toNumber(
-            getInputValue(
-                "editMonthlyTarget"
-            )
-        );
-
-
-    const notes =
-        getInputValue(
-            "editNotes"
-        );
-
-
-    /* VALIDATION */
 
     if (!code) {
 
@@ -2699,8 +1965,6 @@ function saveClientFromDrawer() {
     }
 
 
-    /* DUPLICATE */
-
     const duplicate =
         clients.some(
             (
@@ -2718,8 +1982,7 @@ function saveClientFromDrawer() {
                         ""
                     )
                     .trim()
-                    .toLowerCase()
-                    ===
+                    .toLowerCase() ===
                     code
                         .trim()
                         .toLowerCase()
@@ -2741,9 +2004,7 @@ function saveClientFromDrawer() {
     }
 
 
-    /* KEEP EXISTING DATA */
-
-    const oldClient =
+    const old =
         selectedClientIndex >= 0
             ? clients[
                 selectedClientIndex
@@ -2754,61 +2015,105 @@ function saveClientFromDrawer() {
     const clientData =
         normalizeClient({
 
-            ...oldClient,
+            ...old,
 
             code,
-
             name,
-
             location,
 
-            contact,
-
-            phone,
-
-            email,
-
-            status,
-
-            projects,
-
-            completed,
-
-            pending:
-                Math.max(
-                    projects -
-                    completed,
-                    0
+            contact:
+                getInputValue(
+                    "editContact"
                 ),
 
-            videos,
+            phone:
+                getInputValue(
+                    "editPhone"
+                ),
 
-            weeklyVideos,
+            email:
+                getInputValue(
+                    "editEmail"
+                ),
 
-            monthlyVideos,
+            status:
+                document.getElementById(
+                    "editStatus"
+                )?.value ||
+                "Active",
 
-            weeklyTarget,
+            projects:
+                toNumber(
+                    getInputValue(
+                        "editProjects"
+                    )
+                ),
 
-            monthlyTarget,
+            completed:
+                toNumber(
+                    getInputValue(
+                        "editCompleted"
+                    )
+                ),
 
-            notes,
+            videos:
+                toNumber(
+                    getInputValue(
+                        "editVideos"
+                    )
+                ),
+
+            weeklyVideos:
+                toNumber(
+                    getInputValue(
+                        "editWeeklyVideos"
+                    )
+                ),
+
+            monthlyVideos:
+                toNumber(
+                    getInputValue(
+                        "editMonthlyVideos"
+                    )
+                ),
+
+            weeklyTarget:
+                toNumber(
+                    getInputValue(
+                        "editWeeklyTarget"
+                    )
+                ),
+
+            monthlyTarget:
+                toNumber(
+                    getInputValue(
+                        "editMonthlyTarget"
+                    )
+                ),
+
+            notes:
+                getInputValue(
+                    "editNotes"
+                ),
 
             createdAt:
-                oldClient.createdAt ||
+                old.createdAt ||
                 new Date().toISOString()
 
         });
 
 
-    const isAdding =
-        selectedClientIndex === -1;
+    const adding =
+        selectedClientIndex ===
+        -1;
 
 
-    if (isAdding) {
+    if (adding) {
 
         clients.push(
             clientData
         );
+
 
         selectedClientIndex =
             clients.length - 1;
@@ -2825,13 +2130,16 @@ function saveClientFromDrawer() {
 
     saveClients();
 
-    loadClients();
+    syncClientStatistics();
+
+    loadClients(
+        document.getElementById(
+            "searchClient"
+        )?.value ||
+        ""
+    );
 
     updateSummary();
-
-    fillDrawerDetails(
-        clientData
-    );
 
 
     drawerMode =
@@ -2855,11 +2163,18 @@ function saveClientFromDrawer() {
     );
 
 
+    fillDrawerDetails(
+        clients[
+            selectedClientIndex
+        ]
+    );
+
+
     createEditButtonIfNeeded();
 
 
     alert(
-        isAdding
+        adding
             ? "Client added successfully."
             : "Client updated successfully."
     );
@@ -2874,7 +2189,8 @@ function saveClientFromDrawer() {
 function deleteSelectedClient() {
 
     if (
-        selectedClientIndex < 0
+        selectedClientIndex <
+        0
     ) {
 
         return;
@@ -2895,13 +2211,11 @@ function deleteSelectedClient() {
     }
 
 
-    const confirmDelete =
-        confirm(
+    if (
+        !confirm(
             `Delete ${client.name}?`
-        );
-
-
-    if (!confirmDelete) {
+        )
+    ) {
 
         return;
 
@@ -2916,9 +2230,12 @@ function deleteSelectedClient() {
 
     saveClients();
 
+
     loadClients();
 
+
     updateSummary();
+
 
     closeDrawer();
 
@@ -2931,7 +2248,7 @@ function deleteSelectedClient() {
 
 
 /* =========================================================
-   OPEN DRAWER
+   DRAWER
 ========================================================= */
 
 function openDrawer() {
@@ -3020,12 +2337,1099 @@ function closeDrawer() {
     );
 
 
+    const workflowPanel =
+        document.getElementById(
+            "clientVideoWorkflow"
+        );
+
+
+    if (workflowPanel) {
+
+        workflowPanel.remove();
+
+    }
+
+
     selectedClientIndex =
         -1;
 
 
     drawerMode =
         "view";
+
+}
+
+
+/* =========================================================
+   CLIENT VIDEO WORKFLOW
+   SHOOT → EDIT → UPLOAD
+
+   This is Client-page only.
+   Existing Timesheet is NOT modified.
+========================================================= */
+
+const CLIENT_VIDEO_WORKFLOW_KEY =
+    "clientVideoWorkflow";
+
+
+function readClientVideoWorkflow() {
+
+    try {
+
+        const data =
+            JSON.parse(
+                localStorage.getItem(
+                    CLIENT_VIDEO_WORKFLOW_KEY
+                )
+            ) || [];
+
+
+        return Array.isArray(
+            data
+        )
+            ? data
+            : [];
+
+    } catch (error) {
+
+        return [];
+
+    }
+
+}
+
+
+function saveClientVideoWorkflow(
+    records
+) {
+
+    localStorage.setItem(
+        CLIENT_VIDEO_WORKFLOW_KEY,
+        JSON.stringify(
+            Array.isArray(
+                records
+            )
+                ? records
+                : []
+        )
+    );
+
+}
+
+
+/* =========================================================
+   CLIENT WORKFLOW RECORDS
+========================================================= */
+
+function getClientWorkflowRecords(
+    client
+) {
+
+    if (!client) {
+
+        return [];
+
+    }
+
+
+    const code =
+        String(
+            client.code ||
+            ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    const name =
+        String(
+            client.name ||
+            ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    return readClientVideoWorkflow()
+        .filter(
+            record => {
+
+                const recordCode =
+                    String(
+                        record.clientCode ||
+                        ""
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                const recordName =
+                    String(
+                        record.clientName ||
+                        ""
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                return (
+
+                    (
+                        code &&
+                        recordCode ===
+                        code
+                    ) ||
+
+                    (
+                        name &&
+                        recordName ===
+                        name
+                    )
+
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   TODAY
+========================================================= */
+
+function getTodayKey() {
+
+    const now =
+        new Date();
+
+
+    const year =
+        now.getFullYear();
+
+
+    const month =
+        String(
+            now.getMonth() + 1
+        )
+        .padStart(
+            2,
+            "0"
+        );
+
+
+    const day =
+        String(
+            now.getDate()
+        )
+        .padStart(
+            2,
+            "0"
+        );
+
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+/* =========================================================
+   WORKFLOW COUNT
+========================================================= */
+
+function getWorkflowCount(
+    records,
+    stage,
+    date = ""
+) {
+
+    return records
+        .filter(
+            record => {
+
+                return (
+
+                    String(
+                        record.stage ||
+                        ""
+                    )
+                    .toLowerCase() ===
+                    String(
+                        stage
+                    )
+                    .toLowerCase()
+
+                    &&
+
+                    (
+                        !date ||
+                        record.date ===
+                        date
+                    )
+
+                );
+
+            }
+        )
+        .reduce(
+            (
+                total,
+                record
+            ) => {
+
+                return (
+
+                    total +
+                    toNumber(
+                        record.count
+                    )
+
+                );
+
+            },
+            0
+        );
+
+}
+
+
+/* =========================================================
+   WORKFLOW SUMMARY
+========================================================= */
+
+function getWorkflowSummary(
+    client
+) {
+
+    const records =
+        getClientWorkflowRecords(
+            client
+        );
+
+
+    const today =
+        getTodayKey();
+
+
+    return {
+
+        records,
+
+        shoot:
+            getWorkflowCount(
+                records,
+                "Shoot"
+            ),
+
+        edit:
+            getWorkflowCount(
+                records,
+                "Edit"
+            ),
+
+        upload:
+            getWorkflowCount(
+                records,
+                "Upload"
+            ),
+
+        todayShoot:
+            getWorkflowCount(
+                records,
+                "Shoot",
+                today
+            ),
+
+        todayEdit:
+            getWorkflowCount(
+                records,
+                "Edit",
+                today
+            ),
+
+        todayUpload:
+            getWorkflowCount(
+                records,
+                "Upload",
+                today
+            )
+
+    };
+
+}
+
+
+/* =========================================================
+   WORKFLOW STYLES
+   Injected from JS so existing CSS/HTML need not be changed.
+========================================================= */
+
+function ensureClientWorkflowStyles() {
+
+    if (
+        document.getElementById(
+            "clientWorkflowInjectedStyles"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const style =
+        document.createElement(
+            "style"
+        );
+
+
+    style.id =
+        "clientWorkflowInjectedStyles";
+
+
+    style.textContent = `
+
+        .client-video-workflow {
+            margin-top: 22px;
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,.10);
+            border-radius: 16px;
+            background: rgba(255,255,255,.035);
+        }
+
+        .client-video-workflow-title {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin-bottom:14px;
+        }
+
+        .client-video-workflow-title strong {
+            font-size:15px;
+            letter-spacing:.04em;
+        }
+
+        .client-video-workflow-title span {
+            font-size:11px;
+            opacity:.65;
+        }
+
+        .client-video-workflow-stages {
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:10px;
+        }
+
+        .client-video-stage {
+            border:1px solid rgba(255,255,255,.08);
+            border-radius:13px;
+            padding:12px;
+            background:rgba(0,0,0,.16);
+        }
+
+        .client-video-stage b {
+            display:block;
+            font-size:11px;
+            opacity:.68;
+            text-transform:uppercase;
+            letter-spacing:.08em;
+        }
+
+        .client-video-stage strong {
+            display:block;
+            margin-top:4px;
+            font-size:22px;
+        }
+
+        .client-video-stage small {
+            display:block;
+            margin-top:2px;
+            opacity:.55;
+        }
+
+        .client-video-stage-actions {
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:8px;
+            margin-top:12px;
+        }
+
+        .client-video-stage-actions button {
+            border:1px solid rgba(255,255,255,.10);
+            border-radius:10px;
+            padding:10px 8px;
+            background:rgba(255,255,255,.055);
+            color:inherit;
+            cursor:pointer;
+            font:inherit;
+            font-size:12px;
+            transition:.2s ease;
+        }
+
+        .client-video-stage-actions button:hover {
+            transform:translateY(-1px);
+            background:rgba(255,255,255,.09);
+        }
+
+        .client-video-workflow-today {
+            margin-top:13px;
+            padding-top:13px;
+            border-top:1px solid rgba(255,255,255,.08);
+            font-size:12px;
+            line-height:1.7;
+            opacity:.78;
+        }
+
+        .client-video-workflow-recent {
+            margin-top:10px;
+            display:grid;
+            gap:6px;
+            max-height:150px;
+            overflow:auto;
+        }
+
+        .client-video-workflow-entry {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+            padding:8px 10px;
+            border-radius:9px;
+            background:rgba(255,255,255,.035);
+            font-size:11px;
+        }
+
+        .client-video-workflow-entry span:last-child {
+            opacity:.62;
+            white-space:nowrap;
+        }
+
+        .client-workflow-empty {
+            opacity:.5;
+            font-size:11px;
+            padding:5px 0;
+        }
+
+        @media (max-width: 600px) {
+
+            .client-video-workflow-stages,
+            .client-video-stage-actions {
+                grid-template-columns:1fr;
+            }
+
+        }
+
+    `;
+
+
+    document.head.appendChild(
+        style
+    );
+
+}
+
+
+/* =========================================================
+   WORKFLOW PANEL HOST
+========================================================= */
+
+function getWorkflowPanelHost() {
+
+    const actions =
+        document.querySelector(
+            ".drawer-actions"
+        );
+
+
+    if (actions) {
+
+        return actions;
+
+    }
+
+
+    const notes =
+        document.getElementById(
+            "detailNotes"
+        );
+
+
+    if (
+        notes &&
+        notes.parentElement
+    ) {
+
+        return notes.parentElement;
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   RENDER WORKFLOW
+========================================================= */
+
+function renderClientWorkflow(
+    client
+) {
+
+    ensureClientWorkflowStyles();
+
+
+    const host =
+        getWorkflowPanelHost();
+
+
+    if (!host) {
+
+        return;
+
+    }
+
+
+    let panel =
+        document.getElementById(
+            "clientVideoWorkflow"
+        );
+
+
+    if (!panel) {
+
+        panel =
+            document.createElement(
+                "section"
+            );
+
+
+        panel.id =
+            "clientVideoWorkflow";
+
+
+        panel.className =
+            "client-video-workflow";
+
+
+        host.parentNode.insertBefore(
+            panel,
+            host
+        );
+
+    }
+
+
+    if (!client) {
+
+        panel.innerHTML =
+            "";
+
+        return;
+
+    }
+
+
+    const summary =
+        getWorkflowSummary(
+            client
+        );
+
+
+    const recent =
+        summary.records
+            .slice()
+            .sort(
+                (
+                    a,
+                    b
+                ) => {
+
+                    return String(
+                        b.createdAt ||
+                        ""
+                    )
+                    .localeCompare(
+                        String(
+                            a.createdAt ||
+                            ""
+                        )
+                    );
+
+                }
+            )
+            .slice(
+                0,
+                8
+            );
+
+
+    panel.innerHTML = `
+
+        <div
+            class="client-video-workflow-title"
+        >
+
+            <div>
+
+                <strong>
+
+                    <i
+                        class="fa-solid fa-clapperboard"
+                    ></i>
+
+                    VIDEO WORKFLOW
+
+                </strong>
+
+                <span>
+                    SHOOT → EDIT → UPLOAD
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="client-video-workflow-stages"
+        >
+
+            <div
+                class="client-video-stage"
+            >
+
+                <b>
+                    Shoot
+                </b>
+
+                <strong>
+                    ${summary.shoot}
+                </strong>
+
+                <small>
+                    Today: ${summary.todayShoot}
+                </small>
+
+            </div>
+
+
+            <div
+                class="client-video-stage"
+            >
+
+                <b>
+                    Edit
+                </b>
+
+                <strong>
+                    ${summary.edit}
+                </strong>
+
+                <small>
+                    Today: ${summary.todayEdit}
+                </small>
+
+            </div>
+
+
+            <div
+                class="client-video-stage"
+            >
+
+                <b>
+                    Upload
+                </b>
+
+                <strong>
+                    ${summary.upload}
+                </strong>
+
+                <small>
+                    Today: ${summary.todayUpload}
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="client-video-stage-actions"
+        >
+
+            <button
+                type="button"
+                onclick="recordClientVideoStage('Shoot')"
+            >
+
+                <i
+                    class="fa-solid fa-camera"
+                ></i>
+
+                Add Shoot
+
+            </button>
+
+
+            <button
+                type="button"
+                onclick="recordClientVideoStage('Edit')"
+            >
+
+                <i
+                    class="fa-solid fa-scissors"
+                ></i>
+
+                Add Edit
+
+            </button>
+
+
+            <button
+                type="button"
+                onclick="recordClientVideoStage('Upload')"
+            >
+
+                <i
+                    class="fa-solid fa-cloud-arrow-up"
+                ></i>
+
+                Add Upload
+
+            </button>
+
+        </div>
+
+
+        <div
+            class="client-video-workflow-today"
+        >
+
+            <strong>
+                Today:
+            </strong>
+
+            Shoot ${summary.todayShoot}
+            ·
+            Edit ${summary.todayEdit}
+            ·
+            Upload ${summary.todayUpload}
+
+        </div>
+
+
+        <div
+            class="client-video-workflow-recent"
+        >
+
+            ${
+                recent.length
+
+                ?
+
+                recent.map(
+                    record => {
+
+                        return `
+
+                            <div
+                                class="client-video-workflow-entry"
+                            >
+
+                                <span>
+
+                                    ${escapeHtml(
+                                        record.stage
+                                    )}
+
+                                    ×
+
+                                    ${toNumber(
+                                        record.count
+                                    )}
+
+                                    ${
+                                        record.note
+                                            ? ` · ${escapeHtml(record.note)}`
+                                            : ""
+                                    }
+
+                                </span>
+
+
+                                <span>
+
+                                    ${escapeHtml(
+                                        record.date ||
+                                        "--"
+                                    )}
+
+                                </span>
+
+                            </div>
+
+                        `;
+
+                    }
+                ).join("")
+
+                :
+
+                `
+
+                    <div
+                        class="client-workflow-empty"
+                    >
+
+                        No video workflow activity
+                        recorded yet.
+
+                    </div>
+
+                `
+
+            }
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   RECORD SHOOT / EDIT / UPLOAD
+========================================================= */
+
+function recordClientVideoStage(
+    stage
+) {
+
+    if (
+        selectedClientIndex <
+        0 ||
+        !clients[
+            selectedClientIndex
+        ]
+    ) {
+
+        alert(
+            "Please open a client first."
+        );
+
+        return;
+
+    }
+
+
+    const validStages = [
+
+        "Shoot",
+        "Edit",
+        "Upload"
+
+    ];
+
+
+    if (
+        !validStages.includes(
+            stage
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const client =
+        clients[
+            selectedClientIndex
+        ];
+
+
+    const countInput =
+        prompt(
+            `How many videos were ${stage.toLowerCase()}ed?`,
+            "1"
+        );
+
+
+    if (
+        countInput ===
+        null
+    ) {
+
+        return;
+
+    }
+
+
+    const count =
+        Math.floor(
+            Number(
+                countInput
+            )
+        );
+
+
+    if (
+        !Number.isFinite(
+            count
+        ) ||
+        count <= 0
+    ) {
+
+        alert(
+            "Please enter a valid video count."
+        );
+
+        return;
+
+    }
+
+
+    const date =
+        prompt(
+            "Date (YYYY-MM-DD)",
+            getTodayKey()
+        );
+
+
+    if (
+        date ===
+        null
+    ) {
+
+        return;
+
+    }
+
+
+    const cleanDate =
+        String(
+            date
+        ).trim();
+
+
+    if (
+        !/^\\d{4}-\\d{2}-\\d{2}$/.test(
+            cleanDate
+        )
+    ) {
+
+        alert(
+            "Please enter date in YYYY-MM-DD format."
+        );
+
+        return;
+
+    }
+
+
+    const note =
+        prompt(
+            "Optional note",
+            ""
+        );
+
+
+    if (
+        note ===
+        null
+    ) {
+
+        return;
+
+    }
+
+
+    const records =
+        readClientVideoWorkflow();
+
+
+    records.push({
+
+        id:
+            `cvw_${Date.now()}_${Math.random()
+                .toString(36)
+                .slice(2, 8)}`,
+
+        clientCode:
+            client.code ||
+            "",
+
+        clientName:
+            client.name ||
+            "",
+
+        stage,
+
+        count,
+
+        date:
+            cleanDate,
+
+        note:
+            String(
+                note
+            ).trim(),
+
+        createdAt:
+            new Date().toISOString()
+
+    });
+
+
+    saveClientVideoWorkflow(
+        records
+    );
+
+
+    renderClientWorkflow(
+        client
+    );
+
+
+    loadClients(
+        document.getElementById(
+            "searchClient"
+        )?.value ||
+        ""
+    );
+
+
+    alert(
+        `${stage} activity added successfully.`
+    );
+
+}
+
+
+/* =========================================================
+   HELPER TO REFRESH WORKFLOW
+========================================================= */
+
+function renderAllClientWorkflow() {
+
+    if (
+        selectedClientIndex >=
+        0 &&
+        clients[
+            selectedClientIndex
+        ]
+    ) {
+
+        renderClientWorkflow(
+            clients[
+                selectedClientIndex
+            ]
+        );
+
+    }
 
 }
 
@@ -3081,7 +3485,8 @@ function setText(
     if (element) {
 
         element.textContent =
-            value ?? "";
+            value ??
+            "";
 
     }
 
@@ -3106,7 +3511,8 @@ function setInput(
     if (element) {
 
         element.value =
-            value ?? "";
+            value ??
+            "";
 
     }
 
@@ -3114,7 +3520,7 @@ function setInput(
 
 
 /* =========================================================
-   GET INPUT
+   GET INPUT VALUE
 ========================================================= */
 
 function getInputValue(
@@ -3141,29 +3547,25 @@ function escapeHtml(
 ) {
 
     return String(
-        value ?? ""
+        value ??
+        ""
     )
-
     .replace(
         /&/g,
         "&amp;"
     )
-
     .replace(
         /</g,
         "&lt;"
     )
-
     .replace(
         />/g,
         "&gt;"
     )
-
     .replace(
         /"/g,
         "&quot;"
     )
-
     .replace(
         /'/g,
         "&#039;"
@@ -3179,17 +3581,30 @@ function escapeHtml(
 window.openViewDrawer =
     openViewDrawer;
 
+
 window.openAddDrawer =
     openAddDrawer;
+
 
 window.closeDrawer =
     closeDrawer;
 
+
 window.saveClientFromDrawer =
     saveClientFromDrawer;
+
 
 window.deleteSelectedClient =
     deleteSelectedClient;
 
+
 window.loadClients =
     loadClients;
+
+
+window.recordClientVideoStage =
+    recordClientVideoStage;
+
+
+window.renderClientWorkflow =
+    renderClientWorkflow;
