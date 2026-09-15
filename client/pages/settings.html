@@ -8,6 +8,8 @@
 
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/settings.css">
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 
 <body>
@@ -16,72 +18,127 @@
          NAVBAR
     ====================================================== -->
 
-    <nav class="navbar">
+<!-- ================= NAVBAR ================= -->
 
-        <div class="navbar-brand">
-            <span class="brand-main">THE D CUTS</span>
-            <span class="brand-sub">Management System</span>
+<nav class="navbar">
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            <i class="fa-regular fa-clock"></i>
         </div>
 
-        <button
-            class="mobile-menu-btn"
-            type="button"
-            onclick="toggleSettingsSidebar()"
-            aria-label="Toggle settings menu">
-            ☰
-        </button>
+        <h2>DCUTS.TS</h2>
 
-        <div class="menu">
+    </div>
 
+    <ul class="menu">
+
+        <li>
             <a href="../index.html">
-                <span>⌂</span>
+
+                <i class="fa-solid fa-house"></i>
+
                 Home
-            </a>
 
-            <a href="../index.html">
-                <span>▦</span>
+            </a>
+        </li>
+
+
+        <li>
+            <a href="dashboard.html">
+
+                <i class="fa-solid fa-table-columns"></i>
+
                 Dashboard
-            </a>
 
+            </a>
+        </li>
+
+
+        <li>
             <a href="timesheet.html">
-                <span>◷</span>
+
+                <i class="fa-regular fa-clock"></i>
+
                 Timesheet
-            </a>
 
+            </a>
+        </li>
+
+
+        <li>
             <a href="reports.html">
-                <span>▤</span>
+
+                <i class="fa-regular fa-file-lines"></i>
+
                 Reports
-            </a>
 
+            </a>
+        </li>
+
+
+        <li>
             <a href="calendar.html">
-                <span>□</span>
+
+                <i class="fa-solid fa-calendar-days"></i>
+
                 Calendar
-            </a>
 
+            </a>
+        </li>
+
+
+        <li>
             <a href="employees.html">
-                <span>♙</span>
+
+                <i class="fa-solid fa-users"></i>
+
                 Employees
-            </a>
 
+            </a>
+        </li>
+
+
+        <li>
             <a href="clients.html">
-                <span>♧</span>
+
+                <i class="fa-solid fa-store"></i>
+
                 Clients
-            </a>
 
-            <a href="settings.html" class="active">
-                <span>⚙</span>
+            </a>
+        </li>
+
+
+        <li class="active">
+            <a href="settings.html">
+
+                <i class="fa-solid fa-gear"></i>
+
                 Settings
+
             </a>
+        </li>
 
-            <a href="../login.html" onclick="logoutSettings(event)">
-                <span>↪</span>
-                Logout
-            </a>
+    </ul>
 
-        </div>
 
-    </nav>
+    <div class="profile">
 
+        <p>Dcuts</p>
+
+        <span>
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            Admin
+
+        </span>
+
+    </div>
+
+</nav>
 
     <!-- =====================================================
          SETTINGS PAGE
