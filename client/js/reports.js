@@ -14,8 +14,7 @@
 const REPORTS_API_BASE =
     window.API_BASE_URL ||
     window.apiBaseUrl ||
-    "/api";
-
+    "https://dcuts-team.onrender.com/api";
 const TIMESHEET_API =
     `${REPORTS_API_BASE}/timesheets`;
 
